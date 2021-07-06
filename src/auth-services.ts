@@ -1,3 +1,4 @@
+// @ts-ignore
 import qs from 'qs';
 import authComponentStore from './store';
 import axios from 'axios';
