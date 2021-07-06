@@ -5,12 +5,7 @@ import { AuthComponent } from '.';
 import { AuthApiClient } from './auth-api-client';
 
 class AuthServices {
-  signIn = async (
-    username: string,
-    password: string,
-    grant_type = 'password',
-    scope = 'openid'
-  ) => {
+  login = async (username: string, password: string, grant_type = 'password', scope = 'openid') => {
     const body = qs.stringify({
       grant_type,
       username,

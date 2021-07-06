@@ -1,6 +1,6 @@
 {
   "name": "react-native-auth-component",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/react-native-auth-component.git",
   "main": "index.ts",
@@ -23,7 +23,7 @@
     "@react-native-async-storage/async-storage": "react-native-community/async-storage",
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/eslint-config": "^2.0.0",
-    "@types/qs": "^6.9.4",
+    "@types/qs": "^6.9.6",
     "@types/react": "^16.9.48",
     "@types/react-native": "^0.63.13",
     "eslint": "^7.8.1",

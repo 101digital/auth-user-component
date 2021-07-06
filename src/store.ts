@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-community/async-storage';
 
-const REFRESH_TOKEN_KEY = 'refreshToken';
-const ACCESS_TOKEN_KEY = 'accessToken';
-const ORG_TOKEN_KEY = 'orgToken';
+const REFRESH_TOKEN_KEY = 'authcomponent.refreshToken';
+const ACCESS_TOKEN_KEY = 'authcomponent.accessToken';
+const ORG_TOKEN_KEY = 'authcomponent.orgToken';
 
 class AuthComponentStore {
   storeRefreshToken = (refreshToken: string) =>
