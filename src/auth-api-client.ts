@@ -21,12 +21,12 @@ export class AuthApiClient {
   public getAuthApiClient = () => {
     if (this._axiosInstance === undefined) {
       const configs = AuthComponent.instance().getConfigs();
-      const { tokenBaseUrl, ternantDomain, appId, appSecret } = configs;
+      const { tokenBaseUrl, ternantDomain, clientId, clientSecret } = configs;
       const baseURL = `${tokenBaseUrl}?tenantDomain=${ternantDomain}`;
       this._axiosInstance = axios.create({
         baseURL,
         headers: {
-          Authorization: `Basic ${Base64.encode(`${appId}:${appSecret}`)}`,
+          Authorization: `Basic ${Base64.encode(`${clientId}:${clientSecret}`)}`,
           'content-type': 'application/x-www-form-urlencoded',
         },
       });

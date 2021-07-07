@@ -1,8 +1,8 @@
 import { DeviceEventEmitter } from 'react-native';
 
 export type AuthComponentConfig = {
-  appId: string;
-  appSecret: string;
+  clientId: string;
+  clientSecret: string;
   ternantDomain: string;
   tokenBaseUrl: string;
   membershipBaseUrl: string;

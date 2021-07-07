@@ -28,8 +28,8 @@ import { AuthComponent } from 'react-native-auth-component';
 
 AuthComponent.instance()
   .configure({
-    appId: env.api.clientId,  //required
-    appSecret: env.api.clientSecret,  //required
+    clientId: env.api.clientId,  //required
+    clientSecret: env.api.clientSecret,  //required
     ternantDomain: env.api.tenantDomain,  //required
     tokenBaseUrl: env.api.baseUrl.token,  //required
     membershipBaseUrl: env.api.baseUrl.membership,  //required
