@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 // @ts-ignore
 import qs from 'qs';
-import { AuthComponent } from '.';
+import { AuthComponent } from '..';
 import { AuthApiClient } from './auth-api-client';
 
 let isRefreshed = false;

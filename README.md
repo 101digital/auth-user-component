@@ -1,6 +1,6 @@
 # react-native-auth-component
 
-<b>react-native-auth-component</b> is a reuseable component for authentication and authorization that can be used across all the apps developed by 101 Digital.
+<b>react-native-auth-component</b> is a reusable component for authentication and authorization that can be used across all the apps developed by 101 Digital.
 
 ## Features
 

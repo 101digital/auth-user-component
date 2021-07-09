@@ -1,9 +1,9 @@
 // @ts-ignore
 import qs from 'qs';
-import authComponentStore from './store';
+import authComponentStore from '../store';
 import axios from 'axios';
-import { AuthComponent } from '.';
-import { AuthApiClient } from './auth-api-client';
+import { AuthComponent } from '..';
+import { AuthApiClient } from '../api-client/auth-api-client';
 
 class AuthServices {
   login = async (username: string, password: string, grant_type = 'password', scope = 'openid') => {

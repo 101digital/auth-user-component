@@ -1,5 +1,5 @@
 import { Base64 } from 'js-base64';
-import { AuthComponent } from '.';
+import { AuthComponent } from '..';
 import axios, { AxiosInstance } from 'axios';
 
 export class AuthApiClient {
