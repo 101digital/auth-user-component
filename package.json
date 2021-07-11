@@ -1,6 +1,6 @@
 {
   "name": "react-native-auth-component",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/react-native-auth-component.git",
   "main": "index.ts",
@@ -27,8 +27,10 @@
     "@types/react": "^16.9.48",
     "@types/react-native": "^0.63.13",
     "eslint": "^7.8.1",
+    "formik": "^2.2.9",
     "react": "16.13.1",
     "react-native": "0.63.2",
+    "react-native-theme-component": "https://github.com/101digital/react-native-theme-component.git",
     "react-test-renderer": "^17.0.2",
     "typescript": "^4.0.2"
   },
