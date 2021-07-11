@@ -18,6 +18,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   const [dialCode, setDialCode] = useState('');
   const rootStyles = useMergeStyles(Root?.style);
   const [isSigning, setIsSigning] = useState(false);
+  const _type = InputForm?.props?.type ?? 'phonenumber';
 
   useImperativeHandle(
     ref,
@@ -35,7 +36,12 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
     try {
       setIsSigning(true);
       const { username, password } = values;
-      await authServices.login(username, password);
+      if (_type === 'phonenumber') {
+        const sanitizedMobileNumber = username.replace(/\D+/g, '');
+        await authServices.login(sanitizedMobileNumber, password);
+      } else {
+        await authServices.login(username, password);
+      }
       const { data } = await authServices.fetchProfile();
       Root?.props?.onLoginSuccess?.(data);
       setIsSigning(false);
@@ -47,14 +53,14 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
 
   const renderForm = (formProps: FormikProps<SignInData>) => (
     <View>
-      {InputForm?.props?.type === 'email' ? (
+      {_type === 'email' ? (
         <InputField
           prefixIcon={InputForm?.component?.passwordIcon}
-          name="username"
-          returnKeyType="done"
+          name='username'
+          returnKeyType='done'
           placeholder={InputForm?.props?.usernameHint ?? 'Email'}
-          keyboardType="email-address"
-          autoCapitalize="none"
+          keyboardType='email-address'
+          autoCapitalize='none'
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
@@ -63,21 +69,21 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
           dialCode={dialCode}
           onPressDialCode={InputForm?.props?.onPressDialCode}
           prefixIcon={<View>{InputForm?.component?.usernameIcon}</View>}
-          name="username"
-          returnKeyType="done"
+          name='username'
+          returnKeyType='done'
           placeholder={InputForm?.props?.usernameHint ?? 'Mobile number'}
-          autoCapitalize="none"
+          autoCapitalize='none'
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
       )}
       <InputField
         prefixIcon={InputForm?.component?.passwordIcon}
-        name="password"
-        returnKeyType="done"
+        name='password'
+        returnKeyType='done'
         secureTextEntry
         placeholder={InputForm?.props?.passwordHint ?? 'Password'}
-        autoCapitalize="none"
+        autoCapitalize='none'
         formatError={Root?.props?.formatError}
         style={InputForm?.style?.passwordInputFieldStyle}
       />
@@ -103,8 +109,8 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
     </View>
   );
   return (
-    <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
-      <ScrollView keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView style={rootStyles.containerStyle} behavior='padding' enabled>
+      <ScrollView keyboardShouldPersistTaps='handled'>
         {Root?.components?.header}
         <Text style={rootStyles.formTitleStyle}>{Root?.props?.formTitle ?? 'Sign In'}</Text>
         <Formik
