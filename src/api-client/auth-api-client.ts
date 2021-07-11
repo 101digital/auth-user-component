@@ -18,7 +18,7 @@ export class AuthApiClient {
     return AuthApiClient._instance;
   }
 
-  public initClient(configs: AuthComponentConfig) {
+  public configure(configs: AuthComponentConfig) {
     if (!this._axiosInstance) {
       const { tokenBaseUrl, ternantDomain, clientId, clientSecret } = configs;
       const baseURL = `${tokenBaseUrl}?tenantDomain=${ternantDomain}`;

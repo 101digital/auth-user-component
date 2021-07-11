@@ -11,7 +11,7 @@ import {
 import { Button, InputField, InputPhoneNumber } from 'react-native-theme-component';
 import { LoginComponentProps, LoginComponentRef, SignInData } from './types';
 import useMergeStyles from './styles';
-import authServices from '../services/auth-services';
+import { AuthServices } from '../services/auth-services';
 
 const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   const { Root, InputForm } = props;
@@ -38,11 +38,11 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
       const { username, password } = values;
       if (_type === 'phonenumber') {
         const sanitizedMobileNumber = username.replace(/\D+/g, '');
-        await authServices.login(sanitizedMobileNumber, password);
+        await AuthServices.instance().login(sanitizedMobileNumber, password);
       } else {
-        await authServices.login(username, password);
+        await AuthServices.instance().login(username, password);
       }
-      const { data } = await authServices.fetchProfile();
+      const { data } = await AuthServices.instance().fetchProfile();
       Root?.props?.onLoginSuccess?.(data);
       setIsSigning(false);
     } catch (error) {
@@ -56,11 +56,11 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
       {_type === 'email' ? (
         <InputField
           prefixIcon={InputForm?.component?.passwordIcon}
-          name='username'
-          returnKeyType='done'
+          name="username"
+          returnKeyType="done"
           placeholder={InputForm?.props?.usernameHint ?? 'Email'}
-          keyboardType='email-address'
-          autoCapitalize='none'
+          keyboardType="email-address"
+          autoCapitalize="none"
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
@@ -69,21 +69,21 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
           dialCode={dialCode}
           onPressDialCode={InputForm?.props?.onPressDialCode}
           prefixIcon={<View>{InputForm?.component?.usernameIcon}</View>}
-          name='username'
-          returnKeyType='done'
+          name="username"
+          returnKeyType="done"
           placeholder={InputForm?.props?.usernameHint ?? 'Mobile number'}
-          autoCapitalize='none'
+          autoCapitalize="none"
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
       )}
       <InputField
         prefixIcon={InputForm?.component?.passwordIcon}
-        name='password'
-        returnKeyType='done'
+        name="password"
+        returnKeyType="done"
         secureTextEntry
         placeholder={InputForm?.props?.passwordHint ?? 'Password'}
-        autoCapitalize='none'
+        autoCapitalize="none"
         formatError={Root?.props?.formatError}
         style={InputForm?.style?.passwordInputFieldStyle}
       />
@@ -109,8 +109,8 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
     </View>
   );
   return (
-    <KeyboardAvoidingView style={rootStyles.containerStyle} behavior='padding' enabled>
-      <ScrollView keyboardShouldPersistTaps='handled'>
+    <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
+      <ScrollView keyboardShouldPersistTaps="handled">
         {Root?.components?.header}
         <Text style={rootStyles.formTitleStyle}>{Root?.props?.formTitle ?? 'Sign In'}</Text>
         <Formik
