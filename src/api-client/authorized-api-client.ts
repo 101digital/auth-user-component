@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { DeviceEventEmitter } from 'react-native';
-import { AuthServices } from '../services/auth-services';
+import authServices from '../services/auth-services';
 import authComponentStore from '../store';
 
 type TokenData = {
@@ -38,10 +38,10 @@ const attachTokenToRequest = (
 const refreshTokens = async () => {
   const refreshToken = await authComponentStore.getRefreshToken();
   return new Promise<TokenData>((resolve, reject) => {
-    AuthServices.instance()
+    authServices
       .refreshToken(refreshToken ?? '')
       .then(async ({ refresh_token, access_token }) => {
-        const orgToken = await AuthServices.instance().fetchOrgToken();
+        const { orgToken } = await authServices.fetchProfile();
         return [refresh_token, access_token, orgToken];
       })
       .then(([refresh_token, access_token, orgToken]) => {

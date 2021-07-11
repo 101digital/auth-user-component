@@ -1,5 +1,5 @@
 import { Base64 } from 'js-base64';
-import { AuthComponent } from '..';
+import { AuthComponentConfig } from '..';
 import axios, { AxiosInstance } from 'axios';
 
 export class AuthApiClient {
@@ -18,9 +18,8 @@ export class AuthApiClient {
     return AuthApiClient._instance;
   }
 
-  public getAuthApiClient = () => {
-    if (this._axiosInstance === undefined) {
-      const configs = AuthComponent.instance().getConfigs();
+  public initClient(configs: AuthComponentConfig) {
+    if (!this._axiosInstance) {
       const { tokenBaseUrl, ternantDomain, clientId, clientSecret } = configs;
       const baseURL = `${tokenBaseUrl}?tenantDomain=${ternantDomain}`;
       this._axiosInstance = axios.create({
@@ -31,6 +30,9 @@ export class AuthApiClient {
         },
       });
     }
-    return this._axiosInstance;
+  }
+
+  public getAuthApiClient = () => {
+    return this._axiosInstance!;
   };
 }

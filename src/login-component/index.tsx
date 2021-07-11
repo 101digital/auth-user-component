@@ -11,11 +11,13 @@ import {
 import { Button, InputField, InputPhoneNumber } from 'react-native-theme-component';
 import { LoginComponentProps, LoginComponentRef, SignInData } from './types';
 import useMergeStyles from './styles';
+import authServices from '../services/auth-services';
 
 const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   const { Root, InputForm } = props;
   const [dialCode, setDialCode] = useState('');
   const rootStyles = useMergeStyles(Root?.style);
+  const [isSigning, setIsSigning] = useState(false);
 
   useImperativeHandle(
     ref,
@@ -30,8 +32,17 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
-    const { username, password } = values;
-    Root?.props?.onLogin?.(username, password);
+    try {
+      setIsSigning(true);
+      const { username, password } = values;
+      await authServices.login(username, password);
+      const { data } = await authServices.fetchProfile();
+      Root?.props?.onLoginSuccess?.(data);
+      setIsSigning(false);
+    } catch (error) {
+      setIsSigning(false);
+      Root?.props?.onLoginFailed?.(error);
+    }
   };
 
   const renderForm = (formProps: FormikProps<SignInData>) => (
@@ -80,7 +91,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
         </Text>
       </TouchableOpacity>
       <Button
-        isLoading={Root.props.isSigning}
+        isLoading={isSigning}
         style={{
           primaryContainerStyle: {
             marginTop: 32,
