@@ -5,8 +5,26 @@ import axios from 'axios';
 import { AuthComponent } from '..';
 import { AuthApiClient } from '../api-client/auth-api-client';
 
-class AuthServices {
-  login = async (username: string, password: string, grant_type = 'password', scope = 'openid') => {
+export class AuthServices {
+  private static _instance: AuthServices = new AuthServices();
+
+  constructor() {
+    if (AuthServices._instance) {
+      throw new Error('Error: Instantiation failed: Use AuthComponent.instance() instead of new.');
+    }
+    AuthServices._instance = this;
+  }
+
+  public static instance(): AuthServices {
+    return AuthServices._instance;
+  }
+
+  public login = async (
+    username: string,
+    password: string,
+    grant_type = 'password',
+    scope = 'openid'
+  ) => {
     const body = qs.stringify({
       grant_type,
       username,
@@ -23,7 +41,7 @@ class AuthServices {
     return response.data;
   };
 
-  refreshToken = async (refreshToken: string, grant_type = 'refresh_token') => {
+  public refreshToken = async (refreshToken: string, grant_type = 'refresh_token') => {
     const body = qs.stringify({ grant_type, refresh_token: refreshToken });
     const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
     const { access_token, refresh_token } = response.data;
@@ -32,7 +50,7 @@ class AuthServices {
     return response.data;
   };
 
-  fetchOrgToken = async () => {
+  public fetchOrgToken = async () => {
     const { membershipBaseUrl } = AuthComponent.instance().getConfigs();
     const accessToken = await authComponentStore.getAccessToken();
     const response = await axios.get(`${membershipBaseUrl}/users/me`, {
@@ -47,10 +65,7 @@ class AuthServices {
     return memberShip?.token ?? undefined;
   };
 
-  logout = async () => {
+  public logout = async () => {
     await authComponentStore.clearTokens();
   };
 }
-
-const instance = new AuthServices();
-export default instance;
