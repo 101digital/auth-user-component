@@ -39,11 +39,11 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
       {InputForm?.props?.type === 'email' ? (
         <InputField
           prefixIcon={InputForm?.component?.passwordIcon}
-          name='username'
-          returnKeyType='done'
+          name="username"
+          returnKeyType="done"
           placeholder={InputForm?.props?.usernameHint ?? 'Email'}
-          keyboardType='email-address'
-          autoCapitalize='none'
+          keyboardType="email-address"
+          autoCapitalize="none"
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
@@ -52,21 +52,21 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
           dialCode={dialCode}
           onPressDialCode={InputForm?.props?.onPressDialCode}
           prefixIcon={<View>{InputForm?.component?.usernameIcon}</View>}
-          name='username'
-          returnKeyType='done'
+          name="username"
+          returnKeyType="done"
           placeholder={InputForm?.props?.usernameHint ?? 'Mobile number'}
-          autoCapitalize='none'
+          autoCapitalize="none"
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
       )}
       <InputField
         prefixIcon={InputForm?.component?.passwordIcon}
-        name='password'
-        returnKeyType='done'
+        name="password"
+        returnKeyType="done"
         secureTextEntry
         placeholder={InputForm?.props?.passwordHint ?? 'Password'}
-        autoCapitalize='none'
+        autoCapitalize="none"
         formatError={Root?.props?.formatError}
         style={InputForm?.style?.passwordInputFieldStyle}
       />
@@ -92,8 +92,8 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
     </View>
   );
   return (
-    <KeyboardAvoidingView style={rootStyles.containerStyle} behavior='padding' enabled>
-      <ScrollView keyboardShouldPersistTaps='handled'>
+    <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
+      <ScrollView keyboardShouldPersistTaps="handled">
         {Root?.components?.header}
         <Text style={rootStyles.formTitleStyle}>{Root?.props?.formTitle ?? 'Sign In'}</Text>
         <Formik
