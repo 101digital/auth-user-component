@@ -74,4 +74,14 @@ export class AuthServices {
   logout = async () => {
     await authComponentStore.clearTokens();
   };
+
+  fetchAppAccessToken = async () => {
+    const { grantType, scope } = this._configs!;
+    const body = qs.stringify({
+      grant_type: grantType ?? 'client_credentials',
+      scope: scope ?? 'PRODUCTION',
+    });
+    const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
+    return response.data.access_token;
+  };
 }

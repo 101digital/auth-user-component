@@ -1,8 +1,5 @@
+import { AuthServices } from '@/services/auth-services';
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-// @ts-ignore
-import qs from 'qs';
-import { AuthComponent } from '..';
-import { AuthApiClient } from './auth-api-client';
 
 let isRefreshed = false;
 let isRefreshing = false;
@@ -22,14 +19,8 @@ const attachTokenToRequest = (request: AxiosRequestConfig, token?: string) => {
   request.headers.Authorization = 'Bearer ' + token;
 };
 
-const fetchAppAccessToken = async (): Promise<string> => {
-  const configs = AuthComponent.instance().getConfigs();
-  const body = qs.stringify({
-    grant_type: configs.grantType ?? 'client_credentials',
-    scope: configs.scope ?? 'PRODUCTION',
-  });
-  const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
-  return response.data.access_token;
+const fetchAppAccessToken = (): Promise<string> => {
+  return AuthServices.instance().fetchAppAccessToken();
 };
 
 export const createAppTokenApiClient = (baseURL: string) => {
