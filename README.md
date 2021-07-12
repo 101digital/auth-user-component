@@ -16,6 +16,23 @@ To add this component to React Native app, run this command:
 yarn add git+ssh://git@github.com/101digital/react-native-auth-component.git
 ```
 
+Because <b>react-native-auth-component</> depends on some libraries, so make sure you installed all dependencies into your project.
+  
+- Lodash: https://github.com/lodash/lodash
+
+- Formik: https://github.com/formium/formik
+  
+- Masked Text: https://github.com/benhurott/react-native-masked-text
+  
+- React Native Modal: https://github.com/react-native-modal/react-native-modal
+  
+- Async storage: https://github.com/react-native-async-storage/async-storage
+  
+- Theme component: https://github.com/101digital/react-native-theme-component.git
+  
+- Svg display: https://github.com/react-native-svg/react-native-svg
+  
+
 Make sure you have permission to access this repository
 
 ## Quick Start
@@ -65,18 +82,7 @@ Create client to excute API request that only required basic token.
 import { createAppTokenApiClient } from 'react-native-auth-component';
 ```
 
-### `createAuthorizedApiClient`
-
-Create client to excute API requests that required Authentication
-
-- `baseURL`: base url of services
-- `withOrgToken`: this is OPTIONAL for request need `org-token` for Authentication
-
-```javascript
-import { createAuthorizedApiClient } from 'react-native-auth-component';
-```
-
-### `authServices`
+### `AuthServices`
 
 Provide functions to make authentication
 
@@ -88,8 +94,13 @@ Provide functions to make authentication
 
 - `logout`: Promise function to clear current session
 
+- `createAppTokenApiClient` Create client to excute API requests that required Authentication
+
 ```javascript
-import { authServices } from 'react-native-auth-component';
+import { AuthServices } from 'react-native-auth-component';
+
+// your logic
+const resp = await AuthServices.instance().login('abc', 'password');
 ```
 
 ### `authComponentStore`
@@ -132,3 +143,49 @@ const handleSessionExpired = () => {
   // Call your logout function
 };
 ```
+  
+### `LoginComponent`
+  
+Provide a simple login form (that is optional, you can use your login form), support type `email` and `phonenumber`. You can listen login succeed or failed.
+
+```javascript
+import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';
+  
+
+const LoginScreen = () => {
+  const loginRefs = useRef<LoginComponentRef>(); // use to update country code
+
+  return (
+    <View>
+    /* YOUR COMPONENTS */
+      <LoginComponent
+        ref={loginRefs}
+        Root={{
+            props: {
+              onLoginSuccess: (userData) => {
+                // handle login success with profile data
+              },
+              onLoginFailed: (error) => {
+                // handle login failed with error
+              },
+              onPressForgetPassword: () => {
+                // handle click to forgot password
+              },
+              onPressRegister: () => {
+                // handle click to register
+              },
+              formatError: getErrorMessage, // format in-line error message, ex translate error to language
+            }
+          }}
+      />
+    /* YOUR COMPONENTS */
+    </View>
+  );
+  
+}
+
+  
+```
+  
+  
+  
