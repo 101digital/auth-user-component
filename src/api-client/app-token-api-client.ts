@@ -1,4 +1,4 @@
-import { AuthServices } from '@/services/auth-services';
+import { AuthServices } from '../services/auth-services';
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 let isRefreshed = false;
