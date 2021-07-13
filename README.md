@@ -71,6 +71,16 @@ export default App;
 
 ## API reference
 
+### `createAppTokenApiClient`
+
+Create client to excute API request that only required basic token.
+
+- `baseURL`: base url of services
+
+```javascript
+import { createAppTokenApiClient } from 'react-native-auth-component';
+```
+
 ### `createAuthorizedApiClient`
 
 Create client to excute API requests that required Authentication
@@ -94,7 +104,7 @@ Provide functions to make authentication
 
 - `logout`: Promise function to clear current session
 
-- `createAppTokenApiClient` Create client to excute API request that only required basic token.
+- `fetchAppAccessToken`: Promise function return app access token base on basic token
 
 ```javascript
 import { AuthServices } from 'react-native-auth-component';
