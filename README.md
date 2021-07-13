@@ -191,9 +191,9 @@ const LoginScreen = () => {
 }
 ```
 
-- Root
+- <b>Root</b>
 
-1. `props` (REQUIRED)
+1. <b>`props`</b> (REQUIRED)
 
 | Name                  | Type                | Description                                                    |
 | :-------------------- | :------------------ | :------------------------------------------------------------- |
@@ -208,7 +208,7 @@ const LoginScreen = () => {
 | signUpLabel           | string (Optional)   | Label of register button (default is `Sign up here`)           |
 | forgotPasswordLabel   | string (Optional)   | Label of forgot password button (default is `Forgot password`) |
 
-2. `style` (OPTIONAL)
+2. <b>`style`</b> (OPTIONAL)
 
 Type of `LoginComponentStyles`
 
@@ -222,7 +222,7 @@ Type of `LoginComponentStyles`
 | signUpLabelStyle             | TextStyle | Style of register label         |
 | signUpContainerStyle         | ViewStyle | Style of register button        |
 
-2. `components` (OPTIONAL)
+2. <b>`components`</b> (OPTIONAL)
 
 | Name                       | Type                          | Description                             |
 | :------------------------- | :---------------------------- | :-------------------------------------- |
@@ -231,9 +231,9 @@ Type of `LoginComponentStyles`
 | renderForgotPasswordButton | Function return React Element | Override default forgot password button |
 | renderRegisterButton       | Function return React Element | Override default register button        |
 
-- InputForm
+- <b>InputForm</b>
 
-1. `props` (OPTIONAL)
+1. <b>`props`</b> (OPTIONAL)
 
 | Name              | Type                                | Description                                                           |
 | :---------------- | :---------------------------------- | :-------------------------------------------------------------------- |
@@ -244,7 +244,7 @@ Type of `LoginComponentStyles`
 | passwordHint      | string (Optional)                   | Password placeholder text                                             |
 | onPressDialCode   | Function (Optional)                 | Handle actions when click dial code label                             |
 
-2. `style` (OPTIONAL)
+2. <b>`style`</b> (OPTIONAL)
 
 Type of `InputFormStyles`
 
@@ -255,7 +255,7 @@ Type of `InputFormStyles`
 
 More about styles of each, you can reference here: https://github.com/101digital/react-native-theme-component.git
 
-3. `component`
+3. <b>`component`</b>
 
 | Name         | Type                 | Description                   |
 | :----------- | :------------------- | :---------------------------- |
