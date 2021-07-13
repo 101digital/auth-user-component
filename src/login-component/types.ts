@@ -19,7 +19,7 @@ export type LoginComponentProps = {
     props: {
       onLoginSuccess: (userData: any) => void;
       onLoginFailed: (error: Error) => void;
-      onPressForgetPassword: () => void;
+      onPressForgotPassword: () => void;
       onPressRegister: () => void;
       formatError?: (error: string) => string;
       formTitle?: string;
@@ -31,6 +31,8 @@ export type LoginComponentProps = {
     components?: {
       header?: ReactNode;
       footer?: ReactNode;
+      renderForgotPasswordButton?: () => React.ReactElement | null;
+      renderRegisterButton?: () => React.ReactElement | null;
     };
   };
   InputForm?: {

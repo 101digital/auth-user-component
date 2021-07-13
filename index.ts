@@ -1,4 +1,4 @@
-export { default as authComponentStore } from './src/store';
+export { default as authComponentStore } from './src/services/store';
 export { AuthComponent, AuthComponentConfig } from './src/index';
 export { AuthServices } from './src/services/auth-services';
 export { createAuthorizedApiClient } from './src/api-client/authorized-api-client';

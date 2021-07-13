@@ -1,6 +1,6 @@
 // @ts-ignore
 import qs from 'qs';
-import authComponentStore from '../store';
+import authComponentStore from './store';
 import axios from 'axios';
 import { AuthComponentConfig } from '..';
 import { AuthApiClient } from '../api-client/auth-api-client';

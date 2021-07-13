@@ -87,15 +87,17 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
         formatError={Root?.props?.formatError}
         style={InputForm?.style?.passwordInputFieldStyle}
       />
-      <TouchableOpacity
-        activeOpacity={0.8}
-        style={rootStyles.forgotPasswordContainerStyle}
-        onPress={Root.props.onPressForgetPassword}
-      >
-        <Text style={rootStyles.forgotPasswordLabelStyle}>
-          {Root?.props?.forgotPasswordLabel ?? 'Forgot password'}
-        </Text>
-      </TouchableOpacity>
+      {Root.components?.renderForgotPasswordButton?.() ?? (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={rootStyles.forgotPasswordContainerStyle}
+          onPress={Root.props.onPressForgotPassword}
+        >
+          <Text style={rootStyles.forgotPasswordLabelStyle}>
+            {Root?.props?.forgotPasswordLabel ?? 'Forgot password'}
+          </Text>
+        </TouchableOpacity>
+      )}
       <Button
         isLoading={isSigning}
         style={{
@@ -120,16 +122,18 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
         >
           {renderForm}
         </Formik>
-        <View style={rootStyles.signUpContainerStyle}>
-          <Text style={rootStyles.noneAccountLabelStyle}>
-            {Root?.props?.notAccountLabel ?? 'Not a user yet?'}
-          </Text>
-          <TouchableOpacity activeOpacity={0.8} onPress={Root.props.onPressRegister}>
-            <Text style={rootStyles.signUpLabelStyle}>
-              {Root?.props?.signUpLabel ?? 'Sign up here'}
+        {Root.components?.renderRegisterButton?.() ?? (
+          <View style={rootStyles.signUpContainerStyle}>
+            <Text style={rootStyles.noneAccountLabelStyle}>
+              {Root?.props?.notAccountLabel ?? 'Not a user yet?'}
             </Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity activeOpacity={0.8} onPress={Root.props.onPressRegister}>
+              <Text style={rootStyles.signUpLabelStyle}>
+                {Root?.props?.signUpLabel ?? 'Sign up here'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {Root?.components?.footer}
       </ScrollView>
     </KeyboardAvoidingView>
