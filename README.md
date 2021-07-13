@@ -15,8 +15,9 @@ To add this component to React Native app, run this command:
 ```
 yarn add git+ssh://git@github.com/101digital/react-native-auth-component.git
 ```
+Make sure you have permission to access this repository
 
-Because <b>react-native-auth-component</> depends on some libraries, so make sure you installed all dependencies into your project.
+Because <b>react-native-auth-component</b> depends on some libraries, so make sure you installed all dependencies into your project.
   
 - Lodash: https://github.com/lodash/lodash
 
@@ -32,8 +33,6 @@ Because <b>react-native-auth-component</> depends on some libraries, so make sur
   
 - Svg display: https://github.com/react-native-svg/react-native-svg
   
-
-Make sure you have permission to access this repository
 
 ## Quick Start
 
@@ -72,14 +71,15 @@ export default App;
 
 ## API reference
 
-### `createAppTokenApiClient`
+### `createAuthorizedApiClient`
 
-Create client to excute API request that only required basic token.
+Create client to excute API requests that required Authentication
 
 - `baseURL`: base url of services
+- `withOrgToken`: this is OPTIONAL for request need `org-token` for Authentication
 
 ```javascript
-import { createAppTokenApiClient } from 'react-native-auth-component';
+import { createAuthorizedApiClient } from 'react-native-auth-component';
 ```
 
 ### `AuthServices`
@@ -94,18 +94,18 @@ Provide functions to make authentication
 
 - `logout`: Promise function to clear current session
 
-- `createAppTokenApiClient` Create client to excute API requests that required Authentication
+- `createAppTokenApiClient` Create client to excute API request that only required basic token.
 
 ```javascript
 import { AuthServices } from 'react-native-auth-component';
 
 // your logic
-const resp = await AuthServices.instance().login('abc', 'password');
+const resp = await AuthServices.instance().login('username', 'password');
 ```
 
 ### `authComponentStore`
 
-Provide functions to store and retrieve stored data in local storage (using `@react-native-community/async-storage`)
+Provide functions to store and retrieve stored data in local storage
 
 - `storeAccessToken`: store latest access token to local storage
 
@@ -146,7 +146,7 @@ const handleSessionExpired = () => {
   
 ### `LoginComponent`
   
-Provide a simple login form (that is optional, you can use your login form), support type `email` and `phonenumber`. You can listen login succeed or failed.
+Provide a simple login form (that is optional, you can use your login form), support type `email` and `phonenumber`. You can listen login succeed or failed response then handle your business logic.
 
 ```javascript
 import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';
@@ -174,14 +174,13 @@ const LoginScreen = () => {
               onPressRegister: () => {
                 // handle click to register
               },
-              formatError: getErrorMessage, // format in-line error message, ex translate error to language
+<!--               formatError: getErrorMessage, // format in-line error message, ex translate error to language -->
             }
           }}
       />
     /* YOUR COMPONENTS */
     </View>
   );
-  
 }
 
   
