@@ -1,0 +1,20 @@
+{
+  "init": {
+    "prefix": "auth-component-init",
+    "body": [
+      "import { AuthComponent } from 'react-native-auth-component';",
+      "",
+      "AuthComponent.instance()",
+      "  .configure({",
+      "    clientId: ${1:string},",
+      "    clientSecret: ${2:string},",
+      "    ternantDomain: ${3:string},",
+      "    tokenBaseUrl: ${4:string},",
+      "    membershipBaseUrl: ${5:string},",
+      "  })",
+      "  .then(() => {$0});"
+    ],
+    "description": "AuthComponent",
+    "scope": "javascript,typescript,typescriptreact"
+  }
+}

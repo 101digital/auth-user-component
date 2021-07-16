@@ -1,6 +1,6 @@
 {
   "name": "react-native-auth-component",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/react-native-auth-component.git",
   "main": "index.ts",
@@ -41,5 +41,16 @@
   },
   "resolutions": {
     "@react-native-community/cli-platform-ios": "4.13.0"
+  },
+  "categories": [
+    "Snippets"
+  ],
+  "contributes": {
+    "snippets": [
+      {
+        "language": "javascript,typescript,typescriptreact",
+        "path": "./snippets.json"
+      }
+    ]
   }
 }
