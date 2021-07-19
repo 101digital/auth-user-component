@@ -102,7 +102,7 @@ import { createAuthorizedApiClient } from 'react-native-auth-component';
 
 ### `AuthContext`
 
-Maintain authentication state using Context API. To retrieve Context data and function, you can use `useContext` inside React Component.
+Maintain authentication state using Context API. To retrieve Context data and function, you can use `useContext` inside a React Component.
 
 ```javascript
 import React, { useContext } from 'react';
@@ -151,19 +151,19 @@ const resp = await AuthServices.instance().login('username', 'password');
 
 Provide functions to store and retrieve stored data in local storage
 
-- `storeAccessToken`: store latest access token to local storage
+- Functions
 
-- `getAccessToken`: retrieve latest access token from local storage
-
-- `storeRefreshToken`: store latest refresh token to local storage
-
-- `getRefreshToken`: retrieve latest refresh token from local storage
-
-- `storeOrgToken`: store latest org token to local storage
-
-- `getOrgToken`: retrieve latest org token from local storage
-
-- `clearAuths`: clear current access_token, refresh_token, org_token, profile data
+| Name              | Type                     | Description                                                        |
+| :---------------- | :----------------------- | :----------------------------------------------------------------- |
+| storeAccessToken  | Function (access_token)  | Store latest access token to local storage                         |
+| getAccessToken    | Function                 | Retrieve latest access token from local storage                    |
+| storeRefreshToken | Function (refresh_token) | Store latest refresh token to local storage                        |
+| getRefreshToken   | Function                 | Retrieve latest refresh token from local storage                   |
+| storeOrgToken     | Function (org_token)     | Store latest org token to local storage                            |
+| getOrgToken       | Function                 | Retrieve latest org token from local storage                       |
+| storeProfile      | Function (profile)       | Store current profile data to local storage                        |
+| getProfile        | Function                 | Retrieve current profile data from local storage                   |
+| clearAuths        | Function                 | Clear current access_token, refresh_token, org_token, profile data |
 
 ```javascript
 import { authComponentStore } from 'react-native-auth-component';

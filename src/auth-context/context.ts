@@ -1,4 +1,4 @@
-import { Profile } from '@/types';
+import { Profile } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
