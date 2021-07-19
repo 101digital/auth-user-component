@@ -18,7 +18,7 @@ export interface AuthContextData {
     firstName: string,
     lastName: string,
     profilePicture?: string
-  ) => void;
+  ) => Promise<boolean>;
   isUpdatingProfile?: boolean;
   errorUpdateProfile?: Error;
   clearUpdateProfileError: () => void;
@@ -31,7 +31,7 @@ export const authDefaultValue: AuthContextData = {
   login: async () => undefined,
   logout: () => null,
   clearSignInError: () => null,
-  updateProfile: () => null,
+  updateProfile: async () => false,
   clearUpdateProfileError: () => null,
 };
 
@@ -106,9 +106,11 @@ export const useAuthContextValue = (): AuthContextData => {
         getProfilePicture(data);
         await authComponentStore.storeProfile(data);
         setIsUpdatingProfile(false);
+        return true;
       } catch (error) {
         setIsUpdatingProfile(false);
         setErrorUpdateProfile(error);
+        return false;
       }
     },
     []
