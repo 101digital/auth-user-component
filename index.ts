@@ -9,3 +9,5 @@ export {
   LoginComponentRef,
   LoginComponentStyles,
 } from './src/login-component/types';
+export { AuthContext, AuthProvider } from './src/auth-context';
+export * from './src/types';
