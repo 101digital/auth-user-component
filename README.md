@@ -63,6 +63,20 @@ const App = () => {
 export default App;
 ```
 
+<b>react-native-auth-component</b> also provides `AuthContext` using Context API to maintain authentication state. If you want to use `AuthContext` you <b>HAVE TO</b> wrap your components with `AuthProvider`. This is required if you use `LoginComponent`.
+
+```javascript
+import { AuthComponent, AuthProvider } from 'react-native-auth-component';
+
+// init AuthComponent
+
+const App = () => {
+  <AuthProvider>/* YOUR COMPONENTS */</AuthProvider>;
+};
+
+export default App;
+```
+
 ## API reference
 
 ### `createAppTokenApiClient`
@@ -86,19 +100,45 @@ Create client to excute API requests that required Authentication
 import { createAuthorizedApiClient } from 'react-native-auth-component';
 ```
 
+### `AuthContext`
+
+Maintain authentication state using Context API. To retrieve Context data and function, you can use `useContext` inside React Component.
+
+```javascript
+import React, { useContext } from 'react';
+import { AuthContext } from 'react-native-auth-component';
+
+const ReactComponentEx = () => {
+  const { login, profile } = useContext(AuthContext);
+
+  /* YOUR COMPONENT */
+};
+```
+
+- Functions and state data
+
+| Name        | Type                          | Description                                                                  |
+| :---------- | :---------------------------- | :--------------------------------------------------------------------------- |
+| profile     | Profile                       | Current user profile. Return `undefined` if not authenticated                |
+| isSignedIn  | bool                          | Authentication state. Return `true` if authenticated, or else return `false` |
+| isSigning   | bool                          | Return `true` if excuting login action                                       |
+| errorSignIn | Error                         | Return error value if any failures while excuting login                      |
+| login       | Function (username, password) | Excute login action                                                          |
+| clearError  | Funtion                       | Clear current failed login state                                             |
+
 ### `AuthServices`
 
 Provide functions to make authentication
 
-- `login`: Promise function using username/password or email/password to generate token. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.
+- Functions
 
-- `refreshToken`: Promise function to re-new token from old `refresh_token`. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.
-
-- `fetchOrgToken`: Promise function to get token from organization which linked to accounts. If successfully, `org_token` will be stored to local storage.
-
-- `logout`: Promise function to clear current session
-
-- `fetchAppAccessToken`: Promise function return app access token base on basic token
+| Name                | Type                          | Description                                                                                                                                                                                           |
+| :------------------ | :---------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| login               | Function (username, password) | Promise function using username/password or email/password to generate token. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data. |
+| refreshToken        | Function (refresh_token)      | Promise function to re-new token from old `refresh_token`. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.                    |
+| fetchOrgToken       | Function                      | Promise function to get token from organization which linked to accounts. If successfully, `org_token` will be stored to local storage.                                                               |
+| logout              | Function                      | Promise function to clear current session                                                                                                                                                             |
+| fetchAppAccessToken | Function                      | Promise function return app access token base on basic token                                                                                                                                          |
 
 ```javascript
 import { AuthServices } from 'react-native-auth-component';
@@ -123,7 +163,7 @@ Provide functions to store and retrieve stored data in local storage
 
 - `getOrgToken`: retrieve latest org token from local storage
 
-- `clearTokens`: clear current access_token, refresh_token, org_token
+- `clearAuths`: clear current access_token, refresh_token, org_token, profile data
 
 ```javascript
 import { authComponentStore } from 'react-native-auth-component';
@@ -151,6 +191,8 @@ const handleSessionExpired = () => {
 ### `LoginComponent`
 
 Provide a simple login form (that is optional, you can use your login form), support type `email` and `phonenumber`. You can listen login succeed or failed response then handle your business logic.
+
+<b>Important</b>: If you use LoginComponent, you <b>HAVE TO</b> wrap your `App` with `AuthProvider`
 
 ```javascript
 import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';
@@ -181,7 +223,7 @@ const LoginScreen = () => {
               onPressRegister: () => {
                 // handle click to register
               },
-<!--               formatError: getErrorMessage, // format in-line error message, ex translate error to language -->
+              formatError: getErrorMessage, // format in-line error message, ex translate error to language
             }
           }}
       />

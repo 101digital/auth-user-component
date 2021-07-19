@@ -1,5 +1,5 @@
 import { Formik, FormikProps } from 'formik';
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useContext, useEffect, useImperativeHandle, useState } from 'react';
 import {
   View,
   KeyboardAvoidingView,
@@ -11,14 +11,19 @@ import {
 import { Button, InputField, InputPhoneNumber } from 'react-native-theme-component';
 import { LoginComponentProps, LoginComponentRef, SignInData } from './types';
 import useMergeStyles from './styles';
-import { AuthServices } from '../services/auth-services';
+import { AuthContext } from '../auth-context';
 
 const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   const { Root, InputForm } = props;
   const [dialCode, setDialCode] = useState('');
   const rootStyles = useMergeStyles(Root?.style);
-  const [isSigning, setIsSigning] = useState(false);
   const _type = InputForm?.props?.type ?? 'phonenumber';
+  const { login, isSignedIn, errorSignIn, isSigning } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (isSignedIn) {
+    }
+  }, [isSignedIn]);
 
   useImperativeHandle(
     ref,
@@ -33,21 +38,13 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
-    try {
-      setIsSigning(true);
-      const { username, password } = values;
-      if (_type === 'phonenumber') {
-        const sanitizedMobileNumber = username.replace(/\D+/g, '');
-        await AuthServices.instance().login(sanitizedMobileNumber, password);
-      } else {
-        await AuthServices.instance().login(username, password);
-      }
-      const { data } = await AuthServices.instance().fetchProfile();
-      Root?.props?.onLoginSuccess?.(data);
-      setIsSigning(false);
-    } catch (error) {
-      setIsSigning(false);
-      Root?.props?.onLoginFailed?.(error);
+    const { username, password } = values;
+    const _username = _type === 'phonenumber' ? username.replace(/\D+/g, '') : username;
+    const profile = await login(_username, password);
+    if (profile) {
+      Root?.props?.onLoginSuccess?.(profile);
+    } else if (errorSignIn) {
+      Root?.props?.onLoginFailed?.(errorSignIn);
     }
   };
 

@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { DeviceEventEmitter } from 'react-native';
 import { AuthServices } from '../services/auth-services';
-import authComponentStore from '../services/store';
+import authComponentStore from '../services/local-store';
 
 type TokenData = {
   accessToken?: string;

@@ -1,8 +1,10 @@
+import { Profile } from '../types';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const REFRESH_TOKEN_KEY = 'authcomponent.refreshToken';
 const ACCESS_TOKEN_KEY = 'authcomponent.accessToken';
 const ORG_TOKEN_KEY = 'authcomponent.orgToken';
+const PROFILE_KEY = 'authcomponent.profile';
 
 class AuthComponentStore {
   storeRefreshToken = (refreshToken: string) =>
@@ -18,10 +20,22 @@ class AuthComponentStore {
 
   getOrgToken = () => AsyncStorage.getItem(ORG_TOKEN_KEY);
 
-  clearTokens = async () => {
+  storeProfile = (profile: Profile) => AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+
+  getProfile = async () => {
+    try {
+      const value = await AsyncStorage.getItem(PROFILE_KEY);
+      return value ? JSON.parse(value) : undefined;
+    } catch (_) {
+      return undefined;
+    }
+  };
+
+  clearAuths = async () => {
     await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
     await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
     await AsyncStorage.removeItem(ORG_TOKEN_KEY);
+    await AsyncStorage.removeItem(PROFILE_KEY);
   };
 }
 

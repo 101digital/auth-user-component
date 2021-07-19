@@ -1,5 +1,5 @@
 {
-  "init": {
+  "initial": {
     "prefix": "auth-component-init",
     "body": [
       "import { AuthComponent } from 'react-native-auth-component';",

@@ -1,6 +1,6 @@
 // @ts-ignore
 import qs from 'qs';
-import authComponentStore from './store';
+import authComponentStore from './local-store';
 import axios from 'axios';
 import { AuthComponentConfig } from '..';
 import { AuthApiClient } from '../api-client/auth-api-client';
@@ -72,7 +72,7 @@ export class AuthServices {
   };
 
   logout = async () => {
-    await authComponentStore.clearTokens();
+    await authComponentStore.clearAuths();
   };
 
   fetchAppAccessToken = async () => {
