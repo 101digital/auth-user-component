@@ -84,4 +84,30 @@ export class AuthServices {
     const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
     return response.data.access_token;
   };
+
+  updateProfile = async (
+    userId: string,
+    firstName: string,
+    lastName: string,
+    profilePicture?: string
+  ) => {
+    const { membershipBaseUrl } = this._configs!;
+    const accessToken = await authComponentStore.getAccessToken();
+    const body = {
+      firstName: firstName,
+      lastName: lastName,
+      listCustomFields: [
+        {
+          customKey: 'logo',
+          customValue: profilePicture,
+        },
+      ],
+    };
+    const response = await axios.put(`${membershipBaseUrl}/users/${userId}`, body, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  };
 }

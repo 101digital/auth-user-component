@@ -6,14 +6,22 @@ import { AuthServices } from '../services/auth-services';
 
 export interface AuthContextData {
   profile?: Profile;
+  profilePicture?: string;
   isSignedIn: boolean;
   isSigning: boolean;
   errorSignIn?: Error;
   login: (username: string, password: string) => Promise<Profile | undefined>;
   logout: () => void;
-  clearError: () => void;
-  updateProfile: (profile: Profile) => void;
-  profilePicture?: string;
+  clearSignInError: () => void;
+  updateProfile: (
+    userId: string,
+    firstName: string,
+    lastName: string,
+    profilePicture?: string
+  ) => void;
+  isUpdatingProfile?: boolean;
+  errorUpdateProfile?: Error;
+  clearUpdateProfileError: () => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -22,8 +30,9 @@ export const authDefaultValue: AuthContextData = {
   errorSignIn: undefined,
   login: async () => undefined,
   logout: () => null,
-  clearError: () => null,
+  clearSignInError: () => null,
   updateProfile: () => null,
+  clearUpdateProfileError: () => null,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -34,6 +43,8 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isSigning, setIsSigning] = useState<boolean>(false);
   const [_errorSignIn, setErrorSignIn] = useState<Error | undefined>();
   const [_profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
+  const [_errorUpdateProfile, setErrorUpdateProfile] = useState<Error | undefined>();
+  const [_isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
 
   useEffect(() => {
     checkLogin();
@@ -75,7 +86,7 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   }, []);
 
-  const clearError = useCallback(() => {
+  const clearSignInError = useCallback(() => {
     setErrorSignIn(undefined);
   }, []);
 
@@ -85,11 +96,25 @@ export const useAuthContextValue = (): AuthContextData => {
     setProfile(undefined);
   }, []);
 
-  const updateProfile = useCallback(async (profile: Profile) => {
-    setProfile(profile);
-    getProfilePicture(profile);
-    await authComponentStore.storeProfile(profile);
-  }, []);
+  const updateProfile = useCallback(
+    async (userId: string, firstName: string, lastName: string, profilePicture?: string) => {
+      try {
+        setIsUpdatingProfile(true);
+        await AuthServices.instance().updateProfile(userId, firstName, lastName, profilePicture);
+        const { data } = await AuthServices.instance().fetchProfile();
+        setProfile(data);
+        getProfilePicture(data);
+        await authComponentStore.storeProfile(data);
+        setIsUpdatingProfile(false);
+      } catch (error) {
+        setIsUpdatingProfile(false);
+        setErrorUpdateProfile(error);
+      }
+    },
+    []
+  );
+
+  const clearUpdateProfileError = useCallback(() => {}, []);
 
   return useMemo(
     () => ({
@@ -97,12 +122,23 @@ export const useAuthContextValue = (): AuthContextData => {
       isSignedIn: _isSignedIn,
       isSigning: _isSigning,
       login,
-      clearError,
+      clearSignInError,
       logout,
       updateProfile,
       profilePicture: _profilePicture,
       errorSignIn: _errorSignIn,
+      errorUpdateProfile: _errorUpdateProfile,
+      clearUpdateProfileError,
+      isUpdatingProfile: _isUpdatingProfile,
     }),
-    [_profile, _isSignedIn, _isSigning, _profilePicture, _errorSignIn]
+    [
+      _profile,
+      _isSignedIn,
+      _isSigning,
+      _profilePicture,
+      _errorSignIn,
+      _errorUpdateProfile,
+      _isUpdatingProfile,
+    ]
   );
 };
