@@ -10,6 +10,7 @@ export interface AuthContextData {
   isSigning: boolean;
   errorSignIn?: Error;
   login: (username: string, password: string) => Promise<Profile | undefined>;
+  logout: () => void;
   clearError: () => void;
 }
 
@@ -18,6 +19,7 @@ export const authDefaultValue: AuthContextData = {
   isSigning: false,
   errorSignIn: undefined,
   login: async () => undefined,
+  logout: () => null,
   clearError: () => null,
 };
 
@@ -62,6 +64,12 @@ export const useAuthContextValue = (): AuthContextData => {
     setErrorSignIn(undefined);
   }, []);
 
+  const logout = useCallback(async () => {
+    await authComponentStore.clearAuths();
+    setIsSignedIn(false);
+    setProfile(undefined);
+  }, []);
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -69,6 +77,7 @@ export const useAuthContextValue = (): AuthContextData => {
       isSigning: _isSigning,
       login,
       clearError,
+      logout,
     }),
     [_profile, _isSignedIn, _isSigning]
   );
