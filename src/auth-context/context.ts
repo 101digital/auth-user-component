@@ -1,4 +1,4 @@
-import { Profile } from '../types';
+import { Profile, ProfileCustomField } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
@@ -12,6 +12,8 @@ export interface AuthContextData {
   login: (username: string, password: string) => Promise<Profile | undefined>;
   logout: () => void;
   clearError: () => void;
+  updateProfile: (profile: Profile) => void;
+  profilePicture?: string;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -21,6 +23,7 @@ export const authDefaultValue: AuthContextData = {
   login: async () => undefined,
   logout: () => null,
   clearError: () => null,
+  updateProfile: () => null,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -30,6 +33,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isSignedIn, setIsSignedIn] = useState<boolean>(false);
   const [_isSigning, setIsSigning] = useState<boolean>(false);
   const [_errorSignIn, setErrorSignIn] = useState<Error | undefined>();
+  const [_profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     checkLogin();
@@ -43,6 +47,7 @@ export const useAuthContextValue = (): AuthContextData => {
       await authComponentStore.storeProfile(data);
       setProfile(data);
       setIsSignedIn(true);
+      getProfilePicture(data);
       setIsSigning(false);
       return data;
     } catch (error) {
@@ -51,6 +56,15 @@ export const useAuthContextValue = (): AuthContextData => {
       return undefined;
     }
   }, []);
+
+  const getProfilePicture = (profile: Profile) => {
+    const profileImage = profile?.listCustomFields.filter((p: ProfileCustomField) => {
+      return p.customKey === 'logo';
+    });
+    if (profileImage && profileImage.length > 0) {
+      setProfilePicture(profileImage[0].customValue);
+    }
+  };
 
   const checkLogin = useCallback(async () => {
     const profile = await authComponentStore.getProfile();
@@ -70,6 +84,12 @@ export const useAuthContextValue = (): AuthContextData => {
     setProfile(undefined);
   }, []);
 
+  const updateProfile = useCallback(async (profile: Profile) => {
+    setProfile(profile);
+    getProfilePicture(profile);
+    await authComponentStore.storeProfile(profile);
+  }, []);
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -78,7 +98,9 @@ export const useAuthContextValue = (): AuthContextData => {
       login,
       clearError,
       logout,
+      updateProfile,
+      profilePicture: _profilePicture,
     }),
-    [_profile, _isSignedIn, _isSigning]
+    [_profile, _isSignedIn, _isSigning, _profilePicture]
   );
 };
