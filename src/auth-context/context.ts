@@ -71,6 +71,7 @@ export const useAuthContextValue = (): AuthContextData => {
     if (profile) {
       setProfile(profile);
       setIsSignedIn(true);
+      getProfilePicture(profile);
     }
   }, []);
 
