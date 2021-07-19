@@ -101,7 +101,8 @@ export const useAuthContextValue = (): AuthContextData => {
       logout,
       updateProfile,
       profilePicture: _profilePicture,
+      errorSignIn: _errorSignIn,
     }),
-    [_profile, _isSignedIn, _isSigning, _profilePicture]
+    [_profile, _isSignedIn, _isSigning, _profilePicture, _errorSignIn]
   );
 };
