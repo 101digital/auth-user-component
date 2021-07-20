@@ -117,14 +117,16 @@ const ReactComponentEx = () => {
 
 - Functions and state data
 
-| Name        | Type                          | Description                                                                  |
-| :---------- | :---------------------------- | :--------------------------------------------------------------------------- |
-| profile     | Profile                       | Current user profile. Return `undefined` if not authenticated                |
-| isSignedIn  | bool                          | Authentication state. Return `true` if authenticated, or else return `false` |
-| isSigning   | bool                          | Return `true` if excuting login action                                       |
-| errorSignIn | Error                         | Return error value if any failures while excuting login                      |
-| login       | Function (username, password) | Excute login action                                                          |
-| clearError  | Funtion                       | Clear current failed login state                                             |
+| Name             | Type                                          | Description                                                                  |
+| :--------------- | :-------------------------------------------- | :--------------------------------------------------------------------------- |
+| profile          | Profile                                       | Current user profile. Return `undefined` if not authenticated                |
+| profilePicture   | string                                        | Get current profile picture                                                  |
+| isSignedIn       | bool                                          | Authentication state. Return `true` if authenticated, or else return `false` |
+| isSigning        | bool                                          | Return `true` if excuting login action                                       |
+| errorSignIn      | Error                                         | Return error value if any failures while excuting login                      |
+| login            | Function (username, password)                 | Excute login action                                                          |
+| clearSignInError | Funtion                                       | Clear current failed login state                                             |
+| updateProfile    | Funtion (userId, firstName, lastName, avatar) | Update current profile information                                           |
 
 ### `AuthServices`
 
