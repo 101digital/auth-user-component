@@ -12,7 +12,7 @@ import { Button, InputField, InputPhoneNumber } from 'react-native-theme-compone
 import { LoginComponentProps, LoginComponentRef, SignInData } from './types';
 import useMergeStyles from './styles';
 import { AuthContext } from '../auth-context';
-import { DefaultLogoIcon, PasswordIcon, PhoneIcon } from '../assets';
+import { DefaultLogoIcon, EmailIcon, PasswordIcon, PhoneIcon } from '../assets';
 
 const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   const { Root, InputForm } = props;
@@ -53,7 +53,9 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
     <View>
       {_type === 'email' ? (
         <InputField
-          prefixIcon={InputForm?.component?.passwordIcon}
+          prefixIcon={
+            InputForm?.component?.usernameIcon ?? <EmailIcon width={30} height={30} color="grey" />
+          }
           name="username"
           returnKeyType="done"
           placeholder={InputForm?.props?.usernameHint ?? 'Email'}
@@ -120,7 +122,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
     <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
       <ScrollView keyboardShouldPersistTaps="handled">
         <View style={rootStyles.logoContainerStyle}>
-          {Root?.components?.header ?? <DefaultLogoIcon />}
+          {Root?.components?.header ?? <DefaultLogoIcon width={120} height={120} />}
         </View>
         <Text style={rootStyles.formTitleStyle}>{Root?.props?.formTitle ?? 'Sign In'}</Text>
         <Formik
