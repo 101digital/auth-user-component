@@ -60,6 +60,7 @@ export type LoginComponentStyles = {
   noneAccountLabelStyle?: StyleProp<TextStyle>;
   signUpLabelStyle?: StyleProp<TextStyle>;
   signUpContainerStyle?: StyleProp<TextStyle>;
+  logoContainerStyle?: StyleProp<ViewStyle>;
 };
 
 export type InputFormStyles = {

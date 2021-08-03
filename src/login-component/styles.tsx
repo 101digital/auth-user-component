@@ -10,6 +10,10 @@ const useMergeStyles = (style?: LoginComponentStyles): LoginComponentStyles => {
       flex: 1,
       padding: 24,
     },
+    logoContainerStyle: {
+      alignSelf: 'center',
+      marginBottom: 32,
+    },
     formTitleStyle: {
       fontFamily: fonts.semiBold,
       fontSize: 22,

@@ -12,6 +12,7 @@ import { Button, InputField, InputPhoneNumber } from 'react-native-theme-compone
 import { LoginComponentProps, LoginComponentRef, SignInData } from './types';
 import useMergeStyles from './styles';
 import { AuthContext } from '../auth-context';
+import { DefaultLogoIcon, PasswordIcon, PhoneIcon } from '@/assets';
 
 const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   const { Root, InputForm } = props;
@@ -65,7 +66,13 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
         <InputPhoneNumber
           dialCode={dialCode}
           onPressDialCode={InputForm?.props?.onPressDialCode}
-          prefixIcon={<View>{InputForm?.component?.usernameIcon}</View>}
+          prefixIcon={
+            <View>
+              {InputForm?.component?.usernameIcon ?? (
+                <PhoneIcon width={30} height={30} color="grey" />
+              )}
+            </View>
+          }
           name="username"
           returnKeyType="done"
           placeholder={InputForm?.props?.usernameHint ?? 'Mobile number'}
@@ -75,7 +82,9 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
         />
       )}
       <InputField
-        prefixIcon={InputForm?.component?.passwordIcon}
+        prefixIcon={
+          InputForm?.component?.passwordIcon ?? <PasswordIcon width={30} height={30} color="grey" />
+        }
         name="password"
         returnKeyType="done"
         secureTextEntry
@@ -110,7 +119,9 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   return (
     <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
       <ScrollView keyboardShouldPersistTaps="handled">
-        {Root?.components?.header}
+        <View style={rootStyles.logoContainerStyle}>
+          {Root?.components?.header ?? <DefaultLogoIcon />}
+        </View>
         <Text style={rootStyles.formTitleStyle}>{Root?.props?.formTitle ?? 'Sign In'}</Text>
         <Formik
           initialValues={InputForm?.props?.initialSignInData ?? SignInData.empty()}
