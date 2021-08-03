@@ -12,7 +12,7 @@ import { Button, InputField, InputPhoneNumber } from 'react-native-theme-compone
 import { LoginComponentProps, LoginComponentRef, SignInData } from './types';
 import useMergeStyles from './styles';
 import { AuthContext } from '../auth-context';
-import { DefaultLogoIcon, PasswordIcon, PhoneIcon } from '@/assets';
+import { DefaultLogoIcon, PasswordIcon, PhoneIcon } from '../assets';
 
 const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   const { Root, InputForm } = props;
