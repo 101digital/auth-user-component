@@ -305,3 +305,95 @@ More about styles of each, you can reference here: https://github.com/101digital
 | :----------- | :------------------- | :---------------------------- |
 | passwordIcon | ReactNode (Optional) | Prefix icon of password field |
 | usernameIcon | ReactNode (Optional) | Prefix icon of username field |
+
+### Add component to the config.json file manually
+
+- First step: Add component to `components` tags and replate `[data]` with your values
+
+```
+{
+...
+ "components": [
+    {
+      "componentId": "72520fc5-6be5-4ee5-b986-0e688ab4adff",
+      "name": "AuthComponent",
+      "isRequired": true,
+      "config": {
+        "clientId": "[data]",
+        "clientSecret": "[data]",
+        "ternantDomain": "[data]",
+        "tokenBaseUrl": "[data]",
+        "membershipBaseUrl": "[data]"
+      }
+    }
+  ]
+...
+}
+```
+
+- Second step: The `dependencies` in `config.json` must have enough below data
+
+```
+{
+...
+ "dependencies": [
+    { "name": "https://github.com/101digital/react-native-theme-component.git" },
+    { "name": "@react-native-community/async-storage", "version": "^1.12.0" },
+    {
+      "name": "axios",
+      "version": "^0.20.0"
+    },
+    {
+      "name": "js-base64",
+      "version": "^3.4.5"
+    },
+    { "name": "qs", "version": "^6.9.4" }
+  ]
+...
+}
+```
+
+If have any item is not existing in `dependencies` of `config.json` file, please find missing one from `src/component.json` and put it to `dependencies`.
+
+- Third step: Place `LoginComponent` with one template to the Screen. Example, if you want place `LoginComponent` to `LoginScreen` with `templateId` is "7c795b14-8ae4-47e0-9a94-162ff71bdf77". Then if user trigger `onPressForgotPassword` button, and you wanna navigate to `ForgotPasswordScreen`
+
+Note that: `templateId` is one of template defined in `src/component.json`. `ForgotPasswordScreen` is existing with `route` name is `forgot-password-screen`
+
+```
+{
+  ...
+  "screens": [
+    {
+      "screenName": "LoginScreen",
+      "route": "login-screen",
+      "stack": "auth-navigator",
+      "screenParams": [],
+      "components": [
+        {
+          "templateId": "7c795b14-8ae4-47e0-9a94-162ff71bdf77",
+          "componentName": "LoginComponent",
+          "functions": [
+            {
+              "id": "c23dc9e4-5a70-41e7-bc30-83e9fdad3cac",
+              "name": "onPressForgotPassword",
+              "action": {
+                "type": "openScreen",
+                "route": "forgot-password-screen"
+              }
+            },
+            {
+              "id": "01c73fba-7060-49ec-acd2-2afbf3e7fda2",
+              "name": "onPressRegister",
+              "action": {
+                "type": "openScreen",
+                "route": "register-screen"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  ...
+}
+```

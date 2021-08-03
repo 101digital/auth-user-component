@@ -1,0 +1,67 @@
+{
+  "id": "72520fc5-6be5-4ee5-b986-0e688ab4adff",
+  "name": "AuthComponent",
+  "repository": "https://github.com/101digital/react-native-auth-component",
+  "config": {
+    "clientId": "string",
+    "clientSecret": "string",
+    "ternantDomain": "string",
+    "tokenBaseUrl": "string",
+    "membershipBaseUrl": "string"
+  },
+  "dependencies": [
+    { "name": "https://github.com/101digital/react-native-theme-component.git" },
+    { "name": "@react-native-community/async-storage", "version": "^1.12.0" },
+    {
+      "name": "axios",
+      "version": "^0.20.0"
+    },
+    {
+      "name": "js-base64",
+      "version": "^3.4.5"
+    },
+    { "name": "qs", "version": "^6.9.4" }
+  ],
+  "templates": [
+    {
+      "id": "7c795b14-8ae4-47e0-9a94-162ff71bdf77",
+      "templateName": "Login with email template",
+      "componentName": "LoginComponent",
+      "import": "import { LoginComponent } from 'react-native-auth-component';",
+      "header": "",
+      "body": "<LoginComponent Root={{ props: { onLoginSuccess: (profile) => { $c59e10ee-e0f2-4c66-8f48-9a7574583fb7 }, onLoginFailed: (error) => { $e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c }, onPressForgotPassword: () => { $c23dc9e4-5a70-41e7-bc30-83e9fdad3cac }, onPressRegister: () => { $01c73fba-7060-49ec-acd2-2afbf3e7fda2 }, }, }}  InputForm={{ style: { passwordInputFieldStyle: { containerStyle: { marginTop: 24, }, }, }, props: { type: 'email', },}}/>",
+      "functions": [
+        {
+          "id": "c59e10ee-e0f2-4c66-8f48-9a7574583fb7",
+          "name": "onLoginSuccess",
+          "params": [
+            {
+              "name": "profile",
+              "type": "Profile"
+            }
+          ]
+        },
+        {
+          "id": "e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c",
+          "name": "onLoginFailed",
+          "params": [
+            {
+              "name": "error",
+              "type": "Error"
+            }
+          ]
+        },
+        {
+          "id": "c23dc9e4-5a70-41e7-bc30-83e9fdad3cac",
+          "name": "onPressForgotPassword",
+          "params": []
+        },
+        {
+          "id": "01c73fba-7060-49ec-acd2-2afbf3e7fda2",
+          "name": "onPressRegister",
+          "params": []
+        }
+      ]
+    }
+  ]
+}
