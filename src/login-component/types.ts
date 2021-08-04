@@ -17,6 +17,7 @@ export type LoginComponentProps = {
   Root: {
     style?: LoginComponentStyles;
     props: {
+      i18n?: any;
       onLoginSuccess: (userData: any) => void;
       onLoginFailed: (error: Error) => void;
       onPressForgotPassword: () => void;

@@ -21,6 +21,8 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   const _type = InputForm?.props?.type ?? 'phonenumber';
   const { login, isSignedIn, errorSignIn, isSigning } = useContext(AuthContext);
 
+  const i18n = Root.props.i18n;
+
   useEffect(() => {
     if (isSignedIn) {
     }
@@ -54,13 +56,15 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
       {_type === 'email' ? (
         <InputField
           prefixIcon={
-            InputForm?.component?.usernameIcon ?? <EmailIcon width={30} height={30} color="grey" />
+            InputForm?.component?.usernameIcon ?? <EmailIcon width={30} height={30} color='grey' />
           }
-          name="username"
-          returnKeyType="done"
-          placeholder={InputForm?.props?.usernameHint ?? 'Email'}
-          keyboardType="email-address"
-          autoCapitalize="none"
+          name='username'
+          returnKeyType='done'
+          placeholder={
+            InputForm?.props?.usernameHint ?? i18n?.t('login_component.lbl_email') ?? 'Email'
+          }
+          keyboardType='email-address'
+          autoCapitalize='none'
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
@@ -71,27 +75,33 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
           prefixIcon={
             <View>
               {InputForm?.component?.usernameIcon ?? (
-                <PhoneIcon width={30} height={30} color="grey" />
+                <PhoneIcon width={30} height={30} color='grey' />
               )}
             </View>
           }
-          name="username"
-          returnKeyType="done"
-          placeholder={InputForm?.props?.usernameHint ?? 'Mobile number'}
-          autoCapitalize="none"
+          name='username'
+          returnKeyType='done'
+          placeholder={
+            InputForm?.props?.usernameHint ??
+            i18n?.t('login_component.lbl_mobile_number') ??
+            'Mobile number'
+          }
+          autoCapitalize='none'
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
       )}
       <InputField
         prefixIcon={
-          InputForm?.component?.passwordIcon ?? <PasswordIcon width={30} height={30} color="grey" />
+          InputForm?.component?.passwordIcon ?? <PasswordIcon width={30} height={30} color='grey' />
         }
-        name="password"
-        returnKeyType="done"
+        name='password'
+        returnKeyType='done'
         secureTextEntry
-        placeholder={InputForm?.props?.passwordHint ?? 'Password'}
-        autoCapitalize="none"
+        placeholder={
+          InputForm?.props?.passwordHint ?? i18n?.t('login_component.lbl_password') ?? 'Password'
+        }
+        autoCapitalize='none'
         formatError={Root?.props?.formatError}
         style={InputForm?.style?.passwordInputFieldStyle}
       />
@@ -102,7 +112,9 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
           onPress={Root.props.onPressForgotPassword}
         >
           <Text style={rootStyles.forgotPasswordLabelStyle}>
-            {Root?.props?.forgotPasswordLabel ?? 'Forgot password'}
+            {Root?.props?.forgotPasswordLabel ??
+              i18n?.t('login_component.btn_forgot_password') ??
+              'Forgot password'}
           </Text>
         </TouchableOpacity>
       )}
@@ -113,18 +125,20 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
             marginTop: 32,
           },
         }}
-        label={Root?.props?.loginButtonLabel ?? 'LOGIN'}
+        label={Root?.props?.loginButtonLabel ?? i18n?.t('login_component.btn_login') ?? 'LOGIN'}
         onPress={formProps.handleSubmit}
       />
     </View>
   );
   return (
-    <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
-      <ScrollView keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView style={rootStyles.containerStyle} behavior='padding' enabled>
+      <ScrollView keyboardShouldPersistTaps='handled'>
         <View style={rootStyles.logoContainerStyle}>
           {Root?.components?.header ?? <DefaultLogoIcon width={120} height={120} />}
         </View>
-        <Text style={rootStyles.formTitleStyle}>{Root?.props?.formTitle ?? 'Sign In'}</Text>
+        <Text style={rootStyles.formTitleStyle}>
+          {Root?.props?.formTitle ?? i18n?.t('login_component.lbl_sign_in') ?? 'Sign In'}
+        </Text>
         <Formik
           initialValues={InputForm?.props?.initialSignInData ?? SignInData.empty()}
           validationSchema={InputForm?.props?.validationSchema}
@@ -135,11 +149,15 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
         {Root.components?.renderRegisterButton?.() ?? (
           <View style={rootStyles.signUpContainerStyle}>
             <Text style={rootStyles.noneAccountLabelStyle}>
-              {Root?.props?.notAccountLabel ?? 'Not a user yet?'}
+              {Root?.props?.notAccountLabel ??
+                i18n?.t('login_component.lbl_not_an_account') ??
+                'Not a user yet?'}
             </Text>
             <TouchableOpacity activeOpacity={0.8} onPress={Root.props.onPressRegister}>
               <Text style={rootStyles.signUpLabelStyle}>
-                {Root?.props?.signUpLabel ?? 'Sign up here'}
+                {Root?.props?.signUpLabel ??
+                  i18n?.t('login_component.btn_sign_up') ??
+                  'Sign up here'}
               </Text>
             </TouchableOpacity>
           </View>

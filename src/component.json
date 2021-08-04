@@ -27,9 +27,9 @@
       "id": "7c795b14-8ae4-47e0-9a94-162ff71bdf77",
       "templateName": "Login with email template",
       "componentName": "LoginComponent",
-      "import": "import { LoginComponent } from 'react-native-auth-component';",
+      "import": "import { LoginComponent } from 'react-native-auth-component';\nimport { i18n } from '@/translations/translation-config';",
       "header": "",
-      "body": "<LoginComponent Root={{ props: { onLoginSuccess: (profile) => { $c59e10ee-e0f2-4c66-8f48-9a7574583fb7 }, onLoginFailed: (error) => { $e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c }, onPressForgotPassword: () => { $c23dc9e4-5a70-41e7-bc30-83e9fdad3cac }, onPressRegister: () => { $01c73fba-7060-49ec-acd2-2afbf3e7fda2 }, }, }}  InputForm={{ style: { passwordInputFieldStyle: { containerStyle: { marginTop: 24, }, }, }, props: { type: 'email', },}}/>",
+      "body": "<LoginComponent Root={{ props: { i18n: i18n, onLoginSuccess: (profile) => { $c59e10ee-e0f2-4c66-8f48-9a7574583fb7 }, onLoginFailed: (error) => { $e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c }, onPressForgotPassword: () => { $c23dc9e4-5a70-41e7-bc30-83e9fdad3cac }, onPressRegister: () => { $01c73fba-7060-49ec-acd2-2afbf3e7fda2 }, }, }}  InputForm={{ style: { passwordInputFieldStyle: { containerStyle: { marginTop: 24, }, }, }, props: { type: 'email', },}}/>",
       "functions": [
         {
           "id": "c59e10ee-e0f2-4c66-8f48-9a7574583fb7",
@@ -63,5 +63,17 @@
         }
       ]
     }
-  ]
+  ],
+  "texts": {
+    "login_component": {
+      "lbl_sign_in": "Sign In",
+      "lbl_email": "Email",
+      "lbl_mobile_number": "Mobile number",
+      "lbl_password": "Password",
+      "btn_forgot_password": "Forgot password",
+      "btn_login": "LOGIN",
+      "btn_sign_up": "Sign up here",
+      "lbl_not_an_account": "Not a user yet?"
+    }
+  }
 }
