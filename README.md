@@ -20,12 +20,7 @@ Make sure you have permission to access this repository
 
 Because <b>react-native-auth-component</b> depends on some libraries, so make sure you installed all dependencies into your project.
 
-- Lodash: https://github.com/lodash/lodash
-- Formik: https://github.com/formium/formik
-- Masked Text: https://github.com/benhurott/react-native-masked-text
-- React Native Modal: https://github.com/react-native-modal/react-native-modal
 - Async storage: https://github.com/react-native-async-storage/async-storage
-- Svg display: https://github.com/react-native-svg/react-native-svg
 - Theme component: https://github.com/101digital/react-native-theme-component.git
 
 ## Quick Start
@@ -308,7 +303,10 @@ More about styles of each, you can reference here: https://github.com/101digital
 
 ### Add component to the config.json file manually
 
-- First step: Add component to `components` tags and replate `[data]` with your values
+1. Make sure you synced latest data in `component.json` to `auth-component.json`[https://github.com/101digital/components-data/blob/main/data/auth-component.json]
+
+2. Add the auth-component to `components` tags and replate `[data]` with your values.
+   The auth-component have `componentId` is "72520fc5-6be5-4ee5-b986-0e688ab4adff" and it can't be changed.
 
 ```
 {
@@ -331,7 +329,7 @@ More about styles of each, you can reference here: https://github.com/101digital
 }
 ```
 
-- Second step: The `dependencies` in `config.json` must have enough below data
+3. Check required dependencies of auth-component inside tag `dependencies` in `config.json`. Make sure tag `dependencies` must have enough below data
 
 ```
 {
@@ -339,15 +337,6 @@ More about styles of each, you can reference here: https://github.com/101digital
  "dependencies": [
     { "name": "https://github.com/101digital/react-native-theme-component.git" },
     { "name": "@react-native-community/async-storage", "version": "^1.12.0" },
-    {
-      "name": "axios",
-      "version": "^0.20.0"
-    },
-    {
-      "name": "js-base64",
-      "version": "^3.4.5"
-    },
-    { "name": "qs", "version": "^6.9.4" }
   ]
 ...
 }
@@ -355,7 +344,9 @@ More about styles of each, you can reference here: https://github.com/101digital
 
 If have any item is not existing in `dependencies` of `config.json` file, please find missing one from `src/component.json` and put it to `dependencies`.
 
-- Third step: Place `LoginComponent` with one template to the Screen. Example, if you want place `LoginComponent` to `LoginScreen` with `templateId` is "7c795b14-8ae4-47e0-9a94-162ff71bdf77". Then if user trigger `onPressForgotPassword` button, and you wanna navigate to `ForgotPasswordScreen`
+4. Place `LoginComponent` with one template to the Screen
+
+- Example, if you want place `LoginComponent` to `LoginScreen` with `templateId` is "7c795b14-8ae4-47e0-9a94-162ff71bdf77". Then if user trigger `onPressForgotPassword` button, and you wanna navigate to `ForgotPasswordScreen`
 
 Note that: `templateId` is one of template defined in `src/component.json`. `ForgotPasswordScreen` is existing with `route` name is `forgot-password-screen`
 
