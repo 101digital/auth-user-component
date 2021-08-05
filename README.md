@@ -303,7 +303,7 @@ More about styles of each, you can reference here: https://github.com/101digital
 
 ### Add component to the config.json file manually
 
-1. Make sure you synced latest data in `component.json` to `auth-component.json`[https://github.com/101digital/components-data/blob/main/data/auth-component.json]
+1. Make sure you synced latest local data in `auth-component.json` into `auth-component.json`[https://github.com/101digital/components-data/blob/main/data/auth-component.json]
 
 2. Add the auth-component to `components` tags and replate `[data]` with your values.
    The auth-component have `componentId` is "72520fc5-6be5-4ee5-b986-0e688ab4adff" and it can't be changed.
