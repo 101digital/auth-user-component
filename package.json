@@ -1,6 +1,6 @@
 {
   "name": "react-native-auth-component",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/react-native-auth-component.git",
   "main": "index.ts",
@@ -32,6 +32,7 @@
     "lodash": "^4.17.21",
     "react": "16.13.1",
     "react-native": "0.63.2",
+    "react-native-localize": "^2.1.1",
     "react-native-masked-text": "^1.13.0",
     "react-native-modal": "^12.0.2",
     "react-native-svg": "^12.1.1",

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { StyleProp, TextStyle, ViewStyle } from 'react-native';
-import { InputFieldStyles, InputPhoneNumberStyles } from 'react-native-theme-component';
+import { ErrorData, InputFieldStyles, InputPhoneNumberStyles } from 'react-native-theme-component';
 
 export type LoginComponentRef = {
   updateCountryCode: (code: string) => void;
@@ -28,6 +28,7 @@ export type LoginComponentProps = {
       notAccountLabel?: string;
       signUpLabel?: string;
       forgotPasswordLabel?: string;
+      genericError?: (error: Error) => ErrorData;
     };
     components?: {
       header?: ReactNode;

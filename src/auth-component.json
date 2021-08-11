@@ -74,6 +74,10 @@
       "btn_login": "LOGIN",
       "btn_sign_up": "Sign up here",
       "lbl_not_an_account": "Not a user yet?"
+    },
+    "common": {
+      "lbl_error": "Something went wrong",
+      "msg_error": "We are experiencing some temporary difficulties. Please try again later or contact our support team."
     }
   }
 }
