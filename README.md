@@ -303,10 +303,9 @@ More about styles of each, you can reference here: https://github.com/101digital
 
 ### Add component to the config.json file manually
 
-1. Make sure you synced latest local data in `auth-component.json` into `auth-component.json`[https://github.com/101digital/components-data/blob/main/data/auth-component.json]
+1. Make sure you synced latest local data in `auth-component.json` into [auth-component.json](https://github.com/101digital/components-data/blob/main/data/auth-component.json). They should be synced once you update
 
-2. Add the auth-component to `components` tags and replate `[data]` with your values.
-   The auth-component have `componentId` is "72520fc5-6be5-4ee5-b986-0e688ab4adff" and it can't be changed.
+2. Add the auth-component to `components` tags and replate `[data]` with your values. The auth-component have `componentId` is "72520fc5-6be5-4ee5-b986-0e688ab4adff" and it can't be changed.
 
 ```
 {
@@ -336,7 +335,6 @@ More about styles of each, you can reference here: https://github.com/101digital
 ...
  "dependencies": [
     { "name": "https://github.com/101digital/react-native-theme-component.git" },
-    { "name": "@react-native-community/async-storage", "version": "^1.12.0" },
   ]
 ...
 }
@@ -346,7 +344,12 @@ If have any item is not existing in `dependencies` of `config.json` file, please
 
 4. Place `LoginComponent` with one template to the Screen
 
-- Example, if you want place `LoginComponent` to `LoginScreen` with `templateId` is "7c795b14-8ae4-47e0-9a94-162ff71bdf77". Then if user trigger `onPressForgotPassword` button, and you wanna navigate to `ForgotPasswordScreen`
+| TemplateID                           | Template name                    |
+| :----------------------------------- | :------------------------------- |
+| 7c795b14-8ae4-47e0-9a94-162ff71bdf77 | Login with email template        |
+| f7244753-8d95-4f91-a1fa-88df174dc064 | Login with phone number template |
+
+- Example, if you want to place `LoginComponent` with email template to `LoginScreen`, then if user trigger `onPressForgotPassword` button, and you wanna navigate to `ForgotPasswordScreen`
 
 Note that: `templateId` is one of template defined in `src/component.json`. `ForgotPasswordScreen` is existing with `route` name is `forgot-password-screen`
 
