@@ -1,6 +1,5 @@
 import { Profile } from '../types';
-import AsyncStorage from '@react-native-community/async-storage';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const REFRESH_TOKEN_KEY = 'authcomponent.refreshToken';
 const ACCESS_TOKEN_KEY = 'authcomponent.accessToken';
 const ORG_TOKEN_KEY = 'authcomponent.orgToken';
