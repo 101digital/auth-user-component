@@ -9,19 +9,7 @@
     "tokenBaseUrl": "string",
     "membershipBaseUrl": "string"
   },
-  "dependencies": [
-    { "name": "https://github.com/101digital/react-native-theme-component.git" },
-    { "name": "@react-native-community/async-storage", "version": "^1.12.0" },
-    {
-      "name": "axios",
-      "version": "^0.20.0"
-    },
-    {
-      "name": "js-base64",
-      "version": "^3.4.5"
-    },
-    { "name": "qs", "version": "^6.9.4" }
-  ],
+  "dependencies": [{ "name": "https://github.com/101digital/react-native-theme-component.git" }],
   "templates": [
     {
       "id": "7c795b14-8ae4-47e0-9a94-162ff71bdf77",
@@ -30,6 +18,46 @@
       "import": "import { LoginComponent } from 'react-native-auth-component';\nimport { i18n } from '@/translations/translation-config';",
       "header": "",
       "body": "<LoginComponent Root={{ props: { i18n: i18n, onLoginSuccess: (profile) => { $c59e10ee-e0f2-4c66-8f48-9a7574583fb7 }, onLoginFailed: (error) => { $e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c }, onPressForgotPassword: () => { $c23dc9e4-5a70-41e7-bc30-83e9fdad3cac }, onPressRegister: () => { $01c73fba-7060-49ec-acd2-2afbf3e7fda2 }, }, }}  InputForm={{ style: { passwordInputFieldStyle: { containerStyle: { marginTop: 24, }, }, }, props: { type: 'email', },}}/>",
+      "functions": [
+        {
+          "id": "c59e10ee-e0f2-4c66-8f48-9a7574583fb7",
+          "name": "onLoginSuccess",
+          "params": [
+            {
+              "name": "profile",
+              "type": "Profile"
+            }
+          ]
+        },
+        {
+          "id": "e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c",
+          "name": "onLoginFailed",
+          "params": [
+            {
+              "name": "error",
+              "type": "Error"
+            }
+          ]
+        },
+        {
+          "id": "c23dc9e4-5a70-41e7-bc30-83e9fdad3cac",
+          "name": "onPressForgotPassword",
+          "params": []
+        },
+        {
+          "id": "01c73fba-7060-49ec-acd2-2afbf3e7fda2",
+          "name": "onPressRegister",
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "f7244753-8d95-4f91-a1fa-88df174dc064",
+      "templateName": "Login with phone number template",
+      "componentName": "LoginComponent",
+      "import": "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';\nimport { i18n } from '@/translations/translation-config';\nimport { CountryPicker, ThemeContext } from 'react-native-theme-component';",
+      "header": "const [showCountryPicker, setShowCountryPicker] = useState(false); const { deviceCountryCode } = useContext(ThemeContext); const loginRefs = useRef<LoginComponentRef>(); useEffect(() => { if (deviceCountryCode) { loginRefs?.current?.updateCountryCode(deviceCountryCode); }}, [deviceCountryCode]);",
+      "body": "<LoginComponent Root={{ props: { i18n: i18n, onLoginSuccess: (profile) => { $c59e10ee-e0f2-4c66-8f48-9a7574583fb7 }, onLoginFailed: (error) => { $e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c }, onPressForgotPassword: () => { $c23dc9e4-5a70-41e7-bc30-83e9fdad3cac }, onPressRegister: () => { $01c73fba-7060-49ec-acd2-2afbf3e7fda2 }, }, }}  InputForm={{ style: { passwordInputFieldStyle: { containerStyle: { marginTop: 24, }, }, }, props: {  onPressDialCode: () => { setShowCountryPicker(true); },},}}/>\n<CountryPicker isVisible={showCountryPicker} onClose={() => { setShowCountryPicker(false); }} onSelectedCountry={(code) => { setShowCountryPicker(false); loginRefs.current?.updateCountryCode(code); }} />",
       "functions": [
         {
           "id": "c59e10ee-e0f2-4c66-8f48-9a7574583fb7",
@@ -74,10 +102,6 @@
       "btn_login": "LOGIN",
       "btn_sign_up": "Sign up here",
       "lbl_not_an_account": "Not a user yet?"
-    },
-    "common": {
-      "lbl_error": "Something went wrong",
-      "msg_error": "We are experiencing some temporary difficulties. Please try again later or contact our support team."
     }
   }
 }
