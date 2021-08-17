@@ -20,7 +20,6 @@ Make sure you have permission to access this repository
 
 Because <b>react-native-auth-component</b> depends on some libraries, so make sure you installed all dependencies into your project.
 
-- Async storage: https://github.com/react-native-async-storage/async-storage
 - Theme component: https://github.com/101digital/react-native-theme-component.git
 
 ## Quick Start
