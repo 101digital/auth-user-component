@@ -12,7 +12,7 @@
 
 To add this component to React Native app, run this command:
 
-```
+```sh
 yarn add git+ssh://git@github.com/101digital/react-native-auth-component.git
 ```
 
@@ -20,7 +20,7 @@ Make sure you have permission to access this repository
 
 Because <b>react-native-auth-component</b> depends on some libraries, so make sure you installed all dependencies into your project.
 
-- Theme component: https://github.com/101digital/react-native-theme-component.git
+- Theme component [react-native-theme-component](https://github.com/101digital/react-native-theme-component.git)
 
 ## Quick Start
 
@@ -51,25 +51,16 @@ AuthComponent.instance()
   });
 
 const App = () => {
-    /* YOUR COMPONENTS */
-}
-
+  return (
+    <View>
+      <AuthProvider>/* YOUR COMPONENTS */</AuthProvider>
+    </View>
+  );
+};
 export default App;
 ```
 
 <b>react-native-auth-component</b> also provides `AuthContext` using Context API to maintain authentication state. If you want to use `AuthContext` you <b>HAVE TO</b> wrap your components with `AuthProvider`. This is required if you use `LoginComponent`.
-
-```javascript
-import { AuthComponent, AuthProvider } from 'react-native-auth-component';
-
-// init AuthComponent
-
-const App = () => {
-  <AuthProvider>/* YOUR COMPONENTS */</AuthProvider>;
-};
-
-export default App;
-```
 
 ## API reference
 
@@ -81,6 +72,8 @@ Create client to excute API request that only required basic token.
 
 ```javascript
 import { createAppTokenApiClient } from 'react-native-auth-component';
+
+const identityApiClient = createAppTokenApiClient(env.api.baseUrl.identity);
 ```
 
 ### `createAuthorizedApiClient`
@@ -92,6 +85,8 @@ Create client to excute API requests that required Authentication
 
 ```javascript
 import { createAuthorizedApiClient } from 'react-native-auth-component';
+
+const authApiClient = createAuthorizedApiClient(env.api.baseUrl.identity);
 ```
 
 ### `AuthContext`
@@ -102,25 +97,36 @@ Maintain authentication state using Context API. To retrieve Context data and fu
 import React, { useContext } from 'react';
 import { AuthContext } from 'react-native-auth-component';
 
-const ReactComponentEx = () => {
+const ReactComponentExample = () => {
   const { login, profile } = useContext(AuthContext);
 
   /* YOUR COMPONENT */
 };
 ```
 
-- Functions and state data
+- Functions and state
 
-| Name             | Type                                          | Description                                                                  |
-| :--------------- | :-------------------------------------------- | :--------------------------------------------------------------------------- |
-| profile          | Profile                                       | Current user profile. Return `undefined` if not authenticated                |
-| profilePicture   | string                                        | Get current profile picture                                                  |
-| isSignedIn       | bool                                          | Authentication state. Return `true` if authenticated, or else return `false` |
-| isSigning        | bool                                          | Return `true` if excuting login action                                       |
-| errorSignIn      | Error                                         | Return error value if any failures while excuting login                      |
-| login            | Function (username, password)                 | Excute login action                                                          |
-| clearSignInError | Funtion                                       | Clear current failed login state                                             |
-| updateProfile    | Funtion (userId, firstName, lastName, avatar) | Update current profile information                                           |
+```javascript
+export interface AuthContextData {
+  profile?: Profile; // Current user profile. Return `undefined` if not authenticated
+  profilePicture?: string; // Get current profile picture
+  isSignedIn: boolean; // Authentication state. Return `true` if authenticated, or else return `false`
+  isSigning: boolean; // Return `true` if excuting login action
+  errorSignIn?: Error; // Return error value if any failures while excuting login
+  login: (username: string, password: string) => Promise<Profile | undefined>; // Excute login action
+  logout: () => void; // Excute logout action
+  clearSignInError: () => void; // Clear current failed login state
+  updateProfile: (
+    userId: string,
+    firstName: string,
+    lastName: string,
+    profilePicture?: string
+  ) => Promise<boolean>; // Update current profile information
+  isUpdatingProfile?: boolean; // Updating profile state
+  errorUpdateProfile?: Error; // Error while update profile
+  clearUpdateProfileError: () => void;
+}
+```
 
 ### `AuthServices`
 
