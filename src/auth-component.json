@@ -1,6 +1,6 @@
 {
-  "id": "72520fc5-6be5-4ee5-b986-0e688ab4adff",
-  "name": "AuthComponent",
+  "id": "auth-component",
+  "name": "Auth Component",
   "repository": "https://github.com/101digital/react-native-auth-component",
   "config": {
     "env": {
@@ -111,29 +111,15 @@
     }
   ],
   "texts": {
-    "vi": {
-      "login_component": {
-        "lbl_sign_in": "Sign In",
-        "lbl_email": "Email",
-        "lbl_mobile_number": "Mobile number",
-        "lbl_password": "Password",
-        "btn_forgot_password": "Forgot password",
-        "btn_login": "LOGIN",
-        "btn_sign_up": "Sign up here",
-        "lbl_not_an_account": "Not a user yet?"
-      }
-    },
-    "en": {
-      "login_component": {
-        "lbl_sign_in": "Sign In",
-        "lbl_email": "Email",
-        "lbl_mobile_number": "Mobile number",
-        "lbl_password": "Password",
-        "btn_forgot_password": "Forgot password",
-        "btn_login": "LOGIN",
-        "btn_sign_up": "Sign up here",
-        "lbl_not_an_account": "Not a user yet?"
-      }
+    "login_component": {
+      "lbl_sign_in": "Sign In",
+      "lbl_email": "Email",
+      "lbl_mobile_number": "Mobile number",
+      "lbl_password": "Password",
+      "btn_forgot_password": "Forgot password",
+      "btn_login": "LOGIN",
+      "btn_sign_up": "Sign up here",
+      "lbl_not_an_account": "Not a user yet?"
     }
   }
 }
