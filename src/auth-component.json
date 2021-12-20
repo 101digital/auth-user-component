@@ -1,0 +1,125 @@
+{
+  "id": "auth-component",
+  "name": "Auth Component",
+  "repository": "https://github.com/101digital/react-native-auth-component",
+  "config": {
+    "env": {
+      "development": {
+        "clientId": "gltBKX0Xvbt5HTRPTPdcuicabRUa",
+        "clientSecret": "vCRObVDOb_vlEctFor8X6LFWArca",
+        "ternantDomain": "carbon.super",
+        "tokenBaseUrl": "https://sandbox.101digital.io/token",
+        "membershipBaseUrl": "https://sandbox.101digital.io/membership-service/1.2.1-SNAPSHOT"
+      },
+      "staging": {
+        "clientId": "gltBKX0Xvbt5HTRPTPdcuicabRUa",
+        "clientSecret": "vCRObVDOb_vlEctFor8X6LFWArca",
+        "ternantDomain": "carbon.super",
+        "tokenBaseUrl": "https://sandbox.101digital.io/token",
+        "membershipBaseUrl": "https://sandbox.101digital.io/membership-service/1.2.1-SNAPSHOT"
+      },
+      "production": {
+        "clientId": "vpqOwqOIY3l7gD4nzuEPgKgQ5Sca",
+        "clientSecret": "VfLff9SrxAwlJMW_TwzkFgnrSm8a",
+        "ternantDomain": "carbon.super",
+        "tokenBaseUrl": "https://api.101digital.io/token",
+        "membershipBaseUrl": "https://api.101digital.io/membership-service/v1.0"
+      }
+    }
+  },
+  "dependencies": [{ "name": "https://github.com/101digital/react-native-theme-component.git" }],
+  "templates": [
+    {
+      "id": "7c795b14-8ae4-47e0-9a94-162ff71bdf77",
+      "templateName": "Login with email template",
+      "componentName": "LoginComponent",
+      "import": "import { LoginComponent } from 'react-native-auth-component';\nimport { i18n } from '@/translations/translation-config';",
+      "header": "",
+      "body": "<LoginComponent Root={{ props: { i18n: i18n, onLoginSuccess: (profile) => { $c59e10ee-e0f2-4c66-8f48-9a7574583fb7 }, onLoginFailed: (error) => { $e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c }, onPressForgotPassword: () => { $c23dc9e4-5a70-41e7-bc30-83e9fdad3cac }, onPressRegister: () => { $01c73fba-7060-49ec-acd2-2afbf3e7fda2 }, }, }}  InputForm={{ style: { passwordInputFieldStyle: { containerStyle: { marginTop: 24, }, }, }, props: { type: 'email', },}}/>",
+      "functions": [
+        {
+          "id": "c59e10ee-e0f2-4c66-8f48-9a7574583fb7",
+          "name": "onLoginSuccess",
+          "params": [
+            {
+              "name": "profile",
+              "type": "Profile"
+            }
+          ]
+        },
+        {
+          "id": "e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c",
+          "name": "onLoginFailed",
+          "params": [
+            {
+              "name": "error",
+              "type": "Error"
+            }
+          ]
+        },
+        {
+          "id": "c23dc9e4-5a70-41e7-bc30-83e9fdad3cac",
+          "name": "onPressForgotPassword",
+          "params": []
+        },
+        {
+          "id": "01c73fba-7060-49ec-acd2-2afbf3e7fda2",
+          "name": "onPressRegister",
+          "params": []
+        }
+      ]
+    },
+    {
+      "id": "f7244753-8d95-4f91-a1fa-88df174dc064",
+      "templateName": "Login with phone number template",
+      "componentName": "LoginComponent",
+      "import": "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';\nimport { i18n } from '@/translations/translation-config';\nimport { CountryPicker, ThemeContext } from 'react-native-theme-component';",
+      "header": "const [showCountryPicker, setShowCountryPicker] = useState(false); const { deviceCountryCode } = useContext(ThemeContext); const loginRefs = useRef<LoginComponentRef>(); useEffect(() => { if (deviceCountryCode) { loginRefs?.current?.updateCountryCode(deviceCountryCode); }}, [deviceCountryCode]);",
+      "body": "<LoginComponent ref={loginRefs} Root={{ props: { i18n: i18n, onLoginSuccess: (profile) => { $c59e10ee-e0f2-4c66-8f48-9a7574583fb7 }, onLoginFailed: (error) => { $e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c }, onPressForgotPassword: () => { $c23dc9e4-5a70-41e7-bc30-83e9fdad3cac }, onPressRegister: () => { $01c73fba-7060-49ec-acd2-2afbf3e7fda2 }, }, }}  InputForm={{ style: { passwordInputFieldStyle: { containerStyle: { marginTop: 24, }, }, }, props: {  onPressDialCode: () => { setShowCountryPicker(true); },},}}/>\n<CountryPicker isVisible={showCountryPicker} onClose={() => { setShowCountryPicker(false); }} onSelectedCountry={(code) => { setShowCountryPicker(false); loginRefs.current?.updateCountryCode(code); }} />",
+      "functions": [
+        {
+          "id": "c59e10ee-e0f2-4c66-8f48-9a7574583fb7",
+          "name": "onLoginSuccess",
+          "params": [
+            {
+              "name": "profile",
+              "type": "Profile"
+            }
+          ]
+        },
+        {
+          "id": "e70094ab-9b8d-45fe-ae8f-9ad40bbbf23c",
+          "name": "onLoginFailed",
+          "params": [
+            {
+              "name": "error",
+              "type": "Error"
+            }
+          ]
+        },
+        {
+          "id": "c23dc9e4-5a70-41e7-bc30-83e9fdad3cac",
+          "name": "onPressForgotPassword",
+          "params": []
+        },
+        {
+          "id": "01c73fba-7060-49ec-acd2-2afbf3e7fda2",
+          "name": "onPressRegister",
+          "params": []
+        }
+      ]
+    }
+  ],
+  "texts": {
+    "login_component": {
+      "lbl_sign_in": "Sign In",
+      "lbl_email": "Email",
+      "lbl_mobile_number": "Mobile number",
+      "lbl_password": "Password",
+      "btn_forgot_password": "Forgot password",
+      "btn_login": "LOGIN",
+      "btn_sign_up": "Sign up here",
+      "lbl_not_an_account": "Not a user yet?"
+    }
+  }
+}
