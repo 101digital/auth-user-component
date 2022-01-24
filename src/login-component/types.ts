@@ -17,17 +17,11 @@ export type LoginComponentProps = {
   Root: {
     style?: LoginComponentStyles;
     props: {
-      i18n?: any;
-      onLoginSuccess: (userData: any) => void;
-      onLoginFailed: (error: Error) => void;
+      onLoginSuccess?: (userData: any) => void;
+      onLoginFailed?: (error: Error) => void;
       onPressForgotPassword: () => void;
       onPressRegister: () => void;
       formatError?: (error: string) => string;
-      formTitle?: string;
-      loginButtonLabel?: string;
-      notAccountLabel?: string;
-      signUpLabel?: string;
-      forgotPasswordLabel?: string;
       genericError?: (error: Error) => ErrorData;
     };
     components?: {
@@ -43,8 +37,6 @@ export type LoginComponentProps = {
       initialSignInData?: SignInData;
       type?: 'phonenumber' | 'email';
       validationSchema?: any;
-      passwordHint?: string;
-      usernameHint?: string;
       onPressDialCode?: () => void;
     };
     component?: {

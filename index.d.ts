@@ -11,4 +11,5 @@ export {
 } from './src/login-component/types';
 export { AuthContext, AuthProvider } from './src/auth-context';
 export * from './src/types';
-export { default as authComponentData } from './src/component.json';
+export { default as authComponentData } from './src/auth-component.json';
+export * from './src/assets';

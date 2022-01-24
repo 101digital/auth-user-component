@@ -1,6 +1,6 @@
 {
   "name": "react-native-auth-component",
-  "version": "1.0.40",
+  "version": "1.0.41",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/react-native-auth-component.git",
   "main": "index.ts",

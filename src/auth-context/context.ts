@@ -1,4 +1,4 @@
-import { Profile, ProfileCustomField } from '../types';
+import { Profile, ProfileCustomField, CountryInformation } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
@@ -10,7 +10,11 @@ export interface AuthContextData {
   isSignedIn: boolean;
   isSigning: boolean;
   errorSignIn?: Error;
-  login: (username: string, password: string) => Promise<Profile | undefined>;
+  login: (
+    username: string,
+    password: string,
+    country?: CountryInformation
+  ) => Promise<Profile | undefined>;
   logout: () => void;
   clearSignInError: () => void;
   updateProfile: (
@@ -50,23 +54,26 @@ export const useAuthContextValue = (): AuthContextData => {
     checkLogin();
   }, []);
 
-  const login = useCallback(async (username: string, password: string) => {
-    try {
-      setIsSigning(true);
-      await AuthServices.instance().login(username, password);
-      const { data } = await AuthServices.instance().fetchProfile();
-      await authComponentStore.storeProfile(data);
-      setProfile(data);
-      setIsSignedIn(true);
-      getProfilePicture(data);
-      setIsSigning(false);
-      return data;
-    } catch (error) {
-      setIsSigning(false);
-      setErrorSignIn(error);
-      return undefined;
-    }
-  }, []);
+  const login = useCallback(
+    async (username: string, password: string, country?: CountryInformation) => {
+      try {
+        setIsSigning(true);
+        await AuthServices.instance().login(username, password);
+        const { data } = await AuthServices.instance().fetchProfile();
+        await authComponentStore.storeProfile(data);
+        setProfile({ ...data, country });
+        setIsSignedIn(true);
+        getProfilePicture(data);
+        setIsSigning(false);
+        return { ...data, country };
+      } catch (error) {
+        setIsSigning(false);
+        setErrorSignIn(error as Error);
+        return undefined;
+      }
+    },
+    []
+  );
 
   const getProfilePicture = (profile: Profile) => {
     const profileImage = profile?.listCustomFields.filter((p: ProfileCustomField) => {
@@ -109,7 +116,7 @@ export const useAuthContextValue = (): AuthContextData => {
         return true;
       } catch (error) {
         setIsUpdatingProfile(false);
-        setErrorUpdateProfile(error);
+        setErrorUpdateProfile(error as Error);
         return false;
       }
     },
