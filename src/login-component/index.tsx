@@ -170,6 +170,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
               }
             : undefined
         }
+        isShowClose={false}
         onClose={clearSignInError}
       />
     </>
