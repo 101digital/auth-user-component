@@ -2,8 +2,8 @@
 import qs from 'qs';
 import authComponentStore from './local-store';
 import axios from 'axios';
-import { AuthComponentConfig } from '..';
 import { AuthApiClient } from '../api-client/auth-api-client';
+import { AuthComponentConfig } from '../types';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
@@ -25,22 +25,19 @@ export class AuthServices {
     this._configs = configs;
   }
 
-  public login = async (
-    username: string,
-    password: string,
-    grant_type = 'password',
-    scope = 'openid'
-  ) => {
+  public login = async (username: string, password: string, grantType?: string, scope?: string) => {
     const body = qs.stringify({
-      grant_type,
+      grant_type: grantType ?? this._configs?.authGrantType ?? 'password',
       username,
       password,
     });
-    const response = await AuthApiClient.instance().getAuthApiClient().post('', body, {
-      params: {
-        scope,
-      },
-    });
+    const response = await AuthApiClient.instance()
+      .getAuthApiClient()
+      .post('', body, {
+        params: {
+          scope: scope ?? this._configs?.authScope ?? 'openid',
+        },
+      });
     const { access_token, refresh_token } = response.data;
     await authComponentStore.storeAccessToken(access_token);
     await authComponentStore.storeRefreshToken(refresh_token);
@@ -76,10 +73,9 @@ export class AuthServices {
   };
 
   fetchAppAccessToken = async () => {
-    const { grantType, scope } = this._configs!;
     const body = qs.stringify({
-      grant_type: grantType ?? 'client_credentials',
-      scope: scope ?? 'PRODUCTION',
+      grant_type: this._configs?.appGrantType ?? 'client_credentials',
+      scope: this._configs?.appScope ?? 'PRODUCTION',
     });
     const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
     return response.data.access_token;

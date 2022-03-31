@@ -58,3 +58,15 @@ export interface Currency {
   displaySpace: number;
   logo: string;
 }
+
+export type AuthComponentConfig = {
+  clientId: string;
+  clientSecret: string;
+  ternantDomain: string;
+  tokenBaseUrl: string;
+  membershipBaseUrl: string;
+  appGrantType?: string; // using for get app token
+  appScope?: string; // using for get app token
+  authGrantType?: string; // using for login
+  authScope?: string; // using for login
+};

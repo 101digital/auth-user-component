@@ -1,16 +1,7 @@
 import { DeviceEventEmitter } from 'react-native';
 import { AuthApiClient } from './api-client/auth-api-client';
 import { AuthServices } from './services/auth-services';
-
-export type AuthComponentConfig = {
-  clientId: string;
-  clientSecret: string;
-  ternantDomain: string;
-  tokenBaseUrl: string;
-  membershipBaseUrl: string;
-  grantType?: string;
-  scope?: string;
-};
+import { AuthComponentConfig } from './types';
 
 export class AuthComponent {
   private static _instance: AuthComponent = new AuthComponent();
