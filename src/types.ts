@@ -68,5 +68,9 @@ export type AuthComponentConfig = {
   appGrantType?: string; // using for get app token
   appScope?: string; // using for get app token
   authGrantType?: string; // using for login
-  authScope?: string; // using for login
+  authScope?: string; // using for login,
+  redirectUrl?: string; // required for oauth2
+  authorizationBaseUrl?: string; // required for oauth2
+  revocationBaseUrl?: string; // required for oauth2
+  endSessionBaseUrl?: string; // required for oauth2
 };

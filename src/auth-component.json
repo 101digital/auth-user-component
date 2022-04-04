@@ -13,7 +13,11 @@
         "authGrantType": "password",
         "authScope": "openid",
         "appGrantType": "client_credentials",
-        "appScope": "PRODUCTION"
+        "appScope": "PRODUCTION",
+        "redirectUrl": "pay101://outh2_callback",
+        "authorizationBaseUrl": "https://sandbox.101digital.io/oauth2/authorize",
+        "revocationBaseUrl": "https://sandbox.101digital.io/revoke",
+        "endSessionBaseUrl": "https://sandbox.101digital.io/oidc/logout"
       },
       "staging": {
         "clientId": "gltBKX0Xvbt5HTRPTPdcuicabRUa",
@@ -24,7 +28,11 @@
         "authGrantType": "password",
         "authScope": "openid",
         "appGrantType": "client_credentials",
-        "appScope": "PRODUCTION"
+        "appScope": "PRODUCTION",
+        "redirectUrl": "pay101://outh2_callback",
+        "authorizationBaseUrl": "https://sandbox.101digital.io/oauth2/authorize",
+        "revocationBaseUrl": "https://sandbox.101digital.io/revoke",
+        "endSessionBaseUrl": "https://sandbox.101digital.io/oidc/logout"
       },
       "production": {
         "clientId": "vpqOwqOIY3l7gD4nzuEPgKgQ5Sca",
@@ -35,7 +43,11 @@
         "authGrantType": "password",
         "authScope": "openid",
         "appGrantType": "client_credentials",
-        "appScope": "PRODUCTION"
+        "appScope": "PRODUCTION",
+        "redirectUrl": "pay101://outh2_callback",
+        "authorizationBaseUrl": "https://sandbox.101digital.io/oauth2/authorize",
+        "revocationBaseUrl": "https://sandbox.101digital.io/revoke",
+        "endSessionBaseUrl": "https://sandbox.101digital.io/oidc/logout"
       }
     }
   },
