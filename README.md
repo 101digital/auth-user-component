@@ -1,12 +1,13 @@
 # react-native-auth-component
 
-<b>react-native-auth-component</b> is a reusable component for authentication and authorization that can be used across all the apps developed by 101 Digital.
+**react-native-auth-component** is a reusable component for authentication and authorization that can be used across all the apps developed by 101 Digital.
 
 ## Features
 
 - Provide login function and keep the current session
 - Auto-refresh token once the token is expired
 - Include manage organization token
+- Support login with OAuth2
 
 ## Installation
 
@@ -18,27 +19,33 @@ yarn add git+ssh://git@github.com/101digital/react-native-auth-component.git
 
 Make sure you have permission to access this repository
 
-Because <b>react-native-auth-component</b> depends on some libraries, so make sure you installed all dependencies into your project.
+Because **react-native-auth-component** depends on some libraries, so make sure you installed all dependencies into your project.
 
-- Theme component [react-native-theme-component](https://github.com/101digital/react-native-theme-component.git)
+- [react-native-theme-component](https://github.com/101digital/react-native-theme-component.git)
+- [react-native-app-auth](https://github.com/FormidableLabs/react-native-app-auth). **Note** You need to see [Stetup](https://github.com/FormidableLabs/react-native-app-auth) only. Other functions have been implemented.
 
 ## Quick Start
 
 Before using this component, you must configure environment variables. That should be configure early in top of your `app.ts`
 
 ```javascript
-import env from '@/env';
 import { AuthComponent } from 'react-native-auth-component';
 
 AuthComponent.instance()
   .configure({
-    clientId: env.api.clientId,  //required
-    clientSecret: env.api.clientSecret,  //required
-    ternantDomain: env.api.tenantDomain,  //required
-    tokenBaseUrl: env.api.baseUrl.token,  //required
-    membershipBaseUrl: env.api.baseUrl.membership,  //required
-    grantType: 'client_credentials'  //optional, default is 'client_credentials',
-    scope: 'PRODUCTION'  //optional, default is 'PRODUCTION'
+    clientId: string;
+    clientSecret: string;
+    ternantDomain: string;
+    tokenBaseUrl: string;
+    membershipBaseUrl: string;
+    appGrantType?: string; // using for get app token
+    appScope?: string; // using for get app token
+    authGrantType?: string; // using for login
+    authScope?: string; // using for login,
+    redirectUrl?: string; // required for oauth2
+    authorizationBaseUrl?: string; // required for oauth2
+    revocationBaseUrl?: string; // required for oauth2
+    endSessionBaseUrl?: string; // required for oauth2
   })
   .then(() => {
     // init other component, such as Banking Component
@@ -60,7 +67,7 @@ const App = () => {
 export default App;
 ```
 
-<b>react-native-auth-component</b> also provides `AuthContext` using Context API to maintain authentication state. If you want to use `AuthContext` you <b>HAVE TO</b> wrap your components with `AuthProvider`. This is required if you use `LoginComponent`.
+**react-native-auth-component** also provides `AuthContext` using Context API to maintain authentication state. If you want to use `AuthContext` you **HAVE TO** wrap your components with `AuthProvider`. This is required if you use `LoginComponent`.
 
 ## API reference
 
@@ -113,7 +120,8 @@ export interface AuthContextData {
   isSignedIn: boolean; // Authentication state. Return `true` if authenticated, or else return `false`
   isSigning: boolean; // Return `true` if excuting login action
   errorSignIn?: Error; // Return error value if any failures while excuting login
-  login: (username: string, password: string) => Promise<Profile | undefined>; // Excute login action
+  login: (username: string, password: string) => Promise<Profile | undefined>; // Execute login action
+  loginOAuth2: () => Promise<Profile | undefined>; // Execute login OAuth2
   logout: () => void; // Excute logout action
   clearSignInError: () => void; // Clear current failed login state
   updateProfile: (
@@ -134,13 +142,14 @@ Provide functions to make authentication
 
 - Functions
 
-| Name                | Type                          | Description                                                                                                                                                                                           |
-| :------------------ | :---------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| login               | Function (username, password) | Promise function using username/password or email/password to generate token. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data. |
-| refreshToken        | Function (refresh_token)      | Promise function to re-new token from old `refresh_token`. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.                    |
-| fetchOrgToken       | Function                      | Promise function to get token from organization which linked to accounts. If successfully, `org_token` will be stored to local storage.                                                               |
-| logout              | Function                      | Promise function to clear current session                                                                                                                                                             |
-| fetchAppAccessToken | Function                      | Promise function return app access token base on basic token                                                                                                                                          |
+| Name                | Type                          | Description                                                                                                                                                                                                                                                               |
+| :------------------ | :---------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| login               | Function (username, password) | Promise function using username/password or email/password to generate token. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.                                                                     |
+| loginOAuth2         | Function                      | Promise function using OAuth2. The application will be redirect to [Authorization Code Flow](https://oauth.net/2/grant-types/authorization-code/) . If successfully, `accessToken` and `refreshToken` will be stored to local storage. Then it will return response data. |
+| refreshToken        | Function (refresh_token)      | Promise function to re-new token from old `refresh_token`. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.                                                                                        |
+| fetchOrgToken       | Function                      | Promise function to get token from organization which linked to accounts. If successfully, `org_token` will be stored to local storage.                                                                                                                                   |
+| logout              | Function                      | Promise function to clear current session                                                                                                                                                                                                                                 |
+| fetchAppAccessToken | Function                      | Promise function return app access token base on basic token                                                                                                                                                                                                              |
 
 ```javascript
 import { AuthServices } from 'react-native-auth-component';
@@ -194,7 +203,7 @@ const handleSessionExpired = () => {
 
 Provide a simple login form (that is optional, you can use your login form), support type `email` and `phonenumber`. You can listen login succeed or failed response then handle your business logic.
 
-<b>Important</b>: If you use LoginComponent, you <b>HAVE TO</b> wrap your `App` with `AuthProvider`
+**Important**: If you use LoginComponent, you **HAVE TO** wrap your `App` with `AuthProvider`
 
 ```javascript
 import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';
@@ -297,7 +306,7 @@ Type of `InputFormStyles`
 | userNameInputFieldStyle | InputPhoneNumberStyles (Optional) | Styles of username input field |
 | passwordInputFieldStyle | InputFieldStyles (Optional)       | Styles of password input field |
 
-More about styles of each, you can reference here: https://github.com/101digital/react-native-theme-component.git
+More about styles of each, you can reference here: <https://github.com/101digital/react-native-theme-component.git>
 
 - `component`
 
