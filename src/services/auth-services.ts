@@ -4,6 +4,7 @@ import authComponentStore from './local-store';
 import axios from 'axios';
 import { AuthApiClient } from '../api-client/auth-api-client';
 import { AuthComponentConfig } from '../types';
+import { authorize } from 'react-native-app-auth';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
@@ -105,5 +106,41 @@ export class AuthServices {
       },
     });
     return response.data;
+  };
+
+  loginOAuth2 = async () => {
+    if (!this._configs) {
+      throw new Error("Error: Can't find the configurations for Auth component");
+    }
+    const {
+      clientId,
+      clientSecret,
+      tokenBaseUrl,
+      redirectUrl,
+      authScope,
+      authorizationBaseUrl,
+      revocationBaseUrl,
+      endSessionBaseUrl,
+    } = this._configs;
+    if (!authorizationBaseUrl) {
+      throw new Error("Error: authorizationEndpoint can't be undefined");
+    }
+    if (!redirectUrl) {
+      throw new Error("Error: redirectUrl can't be undefined");
+    }
+    const config = {
+      clientId,
+      clientSecret,
+      redirectUrl: redirectUrl,
+      scopes: [authScope ?? 'openid'],
+      serviceConfiguration: {
+        authorizationEndpoint: authorizationBaseUrl,
+        tokenEndpoint: tokenBaseUrl,
+        revocationEndpoint: revocationBaseUrl,
+        endSessionEndpoint: endSessionBaseUrl,
+      },
+    };
+    const response = await authorize(config);
+    return response;
   };
 }

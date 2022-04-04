@@ -15,6 +15,7 @@ export interface AuthContextData {
     password: string,
     country?: CountryInformation
   ) => Promise<Profile | undefined>;
+  loginOAuth2: () => Promise<Profile | undefined>;
   logout: () => void;
   clearSignInError: () => void;
   updateProfile: (
@@ -33,6 +34,7 @@ export const authDefaultValue: AuthContextData = {
   isSigning: false,
   errorSignIn: undefined,
   login: async () => undefined,
+  loginOAuth2: async () => undefined,
   logout: () => null,
   clearSignInError: () => null,
   updateProfile: async () => false,
@@ -52,6 +54,26 @@ export const useAuthContextValue = (): AuthContextData => {
 
   useEffect(() => {
     checkLogin();
+  }, []);
+
+  const loginOAuth2 = useCallback(async () => {
+    try {
+      setIsSigning(true);
+      const { accessToken, refreshToken } = await AuthServices.instance().loginOAuth2();
+      await authComponentStore.storeAccessToken(accessToken);
+      await authComponentStore.storeRefreshToken(refreshToken);
+      const { data } = await AuthServices.instance().fetchProfile();
+      await authComponentStore.storeProfile(data);
+      setProfile({ ...data });
+      setIsSignedIn(true);
+      getProfilePicture(data);
+      setIsSigning(false);
+      return { ...data };
+    } catch (error) {
+      setIsSigning(false);
+      setErrorSignIn(error as Error);
+      return undefined;
+    }
   }, []);
 
   const login = useCallback(
@@ -139,6 +161,7 @@ export const useAuthContextValue = (): AuthContextData => {
       errorUpdateProfile: _errorUpdateProfile,
       clearUpdateProfileError,
       isUpdatingProfile: _isUpdatingProfile,
+      loginOAuth2,
     }),
     [
       _profile,
