@@ -22,7 +22,7 @@ Make sure you have permission to access this repository
 Because **react-native-auth-component** depends on some libraries, so make sure you installed all dependencies into your project.
 
 - [react-native-theme-component](https://github.com/101digital/react-native-theme-component.git)
-- [react-native-app-auth](https://github.com/FormidableLabs/react-native-app-auth). **Note** You need to see [Stetup](https://github.com/FormidableLabs/react-native-app-auth) only. Other functions have been implemented.
+- [react-native-app-auth](https://github.com/FormidableLabs/react-native-app-auth). **Note** You need to see [Stetup](https://github.com/FormidableLabs/react-native-app-auth#setup) only. Other functions have been implemented.
 
 ## Quick Start
 
