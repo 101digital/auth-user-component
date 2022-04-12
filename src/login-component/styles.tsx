@@ -8,37 +8,37 @@ const useMergeStyles = (style?: LoginComponentStyles): LoginComponentStyles => {
   const defaultStyles: LoginComponentStyles = StyleSheet.create({
     containerStyle: {
       flex: 1,
-      padding: 24,
+      padding: 24
     },
     logoContainerStyle: {
       alignSelf: 'center',
-      marginBottom: 32,
+      marginBottom: 32
     },
     formTitleStyle: {
       fontFamily: fonts.semiBold,
       fontSize: 22,
       color: '#0C3F79',
-      marginBottom: 32,
+      marginBottom: 32
     },
     forgotPasswordLabelStyle: {
       fontFamily: fonts.regular,
       fontSize: 16,
       color: '#0C3F79',
-      lineHeight: 20,
+      lineHeight: 20
     },
     forgotPasswordContainerStyle: {
       alignSelf: 'flex-end',
-      marginTop: 12,
+      marginTop: 12
     },
     noneAccountLabelStyle: {
       fontFamily: fonts.regular,
       fontSize: 16,
       color: 'grey',
-      lineHeight: 20,
+      lineHeight: 20
     },
     signUpContainerStyle: {
       flexDirection: 'row',
-      marginVertical: 32,
+      marginVertical: 32
     },
     signUpLabelStyle: {
       fontFamily: fonts.regular,
@@ -46,8 +46,13 @@ const useMergeStyles = (style?: LoginComponentStyles): LoginComponentStyles => {
       color: '#0C3F79',
       lineHeight: 20,
       textDecorationLine: 'underline',
-      marginHorizontal: 8,
+      marginHorizontal: 8
     },
+    loginButtonStyle: {
+      primaryContainerStyle: {
+        marginTop: 32
+      }
+    }
   });
   return defaultsDeep(style, defaultStyles);
 };
