@@ -142,7 +142,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   return (
     <>
       <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
-        <ScrollView keyboardShouldPersistTaps="handled">
+        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={rootStyles.logoContainerStyle}>
             {Root?.components?.header ?? <DefaultLogoIcon width={120} height={120} />}
           </View>
