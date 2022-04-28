@@ -6,14 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Text,
-  Keyboard,
+  Keyboard
 } from 'react-native';
 import {
   Button,
   ErrorModal,
   InputField,
   InputPhoneNumber,
-  ThemeContext,
+  ThemeContext
 } from 'react-native-theme-component';
 import { LoginComponentProps, LoginComponentRef, SignInData } from './types';
 import useMergeStyles from './styles';
@@ -36,7 +36,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
   useImperativeHandle(
     ref,
     (): LoginComponentRef => ({
-      updateCountryCode,
+      updateCountryCode
     })
   );
 
@@ -48,7 +48,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
     Keyboard.dismiss();
     const { username, password } = values;
     const _username = _type === 'phonenumber' ? username.replace(/\D+/g, '') : username;
-    const _country = countries.find((country) => country.attributes.idd === dialCode);
+    const _country = countries.find(country => country.attributes.idd === dialCode);
     const profile = await login(_username, password, _country);
     if (profile) {
       Root?.props?.onLoginSuccess?.(profile);
@@ -59,16 +59,25 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
 
   const renderForm = (formProps: FormikProps<SignInData>) => (
     <View>
+      {InputForm?.props?.withLabel && (
+        <Text>
+          {' '}
+          {_type === 'email'
+            ? i18n?.t('login_component.lbl_email')
+            : i18n?.t('login_component.lbl_mobile_number') ?? _type}{' '}
+        </Text>
+      )}
+
       {_type === 'email' ? (
         <InputField
           prefixIcon={
-            InputForm?.component?.usernameIcon ?? <EmailIcon width={30} height={30} color='grey' />
+            InputForm?.component?.usernameIcon ?? <EmailIcon width={30} height={30} color="grey" />
           }
-          name='username'
-          returnKeyType='done'
+          name="username"
+          returnKeyType="done"
           placeholder={i18n?.t('login_component.lbl_email') ?? 'Email'}
-          keyboardType='email-address'
-          autoCapitalize='none'
+          keyboardType="email-address"
+          autoCapitalize="none"
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
         />
@@ -79,30 +88,37 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
           prefixIcon={
             <View>
               {InputForm?.component?.usernameIcon ?? (
-                <PhoneIcon width={30} height={30} color='grey' />
+                <PhoneIcon width={30} height={30} color="grey" />
               )}
             </View>
           }
-          name='username'
-          returnKeyType='done'
+          name="username"
+          returnKeyType="done"
           placeholder={i18n?.t('login_component.lbl_mobile_number') ?? 'Mobile number'}
-          autoCapitalize='none'
+          autoCapitalize="none"
           formatError={Root?.props?.formatError}
           style={InputForm?.style?.userNameInputFieldStyle}
+          withDialCode={InputForm?.props?.withDialCode}
         />
+      )}
+
+      {InputForm?.props?.withLabel && (
+        <Text> {i18n?.t('login_component.lbl_password') ?? 'password'} </Text>
       )}
       <InputField
         prefixIcon={
-          InputForm?.component?.passwordIcon ?? <PasswordIcon width={30} height={30} color='grey' />
+          InputForm?.component?.passwordIcon ?? <PasswordIcon width={30} height={30} color="grey" />
         }
-        name='password'
-        returnKeyType='done'
-        secureTextEntry
+        name="password"
+        returnKeyType="done"
+        secureTextEntry={InputForm?.props?.isVisiblePassword}
         placeholder={i18n?.t('login_component.lbl_password') ?? 'Password'}
-        autoCapitalize='none'
+        autoCapitalize="none"
         formatError={Root?.props?.formatError}
         style={InputForm?.style?.passwordInputFieldStyle}
+        suffixIcon={InputForm?.component?.suffixIcon ?? <></>}
       />
+
       {Root.components?.renderForgotPasswordButton?.() ?? (
         <TouchableOpacity
           activeOpacity={0.8}
@@ -116,11 +132,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
       )}
       <Button
         isLoading={isSigning}
-        style={{
-          primaryContainerStyle: {
-            marginTop: 32,
-          },
-        }}
+        style={rootStyles.loginButtonStyle}
         label={i18n?.t('login_component.btn_login') ?? 'LOGIN'}
         onPress={formProps.handleSubmit}
       />
@@ -129,8 +141,8 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
 
   return (
     <>
-      <KeyboardAvoidingView style={rootStyles.containerStyle} behavior='padding' enabled>
-        <ScrollView keyboardShouldPersistTaps='handled'>
+      <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
+        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={rootStyles.logoContainerStyle}>
             {Root?.components?.header ?? <DefaultLogoIcon width={120} height={120} />}
           </View>
@@ -166,7 +178,7 @@ const LoginComponent = forwardRef((props: LoginComponentProps, ref) => {
                 title: i18n?.t('common.lbl_error') ?? 'Something went wrong',
                 message:
                   i18n?.t('common.msg_error') ??
-                  'We are experiencing some temporary difficulties. Please try again later or contact our support team.',
+                  'We are experiencing some temporary difficulties. Please try again later or contact our support team.'
               }
             : undefined
         }

@@ -23,6 +23,7 @@ Because **react-native-auth-component** depends on some libraries, so make sure 
 
 - [react-native-theme-component](https://github.com/101digital/react-native-theme-component.git)
 - [react-native-app-auth](https://github.com/FormidableLabs/react-native-app-auth). **Note** You need to see [Stetup](https://github.com/FormidableLabs/react-native-app-auth#setup) only. Other functions have been implemented.
+- [react-native-background-timer](https://github.com/ocetnik/react-native-background-timer) using for countdown 
 
 ## Quick Start
 

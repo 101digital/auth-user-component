@@ -24,6 +24,7 @@ export interface AuthContextData {
     lastName: string,
     profilePicture?: string
   ) => Promise<boolean>;
+  fetchProfile: () => void;
   isUpdatingProfile?: boolean;
   errorUpdateProfile?: Error;
   clearUpdateProfileError: () => void;
@@ -38,7 +39,8 @@ export const authDefaultValue: AuthContextData = {
   logout: () => null,
   clearSignInError: () => null,
   updateProfile: async () => false,
-  clearUpdateProfileError: () => null,
+  fetchProfile: async () => false,
+  clearUpdateProfileError: () => null
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -145,6 +147,22 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
+  const fetchProfile = useCallback(async () => {
+    try {
+      setIsUpdatingProfile(true);
+      const { data } = await AuthServices.instance().fetchProfile();
+      setProfile(data);
+      getProfilePicture(data);
+      await authComponentStore.storeProfile(data);
+      setIsUpdatingProfile(false);
+      return true;
+    } catch (error) {
+      setIsUpdatingProfile(false);
+      setErrorUpdateProfile(error as Error);
+      return false;
+    }
+  }, []);
+
   const clearUpdateProfileError = useCallback(() => {}, []);
 
   return useMemo(
@@ -156,12 +174,13 @@ export const useAuthContextValue = (): AuthContextData => {
       clearSignInError,
       logout,
       updateProfile,
+      fetchProfile,
       profilePicture: _profilePicture,
       errorSignIn: _errorSignIn,
       errorUpdateProfile: _errorUpdateProfile,
       clearUpdateProfileError,
       isUpdatingProfile: _isUpdatingProfile,
-      loginOAuth2,
+      loginOAuth2
     }),
     [
       _profile,
@@ -170,7 +189,7 @@ export const useAuthContextValue = (): AuthContextData => {
       _profilePicture,
       _errorSignIn,
       _errorUpdateProfile,
-      _isUpdatingProfile,
+      _isUpdatingProfile
     ]
   );
 };
