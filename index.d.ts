@@ -8,9 +8,10 @@ export { default as ProfileComponent } from './src/profile-component';
 export {
   LoginComponentProps,
   LoginComponentRef,
-  LoginComponentStyles,
+  LoginComponentStyles
 } from './src/login-component/types';
 export { AuthContext, AuthProvider } from './src/auth-context';
 export * from './src/types';
 export { default as authComponentData } from './src/auth-component.json';
 export * from './src/assets';
+export { default as ChangePassword } from './src/change-password-component';

@@ -28,6 +28,14 @@ export interface AuthContextData {
   isUpdatingProfile?: boolean;
   errorUpdateProfile?: Error;
   clearUpdateProfileError: () => void;
+  changeUserPassword: (
+    currentPassword: string,
+    newPassword: string,
+    confirmNewPassword: string
+  ) => void;
+  isChangingPassword: boolean;
+  isChangePassword: boolean;
+  errorChangePassword?: Error;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -40,7 +48,11 @@ export const authDefaultValue: AuthContextData = {
   clearSignInError: () => null,
   updateProfile: async () => false,
   fetchProfile: async () => false,
-  clearUpdateProfileError: () => null
+  clearUpdateProfileError: () => null,
+  changeUserPassword: async () => false,
+  isChangingPassword: false,
+  isChangePassword: false,
+  errorChangePassword: undefined
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -53,6 +65,10 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
   const [_errorUpdateProfile, setErrorUpdateProfile] = useState<Error | undefined>();
   const [_isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
+
+  const [_isChangingPassword, setIsChangingPassword] = useState<boolean>(false);
+  const [_errorChangePassword, setErrorChangePassword] = useState<Error | undefined>();
+  const [_isChangePassword, setIsChangePassword] = useState<boolean>(false);
 
   useEffect(() => {
     checkLogin();
@@ -165,6 +181,31 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const clearUpdateProfileError = useCallback(() => {}, []);
 
+  const changeUserPassword = useCallback(
+    async (currentPassword: string, newPassword: string, confirmNewPassword: string) => {
+      try {
+        setIsChangingPassword(true);
+        await AuthServices.instance().changeUserPassword(
+          currentPassword,
+          newPassword,
+          confirmNewPassword
+        );
+        setIsChangePassword(true);
+        setTimeout(() => {
+          setIsChangePassword(false);
+        }, 500);
+        setIsChangingPassword(false);
+
+        return true;
+      } catch (error) {
+        setIsChangingPassword(false);
+        setErrorChangePassword(error as Error);
+        return undefined;
+      }
+    },
+    []
+  );
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -175,12 +216,16 @@ export const useAuthContextValue = (): AuthContextData => {
       logout,
       updateProfile,
       fetchProfile,
+      changeUserPassword,
       profilePicture: _profilePicture,
       errorSignIn: _errorSignIn,
       errorUpdateProfile: _errorUpdateProfile,
       clearUpdateProfileError,
       isUpdatingProfile: _isUpdatingProfile,
-      loginOAuth2
+      loginOAuth2,
+      isChangingPassword: _isChangingPassword,
+      errorChangePassword: _errorChangePassword,
+      isChangePassword: _isChangePassword
     }),
     [
       _profile,
@@ -189,7 +234,10 @@ export const useAuthContextValue = (): AuthContextData => {
       _profilePicture,
       _errorSignIn,
       _errorUpdateProfile,
-      _isUpdatingProfile
+      _isUpdatingProfile,
+      _isChangingPassword,
+      _errorChangePassword,
+      _isChangePassword
     ]
   );
 };

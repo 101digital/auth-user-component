@@ -30,14 +30,14 @@ export class AuthServices {
     const body = qs.stringify({
       grant_type: grantType ?? this._configs?.authGrantType ?? 'password',
       username,
-      password,
+      password
     });
     const response = await AuthApiClient.instance()
       .getAuthApiClient()
       .post('', body, {
         params: {
-          scope: scope ?? this._configs?.authScope ?? 'openid',
-        },
+          scope: scope ?? this._configs?.authScope ?? 'openid'
+        }
       });
     const { access_token, refresh_token } = response.data;
     await authComponentStore.storeAccessToken(access_token);
@@ -47,7 +47,9 @@ export class AuthServices {
 
   public refreshToken = async (refreshToken: string, grant_type = 'refresh_token') => {
     const body = qs.stringify({ grant_type, refresh_token: refreshToken });
-    const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
+    const response = await AuthApiClient.instance()
+      .getAuthApiClient()
+      .post('', body);
     const { access_token, refresh_token } = response.data;
     await authComponentStore.storeAccessToken(access_token);
     await authComponentStore.storeRefreshToken(refresh_token);
@@ -59,8 +61,8 @@ export class AuthServices {
     const accessToken = await authComponentStore.getAccessToken();
     const response = await axios.get(`${membershipBaseUrl}/users/me`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
     const { data } = response.data;
     const organisationUser = data?.memberships?.filter((el: any) => el.organisationName);
@@ -76,9 +78,11 @@ export class AuthServices {
   fetchAppAccessToken = async () => {
     const body = qs.stringify({
       grant_type: this._configs?.appGrantType ?? 'client_credentials',
-      scope: this._configs?.appScope ?? 'PRODUCTION',
+      scope: this._configs?.appScope ?? 'PRODUCTION'
     });
-    const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
+    const response = await AuthApiClient.instance()
+      .getAuthApiClient()
+      .post('', body);
     return response.data.access_token;
   };
 
@@ -96,14 +100,14 @@ export class AuthServices {
       listCustomFields: [
         {
           customKey: 'logo',
-          customValue: profilePicture,
-        },
-      ],
+          customValue: profilePicture
+        }
+      ]
     };
     const response = await axios.put(`${membershipBaseUrl}/users/${userId}`, body, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+        Authorization: `Bearer ${accessToken}`
+      }
     });
     return response.data;
   };
@@ -120,7 +124,7 @@ export class AuthServices {
       authScope,
       authorizationBaseUrl,
       revocationBaseUrl,
-      endSessionBaseUrl,
+      endSessionBaseUrl
     } = this._configs;
     if (!authorizationBaseUrl) {
       throw new Error("Error: authorizationEndpoint can't be undefined");
@@ -137,10 +141,31 @@ export class AuthServices {
         authorizationEndpoint: authorizationBaseUrl,
         tokenEndpoint: tokenBaseUrl,
         revocationEndpoint: revocationBaseUrl,
-        endSessionEndpoint: endSessionBaseUrl,
-      },
+        endSessionEndpoint: endSessionBaseUrl
+      }
     };
     const response = await authorize(config);
     return response;
+  };
+
+  changeUserPassword = async (
+    currentPassword: string,
+    newPassword: string,
+    confirmNewPassword: string
+  ) => {
+    const { identityBaseUrl } = this._configs!;
+    const accessToken = await authComponentStore.getAccessToken();
+    const body = {
+      currentPassword,
+      newPassword,
+      confirmNewPassword
+    };
+
+    const response = await axios.put(`${identityBaseUrl}/users/passwords`, body, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    return response.data;
   };
 }
