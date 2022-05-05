@@ -15,3 +15,5 @@ export * from './src/types';
 export * from './src/assets';
 export { default as authComponentData } from './src/auth-component.json';
 export { default as ChangePassword } from './src/change-password-component';
+export * from './src/change-password-component/types';
+export * from './src/change-password-component/password-mask';
