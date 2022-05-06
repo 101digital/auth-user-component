@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { ErrorData } from 'react-native-theme-component';
 import { ErrorData, InputFieldStyles, CheckBoxStyles } from 'react-native-theme-component';
 
 export type ChangePasswordRef = {
