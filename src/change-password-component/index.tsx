@@ -34,7 +34,8 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
     changeUserPassword,
     isChangingPassword,
     isChangePassword,
-    errorChangePassword
+    errorChangePassword,
+    clearChangePasswordError
   } = useContext(AuthContext);
 
   const [isSelected1, setSelected1] = useState(false);
@@ -56,9 +57,6 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
         data.password,
         data.confirmPassword
       );
-      if (validInvitation) {
-        console.log('validInvitation ', validInvitation);
-      }
     } catch (error) {
       console.log('error ', error);
     }
@@ -324,7 +322,10 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                 i18n?.t('change_password.lbl_error_message') ??
                 'The current password you entered is invalid. Please try again.'
               }
-              onConfirmed={() => setShowErrorModal(false)}
+              onConfirmed={() => {
+                setShowErrorModal(false);
+                clearChangePasswordError();
+              }}
               style={styles.restrictAlertModalStyles}
             />
           </>
