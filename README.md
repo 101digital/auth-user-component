@@ -23,7 +23,7 @@ Because **react-native-auth-component** depends on some libraries, so make sure 
 
 - [react-native-theme-component](https://github.com/101digital/react-native-theme-component.git)
 - [react-native-app-auth](https://github.com/FormidableLabs/react-native-app-auth). **Note** You need to see [Stetup](https://github.com/FormidableLabs/react-native-app-auth#setup) only. Other functions have been implemented.
-- [react-native-background-timer](https://github.com/ocetnik/react-native-background-timer) using for countdown 
+- [react-native-background-timer](https://github.com/ocetnik/react-native-background-timer) using for countdown
 
 ## Quick Start
 
@@ -143,14 +143,15 @@ Provide functions to make authentication
 
 - Functions
 
-| Name                | Type                          | Description                                                                                                                                                                                                                                                               |
-| :------------------ | :---------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| login               | Function (username, password) | Promise function using username/password or email/password to generate token. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.                                                                     |
-| loginOAuth2         | Function                      | Promise function using OAuth2. The application will be redirect to [Authorization Code Flow](https://oauth.net/2/grant-types/authorization-code/) . If successfully, `accessToken` and `refreshToken` will be stored to local storage. Then it will return response data. |
-| refreshToken        | Function (refresh_token)      | Promise function to re-new token from old `refresh_token`. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.                                                                                        |
-| fetchOrgToken       | Function                      | Promise function to get token from organization which linked to accounts. If successfully, `org_token` will be stored to local storage.                                                                                                                                   |
-| logout              | Function                      | Promise function to clear current session                                                                                                                                                                                                                                 |
-| fetchAppAccessToken | Function                      | Promise function return app access token base on basic token                                                                                                                                                                                                              |
+| Name                | Type                                                       | Description                                                                                                                                                                                                                                                               |
+| :------------------ | :--------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| login               | Function (username, password)                              | Promise function using username/password or email/password to generate token. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.                                                                     |
+| loginOAuth2         | Function                                                   | Promise function using OAuth2. The application will be redirect to [Authorization Code Flow](https://oauth.net/2/grant-types/authorization-code/) . If successfully, `accessToken` and `refreshToken` will be stored to local storage. Then it will return response data. |
+| refreshToken        | Function (refresh_token)                                   | Promise function to re-new token from old `refresh_token`. If successfully, `access_token` and `refresh_token` will be stored to local storage. Then it will return response data.                                                                                        |
+| fetchOrgToken       | Function                                                   | Promise function to get token from organization which linked to accounts. If successfully, `org_token` will be stored to local storage.                                                                                                                                   |
+| logout              | Function                                                   | Promise function to clear current session                                                                                                                                                                                                                                 |
+| fetchAppAccessToken | Function                                                   | Promise function return app access token base on basic token                                                                                                                                                                                                              |
+| changeUserPassword  | Function (currentPassword, newPassword,confirmNewPassword) | Promise function using currentPassword, newPassword and confirmNewPassword to change account password.                                                                                                                                                                    |
 
 ```javascript
 import { AuthServices } from 'react-native-auth-component';
@@ -404,5 +405,115 @@ Note that: `templateId` is one of template defined in `src/component.json`. `For
     }
   ]
   ...
+}
+```
+
+### `ChangePasswordComponent`
+
+Provide a simple function to handle the change password .
+
+**Important**: If you use ChangePasswordComponent, you **HAVE TO** wrap your `App` with `AuthProvider`
+
+```javascript
+import { ChangePassword, ChangePasswordRef,PasswordMask } from 'react-native-auth-component';
+
+const ChangePasswordScreen = () => {
+  const passwordRefs = useRef<ChangePasswordRef>();
+
+
+  return (
+    <View>
+    /* YOUR COMPONENTS */
+      <ChangePassword
+          ref={passwordRefs}
+          Root={{
+            props: {
+              onPressBack: () => {
+                // handle header back icon
+              },
+              onPress: () => {
+                handle success response
+              },
+              title: i18n?.t('change_password.lbl_change_password'),
+              subTitle: i18n?.t('change_password.lbl_sub_title'),
+            },
+            components: {
+              header: <View />,
+            },
+          }}
+          InputForm={{
+            component: {
+              passwordIcon: <View />,
+              usernameIcon: <View />,
+              suffixIcon: (
+                <PasswordMask
+                  isVisible={isVisiblePassword}
+                  onPress={() => setVisiblePassword(!isVisiblePassword)}
+                />
+              ),
+              newSuffixIcon: (
+                <PasswordMask
+                  isVisible={isNewVisiblePassword}
+                  onPress={() => setNewVisiblePassword(!isNewVisiblePassword)}
+                />
+              ),
+              confirmSuffixIcon: (
+                <PasswordMask
+                  isVisible={isConfirmVisiblePassword}
+                  onPress={() => setConfirmVisiblePassword(!isConfirmVisiblePassword)}
+                />
+              ),
+            },
+            style: {
+              passwordInputFieldStyle: {
+                contentContainerStyle: {
+                  backgroundColor: '#fff',
+                },
+              },
+              checkBoxInputFieldStyle: {
+                selectedBoxStyle: {
+                  width: 20,
+                  height: 20,
+                  borderRadius: 4,
+                  backgroundColor: '#14BDEB',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                },
+                unSelectedBoxStyle: {
+                  width: 20,
+                  height: 20,
+                  borderRadius: 4,
+                  borderWidth: 1,
+                  borderColor: '#14BDEB',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                },
+                titleStyle: {
+                  flex: 1,
+                  fontSize: 12,
+                  color: '#000000',
+                  marginLeft: 12,
+                  lineHeight: 21,
+                },
+                containerStyle: {
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: '85%',
+                },
+              },
+            },
+            props: {
+              onPressDialCode: () => {},
+              withDialCode: false,
+              withLabel: true,
+              isVisiblePassword: isVisiblePassword,
+              isNewVisiblePassword: isNewVisiblePassword,
+              isConfirmVisiblePassword: isConfirmVisiblePassword,
+            },
+          }}
+        />
+    /* YOUR COMPONENTS */
+    </View>
+  );
 }
 ```
