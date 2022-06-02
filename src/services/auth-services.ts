@@ -168,4 +168,15 @@ export class AuthServices {
     });
     return response.data;
   };
+
+  recoveryUserPassword = async (mobileNumber: string) => {
+    const { identityBaseUrl } = this._configs!;
+    const accessToken = await this.fetchAppAccessToken();
+    const response = await axios.get(`${identityBaseUrl}/users/${mobileNumber}/recovery-options`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  };
 }

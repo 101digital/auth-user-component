@@ -36,6 +36,10 @@ export interface AuthContextData {
   isChangingPassword: boolean;
   isChangePassword: boolean;
   errorChangePassword?: Error;
+  recoveryUserPassword: (phoneNumber: string) => Promise<{ data: [] } | undefined>;
+  clearRecoveryUserPasswordError: () => void;
+  errorRecoveryUserPassword?: Error;
+  isRecoveringUserPassword: boolean;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -52,7 +56,11 @@ export const authDefaultValue: AuthContextData = {
   changeUserPassword: async () => false,
   isChangingPassword: false,
   isChangePassword: false,
-  errorChangePassword: undefined
+  errorChangePassword: undefined,
+  recoveryUserPassword: async () => undefined,
+  clearRecoveryUserPasswordError: () => null,
+  errorRecoveryUserPassword: undefined,
+  isRecoveringUserPassword: false,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -69,6 +77,8 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isChangingPassword, setIsChangingPassword] = useState<boolean>(false);
   const [_errorChangePassword, setErrorChangePassword] = useState<Error | undefined>();
   const [_isChangePassword, setIsChangePassword] = useState<boolean>(false);
+  const [_isRecoveringUserPassword, setIsRecoveringUserPassword] = useState<boolean>(false);
+  const [_errorRecoveryUserPassword, setErrorRecoveryUserPassword] = useState<Error | undefined>();
 
   useEffect(() => {
     checkLogin();
@@ -206,6 +216,23 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
+  const recoveryUserPassword = useCallback(async (mobileNumber: string) => {
+    try {
+      setIsRecoveringUserPassword(true);
+      const data = await AuthServices.instance().recoveryUserPassword(mobileNumber);
+      setIsRecoveringUserPassword(false);
+      return data;
+    } catch (error) {
+      setIsRecoveringUserPassword(false);
+      setErrorRecoveryUserPassword(error as Error);
+      return undefined;
+    }
+  }, []);
+
+  const clearRecoveryUserPasswordError = useCallback(() => {
+    setErrorRecoveryUserPassword(undefined);
+  }, []);
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -225,7 +252,11 @@ export const useAuthContextValue = (): AuthContextData => {
       loginOAuth2,
       isChangingPassword: _isChangingPassword,
       errorChangePassword: _errorChangePassword,
-      isChangePassword: _isChangePassword
+      isChangePassword: _isChangePassword,
+      recoveryUserPassword,
+      isRecoveringUserPassword: _isRecoveringUserPassword,
+      errorRecoveryUserPassword: _errorRecoveryUserPassword,
+      clearRecoveryUserPasswordError,
     }),
     [
       _profile,
@@ -237,7 +268,9 @@ export const useAuthContextValue = (): AuthContextData => {
       _isUpdatingProfile,
       _isChangingPassword,
       _errorChangePassword,
-      _isChangePassword
+      _isChangePassword,
+      _isRecoveringUserPassword,
+      _errorRecoveryUserPassword,
     ]
   );
 };

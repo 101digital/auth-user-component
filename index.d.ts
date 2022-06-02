@@ -15,3 +15,4 @@ export * from './src/types';
 export { default as authComponentData } from './src/auth-component.json';
 export * from './src/assets';
 export { default as ChangePassword } from './src/change-password-component';
+export { default as RecoveryPassword } from './src/recovery-password-component';
