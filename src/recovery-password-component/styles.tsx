@@ -2,11 +2,15 @@ import { defaultsDeep } from 'lodash';
 import { StyleSheet } from 'react-native';
 import { useThemeFonts } from 'react-native-theme-component';
 import { RecoveryPasswordComponentStyles } from './types';
+import { ThemeContext } from 'react-native-theme-component';
+import { useContext } from 'react';
 
 const useMergeStyles = (
   style?: RecoveryPasswordComponentStyles
 ): RecoveryPasswordComponentStyles => {
   const fonts = useThemeFonts();
+  const { colors } = useContext(ThemeContext);
+
   const defaultStyles: RecoveryPasswordComponentStyles = StyleSheet.create({
     containerStyle: {
       flex: 1,
@@ -18,7 +22,7 @@ const useMergeStyles = (
     formTitleStyle: {
       fontFamily: fonts.semiBold,
       fontSize: 22,
-      color: '#5E0CBC',
+      color: colors.primaryColor,
       marginBottom: 32,
     },
     backButtonContainerStyle: {
