@@ -172,10 +172,6 @@ export class AuthServices {
   recoveryUserPassword = async (mobileNumber: string) => {
     const { identityBaseUrl } = this._configs!;
     const accessToken = await this.fetchAppAccessToken();
-    console.log(
-      `recoveryUserPassword -> request -> url${identityBaseUrl}/users/${mobileNumber}/recovery-options`
-    );
-    console.log(`recoveryUserPassword -> request -> token ${accessToken}`);
     const response = await axios.get(`${identityBaseUrl}/users/${mobileNumber}/recovery-options`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
