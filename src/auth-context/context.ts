@@ -309,6 +309,7 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const clearUserVerificationData = useCallback(() => {
     setErrorUserVerify(undefined);
+    setErrorRequestResetPassword(undefined);
     setIsChangePasswordSuccess(false);
   }, []);
 

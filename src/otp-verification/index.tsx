@@ -82,6 +82,7 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => {
+              clearUserVerificationData();
               Root.props.onPressBack();
             }}
             style={styles.backButtonContainerStyle}
