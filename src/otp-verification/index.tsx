@@ -23,6 +23,7 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
     isChangePasswordSuccess,
     requestRecoveryPassword,
     errorUserVerify,
+    recoveryUserPassword,
     errorRequestResetPassword,
     requestResetUserPassword,
     clearUserVerificationData,
@@ -48,7 +49,10 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
   const resendOtp = async () => {
     setIsSentOtp(true);
     clearUserVerificationData();
-    await requestResetUserPassword();
+    const respone = await recoveryUserPassword();
+    if (respone?.data[0]) {
+      await requestResetUserPassword(respone?.data[0]);
+    }
     setIsSentOtp(false);
   };
 
