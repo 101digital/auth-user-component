@@ -194,7 +194,6 @@ export class AuthServices {
       },
     });
 
-    console.log('requestResetUserPassword -> res', response.data);
     return response.data;
   };
 
@@ -215,7 +214,6 @@ export class AuthServices {
       }
     );
 
-    console.log('resetPassword -> res', response);
     return response.data;
   };
 }

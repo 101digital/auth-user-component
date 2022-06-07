@@ -23,7 +23,7 @@ const useMergeStyles = (style?: OtpVerificationComponentStyles): OtpVerification
       fontStyle: 'italic',
       fontSize: 12,
       lineHeight: 21,
-      color: 'grey',
+      color: colors.gray,
     },
     notReceivedCodeTextStyle: {
       fontFamily: fonts.medium,
@@ -89,7 +89,7 @@ const useMergeStyles = (style?: OtpVerificationComponentStyles): OtpVerification
     },
     otpErrorFieldStyle: {
       focusCellContainerStyle: {
-        borderBottomColor: '#D32F2F',
+        borderBottomColor: colors.error,
       },
     },
   });
