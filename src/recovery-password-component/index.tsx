@@ -19,35 +19,15 @@ import { colors } from '../assets/colors';
 const RecoveryPasswordComponent = forwardRef((props: RecoveryPasswordComponentProps) => {
   const { Root, InputForm } = props;
   const { i18n } = useContext(ThemeContext);
-  const {
-    errorRecoveryUserPassword,
-    clearRecoveryUserPasswordError,
-    isRecoveringUserPassword,
-    recoveryUserPassword,
-  } = useContext(AuthContext);
+  const {saveUserPhoneNumber} = useContext(AuthContext);
 
   const rootStyles = useMergeStyles(Root?.style);
-
-  const [isShowErrorModal, setShowErrorModal] = useState(false);
-
+  
   const handleOnRecoverPassword = async (values: RecoveryData) => {
     Keyboard.dismiss();
-    const { phoneNumber } = values;
-    try {
-      const validInvitation = await recoveryUserPassword(phoneNumber);
-      if (!validInvitation?.data || validInvitation?.data.length === 0) {
-        setShowErrorModal(true);
-      }
-    } catch (error) {
-      console.log('error ', error);
-    }
+    saveUserPhoneNumber(values.phoneNumber);
+    Root?.props?.onRecoveryPasswordSuccess();
   };
-
-  useEffect(() => {
-    if (errorRecoveryUserPassword) {
-      setShowErrorModal(true);
-    }
-  }, [errorRecoveryUserPassword]);
 
   const renderForm = ({ values, submitForm, isValid }: FormikProps<RecoveryData>) => {
     const { phoneNumber } = values;
@@ -56,6 +36,9 @@ const RecoveryPasswordComponent = forwardRef((props: RecoveryPasswordComponentPr
     return (
       <Fragment>
         <View style={rootStyles.content}>
+          <Text style={rootStyles.subTitle}>
+            {i18n?.t('recovery_password_component.lbl_enter_phone_number') ?? 'Enter your mobile number to verify your identity.'}
+          </Text>
           <InputField
             name="phoneNumber"
             returnKeyType="done"
@@ -70,7 +53,7 @@ const RecoveryPasswordComponent = forwardRef((props: RecoveryPasswordComponentPr
         </View>
 
         <Button
-          isLoading={isRecoveringUserPassword}
+          // isLoading={isRecoveringUserPassword}
           style={rootStyles.loginButtonStyle}
           label={i18n?.t('recovery_password_component.lbl_proceed') ?? 'Proceed'}
           onPress={submitForm}
@@ -83,8 +66,7 @@ const RecoveryPasswordComponent = forwardRef((props: RecoveryPasswordComponentPr
 
   return (
     <>
-      <KeyboardAvoidingView style={rootStyles.containerStyle} behavior="padding" enabled>
-        <View style={rootStyles.content}>
+        <View style={rootStyles.container}>
           <SafeAreaView>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -108,8 +90,7 @@ const RecoveryPasswordComponent = forwardRef((props: RecoveryPasswordComponentPr
             {renderForm}
           </Formik>
         </View>
-      </KeyboardAvoidingView>
-      <AlertModal
+      {/* <AlertModal
         isVisible={isShowErrorModal}
         title={i18n?.t('recovery_password_component.lbl_error_title') ?? 'Oops!'}
         message={
@@ -120,7 +101,7 @@ const RecoveryPasswordComponent = forwardRef((props: RecoveryPasswordComponentPr
           setShowErrorModal(false);
           clearRecoveryUserPasswordError();
         }}
-      />
+      /> */}
     </>
   );
 });

@@ -16,3 +16,4 @@ export { default as authComponentData } from './src/auth-component.json';
 export * from './src/assets';
 export { default as ChangePassword } from './src/change-password-component';
 export { default as RecoveryPassword } from './src/recovery-password-component';
+export { default as OtpVerification } from './src/otp-verification';

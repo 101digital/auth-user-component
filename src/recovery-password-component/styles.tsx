@@ -12,7 +12,7 @@ const useMergeStyles = (
   const { colors } = useContext(ThemeContext);
 
   const defaultStyles: RecoveryPasswordComponentStyles = StyleSheet.create({
-    containerStyle: {
+    container: {
       flex: 1,
       padding: 24,
     },
@@ -28,6 +28,9 @@ const useMergeStyles = (
     backButtonContainerStyle: {
       marginBottom: 23,
       width: 100,
+    },
+    subTitle: {
+      marginBottom: 7
     },
     loginButtonStyle: {
       primaryContainerStyle: {

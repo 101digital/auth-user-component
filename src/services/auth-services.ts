@@ -179,4 +179,43 @@ export class AuthServices {
     });
     return response.data;
   };
+
+  requestResetUserPassword = async (channelId: string, recoveryCode: string) => {
+    const { identityBaseUrl } = this._configs!;
+    const publicAppToken = await this.fetchAppAccessToken();
+    const body = {
+      channelId,
+      recoveryCode,
+    };
+
+    const response = await axios.post(`${identityBaseUrl}/users/passwords/reset-request`, body, {
+      headers: {
+        Authorization: `Bearer ${publicAppToken}`,
+      },
+    });
+
+    console.log('requestResetUserPassword -> res', response.data);
+    return response.data;
+  };
+
+  resetPassword = async (newPassword: string, otp: string) => {
+    const { identityBaseUrl } = this._configs!;
+    const publicAppToken = await this.fetchAppAccessToken();
+    const body = {
+      password: newPassword,
+    };
+
+    const response = await axios.put(
+      `${identityBaseUrl}/users/passwords/reset-requests/${otp}`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${publicAppToken}`,
+        },
+      }
+    );
+
+    console.log('resetPassword -> res', response);
+    return response.data;
+  };
 }

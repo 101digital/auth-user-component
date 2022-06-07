@@ -18,3 +18,4 @@ export { default as ChangePassword } from './src/change-password-component';
 export * from './src/change-password-component/types';
 export * from './src/change-password-component/password-mask';
 export { default as RecoveryPassword } from './src/recovery-password-component';
+export { default as OtpVerification } from './src/otp-verification';

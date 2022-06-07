@@ -1,16 +1,15 @@
 import React, { useRef, useContext, useState, forwardRef, useEffect } from 'react';
 import { BackIcon, HelpIcon } from '../assets/icons';
-import { colors, fonts } from '../assets';
-import AlertModal, { AlertModalStyles } from './alert-modal';
+import { colors } from '../assets';
+import AlertModal from './alert-modal';
 import {
   Platform,
   SafeAreaView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
   Keyboard,
-  TouchableHighlight
+  TouchableHighlight,
 } from 'react-native';
 import { ChangePasswordData, ChangePasswordSchema } from './model';
 import { Formik } from 'formik';
@@ -20,23 +19,28 @@ import { AuthContext } from '../auth-context';
 
 import SuccessModel from './success-model';
 
-// RegistrationContext.changeUserPassword
-
 import { Button, InputField, CheckBox } from 'react-native-theme-component';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 // import { RegistrationContext } from '../../context/registration-context';
 import { i18n } from '@/translations/translation-config';
 import Tooltip from 'react-native-walkthrough-tooltip';
+import { styles } from './styles';
 /* eslint-disable no-useless-escape */
 const ChangePassword = forwardRef((props: ChangePasswordProps) => {
   const { Root, InputForm } = props;
   const {
+    isRecoveringUserPassword,
+    recoveryUserPassword,
     changeUserPassword,
+    saveUserNewPassword,
+    requestResetUserPassword,
     isChangingPassword,
     isChangePassword,
     errorChangePassword,
-    clearChangePasswordError
+    isRequestingResetUserPassword,
   } = useContext(AuthContext);
+
+  const isResetPasswordMode = Root?.props?.isReset;
 
   const [isSelected1, setSelected1] = useState(false);
   const [isSelected2, setSelected2] = useState(false);
@@ -48,15 +52,21 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
 
   const formikRef: any = useRef(null);
 
-  const handleOnValidate = async (data: any) => {
+  const handleOnSubmitForm = async (data: any) => {
     Keyboard.dismiss();
-
     try {
-      const validInvitation = await changeUserPassword(
-        data.currentPassword,
-        data.password,
-        data.confirmPassword
-      );
+      if (isResetPasswordMode) {
+        const respone = await recoveryUserPassword();
+        if (respone?.data[0]) {
+          const validInvitation = await requestResetUserPassword(respone?.data[0]);
+          if (validInvitation) {
+            saveUserNewPassword && saveUserNewPassword(data.password);
+            Root?.props.onRequestResetSuccess();
+          }
+        }
+      } else {
+        await changeUserPassword(data.currentPassword, data.password, data.confirmPassword);
+      }
     } catch (error) {
       console.log('error ', error);
     }
@@ -110,7 +120,6 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
       <View style={styles.successContainer}>
         <SuccessModel
           onNext={() => {
-            //console.log('sssxsx');
             Root.props.onPress();
           }}
         />
@@ -121,7 +130,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
       <View style={styles.container}>
         {
           <>
-            <SafeAreaView style={styles.headerContainer}>
+            <SafeAreaView>
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() => {
@@ -149,8 +158,8 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
               enableReinitialize={true}
               initialValues={ChangePasswordData.empty()}
               validationSchema={ChangePasswordSchema}
-              onSubmit={values => {
-                handleOnValidate(values);
+              onSubmit={(values) => {
+                handleOnSubmitForm(values);
               }}
             >
               {({ handleChange, isValid, submitForm }) => {
@@ -163,31 +172,34 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                       showsVerticalScrollIndicator={false}
                       extraScrollHeight={50}
                     >
-                      <Text>
-                        {i18n?.t('change_password.lbl_current_password') ?? 'Current Password'}{' '}
-                      </Text>
-                      <InputField
-                        name="currentPassword"
-                        returnKeyType="done"
-                        secureTextEntry={InputForm?.props?.isVisiblePassword}
-                        placeholder={
-                          i18n?.t('change_password.plh_current_password') ??
-                          'Enter current password'
-                        }
-                        autoCapitalize="none"
-                        formatError={Root?.props?.formatError}
-                        style={InputForm?.style?.passwordInputFieldStyle}
-                        suffixIcon={InputForm?.component?.suffixIcon ?? <></>}
-                        onChange={e => {
-                          // onValidatePassword(e.nativeEvent.text);
-                          handleChange('currentPassword');
-                          // this.handleOffence( );
-                        }}
-                      />
+                      {!isResetPasswordMode && (
+                        <>
+                          <Text style={styles.inputTitle}>
+                            {i18n?.t('change_password.lbl_current_password') ?? 'Current Password'}
+                          </Text>
+                          <InputField
+                            name="currentPassword"
+                            returnKeyType="done"
+                            secureTextEntry={InputForm?.props?.isVisiblePassword}
+                            placeholder={
+                              i18n?.t('change_password.plh_current_password') ??
+                              'Enter current password'
+                            }
+                            autoCapitalize="none"
+                            formatError={Root?.props?.formatError}
+                            style={InputForm?.style?.passwordInputFieldStyle}
+                            suffixIcon={InputForm?.component?.suffixIcon ?? <></>}
+                            onChange={(e) => {
+                              // onValidatePassword(e.nativeEvent.text);
+                              handleChange('currentPassword');
+                              // this.handleOffence( );
+                            }}
+                          />
+                        </>
+                      )}
                       <View style={styles.inputContainer}>
-                        <Text>
-                          {' '}
-                          {i18n?.t('change_password.lbl_new_password') ?? 'New Password'}{' '}
+                        <Text style={styles.inputTitle}>
+                          {i18n?.t('change_password.lbl_new_password') ?? 'New Password'}
                         </Text>
                         <InputField
                           name="password"
@@ -200,7 +212,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                           formatError={Root?.props?.formatError}
                           style={InputForm?.style?.passwordInputFieldStyle}
                           suffixIcon={InputForm?.component?.newSuffixIcon ?? <></>}
-                          onChange={e => {
+                          onChange={(e) => {
                             onValidatePassword(e.nativeEvent.text);
                             handleChange('password');
                             // this.handleOffence( );
@@ -208,9 +220,9 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                         />
                       </View>
                       <View style={styles.inputBottemContainer}>
-                        <Text>
+                        <Text style={styles.inputTitle}>
                           {i18n?.t('change_password.lbl_confirm_password') ??
-                            'Confirm New Password'}{' '}
+                            'Confirm New Password'}
                         </Text>
                         <InputField
                           name="confirmPassword"
@@ -232,7 +244,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                             i18n?.t('change_password.msg_rule_1') ?? 'Must be at least 8 characters'
                           }
                           isSelected={isSelected1}
-                          onChanged={value => {
+                          onChanged={(value) => {
                             console.log('value ', value);
                           }}
                           style={InputForm?.style?.checkBoxInputFieldStyle}
@@ -246,7 +258,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                             'Must contain at least 1 number'
                           }
                           isSelected={isSelected2}
-                          onChanged={value => {
+                          onChanged={(value) => {
                             console.log('value ', value);
                           }}
                           style={InputForm?.style?.checkBoxInputFieldStyle}
@@ -259,7 +271,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                             'Must contain at least 1 upper case'
                           }
                           isSelected={isSelected3}
-                          onChanged={value => {
+                          onChanged={(value) => {
                             console.log('value ', value);
                           }}
                           style={InputForm?.style?.checkBoxInputFieldStyle}
@@ -272,7 +284,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                             'Must contain at least 1 special character '
                           }
                           isSelected={isSelected4}
-                          onChanged={value => {
+                          onChanged={(value) => {
                             console.log('value ', value);
                           }}
                           style={InputForm?.style?.checkBoxInputFieldStyle}
@@ -281,7 +293,6 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                           <Tooltip
                             isVisible={toolTipVisible}
                             content={<Text>(ex. @!.,$/%^)</Text>}
-                            placement="top"
                             onClose={() => setToolTipVisible(false)}
                             backgroundColor={'rgba(0,0,0,0.0)'}
                             placement={'bottom'}
@@ -298,8 +309,16 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                     </KeyboardAwareScrollView>
                     <Button
                       onPress={submitForm}
-                      label={i18n?.t('common.btn_next')}
-                      isLoading={isChangingPassword}
+                      label={
+                        isResetPasswordMode
+                          ? i18n?.t('reset_password.lbl_btn_save')
+                          : i18n?.t('common.btn_next')
+                      }
+                      isLoading={
+                        isChangingPassword ||
+                        isRequestingResetUserPassword ||
+                        isRecoveringUserPassword
+                      }
                       disabled={
                         !isSelected1 || !isSelected2 || !isSelected3 || !isSelected4 || !isValid
                       }
@@ -307,8 +326,8 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                       style={{
                         primaryContainerStyle: {
                           marginHorizontal: 24,
-                          marginBottom: Platform.OS === 'android' ? 24 : 0
-                        }
+                          marginBottom: Platform.OS === 'android' ? 24 : 0,
+                        },
                       }}
                     />
                   </SafeAreaView>
@@ -324,90 +343,13 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
               }
               onConfirmed={() => {
                 setShowErrorModal(false);
-                clearChangePasswordError();
               }}
-              style={styles.restrictAlertModalStyles}
             />
           </>
         }
       </View>
     );
   }
-});
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background
-  },
-  successContainer: {
-    flex: 1,
-    backgroundColor: colors.primaryColor
-  },
-  mainContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-    paddingHorizontal: 24
-  },
-  title: {
-    fontFamily: fonts.bold,
-    fontSize: 24,
-    lineHeight: 36,
-    color: colors.primary,
-    paddingHorizontal: 24,
-    marginBottom: 32
-  },
-  backButtonContainerStyle: {
-    padding: 15,
-    marginLeft: 12,
-    marginBottom: 8,
-    width: 100
-  },
-  actionButton: {
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: 'white',
-    shadowOffset: {
-      width: 0,
-      height: 1
-    }
-  },
-  inputContainer: {
-    paddingTop: 20
-  },
-  inputBottemContainer: {
-    paddingVertical: 20
-  },
-  labelTextStyle: {
-    fontSize: 12,
-    lineHeight: 21,
-    fontFamily: fonts.medium,
-    color: colors.primaryText,
-    marginBottom: 3,
-    marginTop: 20
-  },
-  noteContainer: {
-    borderRadius: 8,
-    // backgroundColor: '#E7DBF5',
-    // width: 327,
-    padding: 15,
-    paddingTop: 0,
-    paddingHorizontal: 24
-  },
-  noteText: {
-    fontFamily: fonts.regular,
-    fontSize: 14,
-    color: '#4E4B50',
-    lineHeight: 24
-  },
-  checkBoxWrapper: { marginBottom: 19 },
-  checkBoxWrapperWithTooltip: {
-    justifyContent: 'flex-start',
-    flexDirection: 'row'
-  },
-  tooltip: { marginLeft: -5 },
-  tooltipContent: { marginLeft: -1, borderRadius: 2 },
-  tooltipArrow: { marginLeft: 4 }
 });
 
 export default ChangePassword;

@@ -1,4 +1,4 @@
-import { Profile, ProfileCustomField, CountryInformation } from '../types';
+import { Profile, ProfileCustomField, CountryInformation, Recovery } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
@@ -6,6 +6,7 @@ import { AuthServices } from '../services/auth-services';
 
 export interface AuthContextData {
   profile?: Profile;
+  recovery?: Recovery;
   profilePicture?: string;
   isSignedIn: boolean;
   isSigning: boolean;
@@ -36,10 +37,22 @@ export interface AuthContextData {
   isChangingPassword: boolean;
   isChangePassword: boolean;
   errorChangePassword?: Error;
-  recoveryUserPassword: (phoneNumber: string) => Promise<{ data: [] } | undefined>;
+  requestResetUserPassword: (recoveryData?: Recovery) => Promise<boolean | undefined>;
+  saveUserPhoneNumber: (phoneNumber: string) => void;
+  recoveryUserPassword: () => Promise<{ data: Recovery[] } | undefined>;
   clearRecoveryUserPasswordError: () => void;
   errorRecoveryUserPassword?: Error;
   isRecoveringUserPassword: boolean;
+  isRequestingResetUserPassword: boolean;
+  setNewPassword?: React.Dispatch<React.SetStateAction<string>>;
+  userMobileNumber?: string;
+  saveUserNewPassword?: (newPassword: string) => void;
+  requestRecoveryPassword: (verificationCode: string) => Promise<boolean>;
+  isVerifying: boolean;
+  isChangePasswordSuccess: boolean;
+  errorUserVerify?: Error;
+  errorRequestResetPassword?: Error;
+  clearUserVerificationData: () => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -54,19 +67,32 @@ export const authDefaultValue: AuthContextData = {
   fetchProfile: async () => false,
   clearUpdateProfileError: () => null,
   changeUserPassword: async () => false,
+  requestResetUserPassword: async () => false,
   isChangingPassword: false,
   isChangePassword: false,
   errorChangePassword: undefined,
+  saveUserPhoneNumber: () => false,
   recoveryUserPassword: async () => undefined,
   clearRecoveryUserPasswordError: () => null,
   errorRecoveryUserPassword: undefined,
   isRecoveringUserPassword: false,
+  isRequestingResetUserPassword: false,
+  setNewPassword: undefined,
+  userMobileNumber: undefined,
+  saveUserNewPassword: undefined,
+  requestRecoveryPassword: async () => false,
+  isVerifying: false,
+  isChangePasswordSuccess: false,
+  errorUserVerify: undefined,
+  errorRequestResetPassword: undefined,
+  clearUserVerificationData: () => null,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
 export const useAuthContextValue = (): AuthContextData => {
   const [_profile, setProfile] = useState<Profile | undefined>(undefined);
+  const [_recovery, setRecovery] = useState<Recovery | undefined>(undefined);
   const [_isSignedIn, setIsSignedIn] = useState<boolean>(false);
   const [_isSigning, setIsSigning] = useState<boolean>(false);
   const [_errorSignIn, setErrorSignIn] = useState<Error | undefined>();
@@ -79,6 +105,15 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isChangePassword, setIsChangePassword] = useState<boolean>(false);
   const [_isRecoveringUserPassword, setIsRecoveringUserPassword] = useState<boolean>(false);
   const [_errorRecoveryUserPassword, setErrorRecoveryUserPassword] = useState<Error | undefined>();
+
+  const [_isRequestingResetPassword, setIsRequestingResetPassword] = useState<boolean>(false);
+  const [_errorRequestResetPassword, setErrorRequestResetPassword] = useState<Error | undefined>();
+  const [_userNewPassword, setUserNewPassword] = useState<string>('');
+
+  const [_userMobileNumber, setUserMobileNumber] = useState<string>('');
+  const [_isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [_errorUserVerify, setErrorUserVerify] = useState<Error | undefined>();
+  const [_isChangePasswordSuccess, setIsChangePasswordSuccess] = useState<boolean>(false);
 
   useEffect(() => {
     checkLogin();
@@ -216,26 +251,88 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const recoveryUserPassword = useCallback(async (mobileNumber: string) => {
+  const saveUserPhoneNumber = useCallback(async (mobileNumber: string) => {
+    setUserMobileNumber(mobileNumber);
+  }, []);
+
+  const recoveryUserPassword = useCallback(async () => {
     try {
       setIsRecoveringUserPassword(true);
-      const data = await AuthServices.instance().recoveryUserPassword(mobileNumber);
-      setIsRecoveringUserPassword(false);
-      return data;
+      const response = await AuthServices.instance().recoveryUserPassword(_userMobileNumber);
+      if (response.data && response.data.length > 0) {
+        setRecovery(response.data[0]);
+      }
+      return response;
     } catch (error) {
-      setIsRecoveringUserPassword(false);
       setErrorRecoveryUserPassword(error as Error);
       return undefined;
+    } finally {
+      setIsRecoveringUserPassword(false);
     }
+  }, [_userMobileNumber]);
+
+  const saveUserNewPassword = useCallback((newPassword) => {
+    setUserNewPassword(newPassword);
   }, []);
+
+  const requestResetUserPassword = useCallback(
+    async (recoveryData?: Recovery) => {
+      try {
+        setIsRequestingResetPassword(true);
+        const recovery = recoveryData || _recovery;
+        if (recovery) {
+          const result = await AuthServices.instance().requestResetUserPassword(
+            recovery.channelId,
+            recovery.recoveryCode
+          );
+          if (result && result.resendCode) {
+            setRecovery({
+              ...recovery,
+              recoveryCode: result.resendCode,
+            });
+          }
+        }
+        return true;
+      } catch (error) {
+        setErrorRequestResetPassword(error as Error);
+        return undefined;
+      } finally {
+        setIsRequestingResetPassword(false);
+      }
+    },
+    [_recovery]
+  );
 
   const clearRecoveryUserPasswordError = useCallback(() => {
     setErrorRecoveryUserPassword(undefined);
   }, []);
 
+  const clearUserVerificationData = useCallback(() => {
+    setErrorUserVerify(undefined);
+    setIsChangePasswordSuccess(false);
+  }, []);
+
+  const requestRecoveryPassword = useCallback(
+    async (otp: string) => {
+      try {
+        setIsVerifying(true);
+        await AuthServices.instance().resetPassword(_userNewPassword, otp);
+        setIsChangePasswordSuccess(true);
+        return true;
+      } catch (error) {
+        setErrorUserVerify(error as Error);
+        return false;
+      } finally {
+        setIsVerifying(false);
+      }
+    },
+    [_userNewPassword]
+  );
+
   return useMemo(
     () => ({
       profile: _profile,
+      recovery: _recovery,
       isSignedIn: _isSignedIn,
       isSigning: _isSigning,
       login,
@@ -253,13 +350,26 @@ export const useAuthContextValue = (): AuthContextData => {
       isChangingPassword: _isChangingPassword,
       errorChangePassword: _errorChangePassword,
       isChangePassword: _isChangePassword,
+      saveUserPhoneNumber,
       recoveryUserPassword,
       isRecoveringUserPassword: _isRecoveringUserPassword,
       errorRecoveryUserPassword: _errorRecoveryUserPassword,
       clearRecoveryUserPasswordError,
+      isRequestingResetUserPassword: _isRequestingResetPassword,
+      errorRequestResetPassword: _errorRequestResetPassword,
+      requestResetUserPassword,
+      saveUserNewPassword,
+      userMobileNumber: _userMobileNumber,
+      userNewPassword: _userNewPassword,
+      requestRecoveryPassword,
+      isVerifying: _isVerifying,
+      isChangePasswordSuccess: _isChangePasswordSuccess,
+      errorUserVerify: _errorUserVerify,
+      clearUserVerificationData,
     }),
     [
       _profile,
+      _recovery,
       _isSignedIn,
       _isSigning,
       _profilePicture,
@@ -271,6 +381,13 @@ export const useAuthContextValue = (): AuthContextData => {
       _isChangePassword,
       _isRecoveringUserPassword,
       _errorRecoveryUserPassword,
+      _errorRequestResetPassword,
+      _isRequestingResetPassword,
+      _userMobileNumber,
+      _isVerifying,
+      _isChangePasswordSuccess,
+      _errorUserVerify,
+      _userNewPassword,
     ]
   );
 };
