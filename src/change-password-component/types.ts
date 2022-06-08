@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
-import { ErrorData, InputFieldStyles, CheckBoxStyles } from 'react-native-theme-component';
+import { ErrorData, InputFieldStyles } from 'react-native-theme-component';
+import { CheckBoxStyles } from 'react-native-theme-component/src/checkbox';
 
 export type ChangePasswordRef = {
   updateCountryCode: (code: string) => void;
@@ -7,14 +8,15 @@ export type ChangePasswordRef = {
 
 export type ChangePasswordProps = {
   Root: {
-    style?: LoginComponentStyles;
     props: {
       formatError?: (error: string) => string;
       genericError?: (error: Error) => ErrorData;
-      onPress: (data: any) => void;
+      onPress: (data?: any) => void;
       onPressBack: () => void;
+      onRequestResetSuccess: () => void;
       title?: string;
       subTitle?: string;
+      isReset?: boolean;
     };
     components?: {
       header?: ReactNode;
@@ -29,9 +31,17 @@ export type ChangePasswordProps = {
       type?: 'phonenumber' | 'email';
       validationSchema?: any;
       onPressDialCode?: () => void;
+      withDialCode?: boolean;
+      withLabel?: boolean;
+      isVisiblePassword?: boolean;
+      isNewVisiblePassword?: boolean;
+      isConfirmVisiblePassword?: boolean;
     };
     component?: {
       usernameIcon?: ReactNode;
+      newSuffixIcon?: ReactNode;
+      confirmSuffixIcon?: ReactNode;
+      suffixIcon?: ReactNode;
     };
   };
 };

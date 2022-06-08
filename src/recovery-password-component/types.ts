@@ -18,7 +18,7 @@ export type RecoveryPasswordComponentProps = {
   Root: {
     style?: RecoveryPasswordComponentStyles;
     props: {
-      onRecoveryPasswordSuccess?: (userData: any) => void;
+      onRecoveryPasswordSuccess: () => void;
       onRecoveryPasswordFailed?: (error: Error) => void;
       onPressBack: () => void;
       formatError?: (error: string) => string;
@@ -41,11 +41,13 @@ export type RecoveryPasswordComponentProps = {
 };
 
 export type RecoveryPasswordComponentStyles = {
-  containerStyle?: StyleProp<ViewStyle>;
-  content?: StyleProp<ViewStyle>;
+  container?: StyleProp<ViewStyle>;
   formTitleStyle?: StyleProp<TextStyle>;
   backButtonContainerStyle?: StyleProp<ViewStyle>;
   logoContainerStyle?: StyleProp<ViewStyle>;
+  loginButtonStyle?: any;
+  subTitle?: StyleProp<TextStyle>;
+  content?: StyleProp<ViewStyle>;
 };
 
 export type InputFormStyles = {

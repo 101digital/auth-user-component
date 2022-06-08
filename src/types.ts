@@ -13,6 +13,13 @@ export interface Profile {
   country?: CountryInformation;
 }
 
+export interface Recovery {
+  channelId: string;
+  channelName: string;
+  recoveryCode: string;
+  recoveryHint: string;
+}
+
 export interface MemberShip {
   membershipId: string;
   organisationName: string;
