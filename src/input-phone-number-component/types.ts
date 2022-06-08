@@ -2,24 +2,22 @@ import { ReactNode } from 'react';
 import { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { ErrorData, InputPhoneNumberStyles } from 'react-native-theme-component';
 
-export type RecoveryPasswordComponentRef = {
-  updateCountryCode: (code: string) => void;
-};
+export type InputPhoneNumberComponentRef = {};
 
-export class RecoveryData {
+export class InputPhoneNumberData {
   constructor(readonly phoneNumber: string) {}
 
-  static empty(): RecoveryData {
-    return new RecoveryData('');
+  static empty(): InputPhoneNumberData {
+    return new InputPhoneNumberData('');
   }
 }
 
-export type RecoveryPasswordComponentProps = {
+export type InputPhoneNumberComponentProps = {
   Root: {
-    style?: RecoveryPasswordComponentStyles;
+    style?: InputPhoneNumberComponentStyles;
     props: {
-      onRecoveryPasswordSuccess: () => void;
-      onRecoveryPasswordFailed?: (error: Error) => void;
+      onInputPhoneNumberSuccess: () => void;
+      onInputPhoneNumberFailed?: (error: Error) => void;
       onPressBack: () => void;
       formatError?: (error: string) => string;
       genericError?: (error: Error) => ErrorData;
@@ -27,7 +25,7 @@ export type RecoveryPasswordComponentProps = {
     components?: {
       header?: ReactNode;
       footer?: ReactNode;
-      renderForgotPasswordButton?: () => React.ReactElement | null;
+      renderForgotButton?: () => React.ReactElement | null;
       renderRegisterButton?: () => React.ReactElement | null;
     };
   };
@@ -40,7 +38,7 @@ export type RecoveryPasswordComponentProps = {
   };
 };
 
-export type RecoveryPasswordComponentStyles = {
+export type InputPhoneNumberComponentStyles = {
   container?: StyleProp<ViewStyle>;
   formTitleStyle?: StyleProp<TextStyle>;
   backButtonContainerStyle?: StyleProp<ViewStyle>;

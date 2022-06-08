@@ -1,17 +1,17 @@
 import { defaultsDeep } from 'lodash';
 import { StyleSheet } from 'react-native';
 import { useThemeFonts } from 'react-native-theme-component';
-import { RecoveryPasswordComponentStyles } from './types';
+import { InputPhoneNumberComponentStyles } from './types';
 import { ThemeContext } from 'react-native-theme-component';
 import { useContext } from 'react';
 
 const useMergeStyles = (
-  style?: RecoveryPasswordComponentStyles
-): RecoveryPasswordComponentStyles => {
+  style?: InputPhoneNumberComponentStyles
+): InputPhoneNumberComponentStyles => {
   const fonts = useThemeFonts();
   const { colors } = useContext(ThemeContext);
 
-  const defaultStyles: RecoveryPasswordComponentStyles = StyleSheet.create({
+  const defaultStyles: InputPhoneNumberComponentStyles = StyleSheet.create({
     container: {
       flex: 1,
       padding: 24,
@@ -30,7 +30,7 @@ const useMergeStyles = (
       width: 100,
     },
     subTitle: {
-      marginBottom: 7
+      marginBottom: 7,
     },
     loginButtonStyle: {
       primaryContainerStyle: {
