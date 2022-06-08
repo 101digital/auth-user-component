@@ -46,12 +46,18 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
     await requestRecoveryPassword(value);
   };
 
+  useEffect(() => {
+    if (value && value.length === 6) {
+      handleOnValidateAndResetPassword();
+    }
+  }, [value]);
+
   const resendOtp = async () => {
     setIsSentOtp(true);
     clearUserVerificationData();
-    const respone = await recoveryUserPassword();
-    if (respone?.data[0]) {
-      await requestResetUserPassword(respone?.data[0]);
+    const response = await recoveryUserPassword();
+    if (response?.data[0]) {
+      await requestResetUserPassword(response?.data[0]);
     }
     setIsSentOtp(false);
   };
