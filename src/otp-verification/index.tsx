@@ -12,10 +12,12 @@ import { OtpVerificationComponentStyles, OtpVerificationScreenProps } from './ty
 import { AuthContext } from '../auth-context/context';
 import SuccessModel from './success-model';
 import AlertModal from '../change-password-component/alert-modal';
+import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 
 const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
   const { Root } = props;
   const countdownRef = useRef<CountDownTimerRef>();
+  const otpRef = useRef<OTPFieldRef>();
   const styles: OtpVerificationComponentStyles = useMergeStyles(Root.styles);
   const {
     userMobileNumber,
@@ -54,6 +56,8 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
 
   const resendOtp = async () => {
     setIsSentOtp(true);
+    otpRef.current?.clearInput();
+    otpRef.current?.focus();
     clearUserVerificationData();
     const response = await recoveryUserPassword();
     if (response?.data[0]) {
@@ -76,7 +80,7 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
 
   const onSuccess = () => {
     clearUserVerificationData();
-    Root.props.onSuccess();
+    Root.props.onVerifyOTPSuccess();
   };
 
   if (isChangePasswordSuccess) {
@@ -116,6 +120,7 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
             extraScrollHeight={50}
           >
             <OTPField
+              ref={otpRef}
               style={
                 errorUserVerify || errorRequestResetPassword
                   ? styles.otpErrorFieldStyle
