@@ -517,3 +517,81 @@ const ChangePasswordScreen = () => {
   );
 }
 ```
+
+### `InputPhoneNumberComponent`
+
+The component provides a form to input old, new password and confirm new password to verify user old password for change password.
+
+```javascript
+import {
+  InputPhoneNumberComponent,
+  InputPhoneNumberComponentRef,
+} from 'react-native-auth-component';
+
+const RecoveryPasswordScreen = () => {
+  const inputPhoneNumberRefs = useRef<InputPhoneNumberComponentRef>();
+  return (
+    <View>
+    /* YOUR COMPONENTS */
+        <InputPhoneNumberComponent
+            ref={inputPhoneNumberRefs}
+            Root={{
+              props: {
+                onVerifyPhoneNumberSuccess:(recoveryData) => {
+                  // handle verify phone number success with recovery data
+                }
+                onVerifyPhoneNumberFailed:(error) => {
+                  // handle verify phone number failed with error data
+                }
+                onPressBack:() => {
+                  // handle press back arrow button
+                }
+              },
+            }}
+            InputForm={{
+              props: {
+                validationSchema: $MobilePhoneSchema,
+              },
+            }}
+          />
+      /* YOUR COMPONENTS */
+    </View>
+  );
+};
+```
+
+### `VerifyOTPComponent`
+
+The component provides a OTP input field, new password and confirm new password to verify user old password for change password.
+
+```javascript
+import { colors, OtpVerification, OtpVerificationComponentRef } from 'react-native-auth-component';
+
+export type ResetPasswordOtpVerificationParams = {};
+
+const ResetPasswordOtpVerificationScreen = () => {
+  const otpVerificationRefs = useRef<OtpVerificationComponentRef>();
+
+  return (
+    <OtpVerification
+      ref={otpVerificationRefs}
+      Root={{
+        props: {
+          onConfirmPasswordError: () => {
+            // handle error confirm password action
+          },
+          onPressBack: () => {
+            // handle press back arrow button
+          },
+          onVerifyOTPSuccess: () => {
+            // handle success verify otp action
+          },
+          onVerifyOTPFailed: () => {
+            // handle failed verify otp action
+          },
+        },
+      }}
+    />
+  );
+};
+```

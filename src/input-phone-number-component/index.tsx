@@ -18,7 +18,9 @@ const InputPhoneNumberComponent = forwardRef((props: InputPhoneNumberComponentPr
   const handleOnRecoverPassword = async (values: InputPhoneNumberData) => {
     Keyboard.dismiss();
     saveUserPhoneNumber(values.phoneNumber);
-    Root?.props?.onInputPhoneNumberSuccess();
+    // TODO: add verify user phone number
+    //
+    Root?.props?.onVerifyPhoneNumberSuccess();
   };
 
   const renderForm = ({ values, submitForm, isValid }: FormikProps<InputPhoneNumberData>) => {

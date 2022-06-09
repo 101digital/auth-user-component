@@ -5,6 +5,17 @@ import { CheckBoxStyles } from 'react-native-theme-component/src/checkbox';
 export type ChangePasswordRef = {
   updateCountryCode: (code: string) => void;
 };
+export class ChangePasswordData {
+  constructor(
+    readonly oldPassword: string,
+    readonly newPassword: string,
+    readonly confirmNewPassword: string
+  ) {}
+
+  static empty(): ChangePasswordData {
+    return new ChangePasswordData('', '', '');
+  }
+}
 
 export type ChangePasswordProps = {
   Root: {
@@ -14,9 +25,10 @@ export type ChangePasswordProps = {
       onPress: (data?: any) => void;
       onPressBack: () => void;
       onRequestResetSuccess: () => void;
+      onRequestResetFailed: () => void;
       title?: string;
       subTitle?: string;
-      isReset?: boolean;
+      isRecoveryMode?: boolean;
     };
     components?: {
       header?: ReactNode;
@@ -27,12 +39,8 @@ export type ChangePasswordProps = {
   InputForm?: {
     style?: InputFormStyles;
     props?: {
-      initialSignInData?: SignInData;
-      type?: 'phonenumber' | 'email';
+      initialChangePasswordData?: ChangePasswordData;
       validationSchema?: any;
-      onPressDialCode?: () => void;
-      withDialCode?: boolean;
-      withLabel?: boolean;
       isVisiblePassword?: boolean;
       isNewVisiblePassword?: boolean;
       isConfirmVisiblePassword?: boolean;

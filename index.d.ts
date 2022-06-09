@@ -15,6 +15,7 @@ export * from './src/types';
 export { default as authComponentData } from './src/auth-component.json';
 export * from './src/assets';
 export { default as ChangePassword } from './src/change-password-component';
+export { ChangePasswordRef } from './src/change-password-component/types';
 export { default as InputPhoneNumberComponent } from './src/input-phone-number-component';
 export { InputPhoneNumberComponentRef } from './src/input-phone-number-component/types';
 export { default as OtpVerification } from './src/otp-verification';

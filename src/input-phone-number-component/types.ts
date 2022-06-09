@@ -16,8 +16,8 @@ export type InputPhoneNumberComponentProps = {
   Root: {
     style?: InputPhoneNumberComponentStyles;
     props: {
-      onInputPhoneNumberSuccess: () => void;
-      onInputPhoneNumberFailed?: (error: Error) => void;
+      onVerifyPhoneNumberSuccess: () => void;
+      onVerifyPhoneNumberFailed: (error: Error) => void;
       onPressBack: () => void;
       formatError?: (error: string) => string;
       genericError?: (error: Error) => ErrorData;

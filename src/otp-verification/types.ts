@@ -3,9 +3,7 @@ import { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { ErrorData } from 'react-native-theme-component';
 import { OTPFieldStyles } from 'react-native-theme-component/src/otp-field';
 
-export type OtpVerificationComponentRef = {
-  updateCountryCode: (code: string) => void;
-};
+export type OtpVerificationComponentRef = {};
 
 export type OtpVerificationScreenProps = {
   Root: {
@@ -13,21 +11,14 @@ export type OtpVerificationScreenProps = {
     props: {
       formatError?: (error: string) => string;
       genericError?: (error: Error) => ErrorData;
-      onSuccess: () => void;
+      onVerifyOTPSuccess: () => void;
+      onVerifyOTPFailed: () => void;
       onPressBack: () => void;
       onConfirmPasswordError: () => void;
     };
     components?: {
       header?: ReactNode;
       footer?: ReactNode;
-      renderRegisterButton?: () => React.ReactElement | null;
-    };
-  };
-  InputForm?: {
-    props?: {
-      type?: 'phonenumber';
-      validationSchema?: any;
-      onPressDialCode?: () => void;
     };
   };
 };

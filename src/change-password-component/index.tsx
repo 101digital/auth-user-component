@@ -40,7 +40,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
     isRequestingResetUserPassword,
   } = useContext(AuthContext);
 
-  const isResetPasswordMode = Root?.props?.isReset;
+  const isRecoveryMode = Root?.props?.isRecoveryMode;
 
   const [isSelected1, setSelected1] = useState(false);
   const [isSelected2, setSelected2] = useState(false);
@@ -55,13 +55,15 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
   const handleOnSubmitForm = async (data: any) => {
     Keyboard.dismiss();
     try {
-      if (isResetPasswordMode) {
+      if (isRecoveryMode) {
         const respone = await recoveryUserPassword();
         if (respone?.data[0]) {
           const validInvitation = await requestResetUserPassword(respone?.data[0]);
           if (validInvitation) {
             saveUserNewPassword && saveUserNewPassword(data.password);
             Root?.props.onRequestResetSuccess();
+          } else {
+            Root?.props.onRequestResetFailed();
           }
         }
       } else {
@@ -172,7 +174,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                       showsVerticalScrollIndicator={false}
                       extraScrollHeight={50}
                     >
-                      {!isResetPasswordMode && (
+                      {!isRecoveryMode && (
                         <>
                           <Text style={styles.inputTitle}>
                             {i18n?.t('change_password.lbl_current_password') ?? 'Current Password'}
@@ -310,7 +312,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
                     <Button
                       onPress={submitForm}
                       label={
-                        isResetPasswordMode
+                        isRecoveryMode
                           ? i18n?.t('reset_password.lbl_btn_save')
                           : i18n?.t('common.btn_next')
                       }
