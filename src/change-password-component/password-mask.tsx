@@ -4,9 +4,9 @@ import {
   ViewStyle,
   TouchableOpacityProps,
   TouchableOpacity,
-  StyleSheet,
+  StyleSheet
 } from 'react-native';
-import { PasswordHideIcon, PasswordShowIcon } from '@/assets/icons';
+import { PasswordHideIcon, PasswordShowIcon } from '../assets/icons';
 
 interface ComponentProps {
   isVisible: boolean;
@@ -34,6 +34,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginRight: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
+    justifyContent: 'center'
+  }
 });

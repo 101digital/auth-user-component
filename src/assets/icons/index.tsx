@@ -5,3 +5,5 @@ export * from './help.icon';
 export * from './loader.icon';
 export * from './information.icon';
 export * from './oncompleted.icon';
+export * from './password-hide.icon';
+export * from './password-show.icon';

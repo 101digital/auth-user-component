@@ -1,19 +1,19 @@
-import { colors, fonts } from '@/assets';
+import { colors, fonts } from '../assets';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background
   },
   successContainer: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary
   },
   mainContainer: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingHorizontal: 24,
+    paddingHorizontal: 24
   },
   title: {
     fontFamily: fonts.bold,
@@ -21,13 +21,13 @@ export const styles = StyleSheet.create({
     lineHeight: 36,
     color: colors.primary,
     paddingHorizontal: 24,
-    marginBottom: 32,
+    marginBottom: 32
   },
   backButtonContainerStyle: {
     padding: 15,
     marginLeft: 12,
     marginBottom: 8,
-    width: 100,
+    width: 100
   },
   actionButton: {
     height: 60,
@@ -35,14 +35,14 @@ export const styles = StyleSheet.create({
     backgroundColor: 'white',
     shadowOffset: {
       width: 0,
-      height: 1,
-    },
+      height: 1
+    }
   },
   inputContainer: {
-    paddingTop: 20,
+    paddingTop: 20
   },
   inputBottemContainer: {
-    paddingVertical: 20,
+    paddingVertical: 20
   },
   labelTextStyle: {
     fontSize: 12,
@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: colors.primaryText,
     marginBottom: 3,
-    marginTop: 20,
+    marginTop: 20
   },
   noteContainer: {
     borderRadius: 8,
@@ -58,23 +58,23 @@ export const styles = StyleSheet.create({
     // width: 327,
     padding: 15,
     paddingTop: 0,
-    paddingHorizontal: 24,
+    paddingHorizontal: 24
   },
   noteText: {
     fontFamily: fonts.regular,
     fontSize: 14,
     color: '#4E4B50',
-    lineHeight: 24,
+    lineHeight: 24
   },
   checkBoxWrapper: { marginBottom: 19 },
   checkBoxWrapperWithTooltip: {
     justifyContent: 'flex-start',
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   tooltip: { marginLeft: -5 },
   tooltipContent: { marginLeft: -1, borderRadius: 2 },
   tooltipArrow: { marginLeft: 4 },
   inputTitle: {
-    marginBottom: 7,
-  },
+    marginBottom: 7
+  }
 });
