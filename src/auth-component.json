@@ -478,7 +478,7 @@
     },
     {
       "id": "login-phonenumber-template-3",
-      "templateName": "Login with phone number template2",
+      "templateName": "Login with phone number template3",
       "componentName": "LoginComponent",
       "imports": [
         "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';",
