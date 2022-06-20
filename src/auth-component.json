@@ -475,6 +475,115 @@
           "params": []
         }
       ]
+    },
+    {
+      "id": "login-phonenumber-template-3",
+      "templateName": "Login with phone number template2",
+      "componentName": "LoginComponent",
+      "imports": [
+        "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';",
+        "import { CountryPicker, ThemeContext } from 'react-native-theme-component';"
+      ],
+      "headers": [
+        "  const [showCountryPicker, setShowCountryPicker] = useState(false);",
+        "  const { deviceCountryCode } = useContext(ThemeContext);",
+        "  const loginRefs = useRef<LoginComponentRef>();",
+        "",
+        "  useEffect(() => {",
+        "    if (deviceCountryCode) {",
+        "      loginRefs?.current?.updateCountryCode(deviceCountryCode);",
+        "    }",
+        "  }, [deviceCountryCode]);"
+      ],
+      "renders": [
+        "      <LoginComponent",
+        "        ref={loginRefs}",
+        "        Root={{",
+        "          props: {",
+        "            onLoginSuccess: (profile) => {",
+        "              $fn-login-success",
+        "            },",
+        "            onLoginFailed: (error) => {",
+        "              $fn-login-failed",
+        "            },",
+        "            onPressForgotPassword: () => {",
+        "              $fn-forgot-password",
+        "            },",
+        "            onPressRegister: () => {",
+        "              $fn-register",
+        "            },",
+        "          },",
+        "        }}",
+        "        InputForm={{",
+        "          component: {",
+        "            passwordIcon: <View />,",
+        "            usernameIcon: <View />,",
+        "          },",
+        "          style: {",
+        "            passwordInputFieldStyle: {",
+        "              containerStyle: { marginTop: 24 },",
+        "            },",
+        "            userNameInputFieldStyle: {",
+        "              contentContainerStyle: {",
+        "                borderWidth: 1,",
+        "                borderRadius: 5,",
+        "                borderBottomWidth: 1,",
+        "              },",
+        "              inputContainerStyle: {",
+        "                height: 42,",
+        "              },",
+        "              textInputStyle: {",
+        "                fontSize: 15,",
+        "                color: '#000000',",
+        "              },",
+        "            },",
+        "          },",
+        "          props: {",
+        "            onPressDialCode: () => {",
+        "              setShowCountryPicker(true);",
+        "            },",
+        "          },",
+        "        }}",
+        "      />",
+        "      <CountryPicker",
+        "        isVisible={showCountryPicker}",
+        "        onClose={() => {",
+        "          setShowCountryPicker(false);",
+        "        }}",
+        "        onSelectedCountry={(code) => {",
+        "          setShowCountryPicker(false);",
+        "          loginRefs.current?.updateCountryCode(code);",
+        "        }}",
+        "      />"
+      ],
+      "functions": [
+        {
+          "id": "fn-login-success",
+          "params": [
+            {
+              "name": "profile",
+              "type": "Profile"
+            }
+          ]
+        },
+        {
+          "id": "fn-login-failed",
+          "params": [
+            {
+              "name": "error",
+              "type": "Error"
+            }
+          ]
+        },
+        {
+          "id": "fn-forgot-password",
+          "params": []
+        },
+        {
+          "id": "fn-register",
+          "params": []
+        }
+      ]
     }
   ],
   "texts": {
