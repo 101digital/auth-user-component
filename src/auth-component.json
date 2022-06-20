@@ -51,7 +51,10 @@
       }
     }
   },
-  "dependencies": [{ "name": "https://github.com/101digital/react-native-theme-component.git" }],
+  "dependencies": [
+    { "name": "https://github.com/101digital/react-native-theme-component.git" },
+    { "name": "https://github.com/101digital/react-native-register-component.git" }
+  ],
   "templates": [
     {
       "id": "login-email-template",
@@ -332,19 +335,13 @@
       "templateName": "Login with phone number template",
       "componentName": "LoginComponent",
       "imports": [
-        "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';",
+        "import { LoginComponent, LoginComponentRef,DefaultLogoIcon,PasswordMask  } from 'react-native-auth-component';",
         "import { CountryPicker, ThemeContext } from 'react-native-theme-component';"
       ],
       "headers": [
-        "  const [showCountryPicker, setShowCountryPicker] = useState(false);",
-        "  const { deviceCountryCode } = useContext(ThemeContext);",
+        "  const [isVisiblePassword, setVisiblePassword] = useState(false);",
         "  const loginRefs = useRef<LoginComponentRef>();",
-        "",
-        "  useEffect(() => {",
-        "    if (deviceCountryCode) {",
-        "      loginRefs?.current?.updateCountryCode(deviceCountryCode);",
-        "    }",
-        "  }, [deviceCountryCode]);"
+        ""
       ],
       "renders": [
         "      <LoginComponent",
@@ -435,15 +432,49 @@
         "            },",
         "          },",
         "        }}",
-        "      />",
-        "      <CountryPicker",
-        "        isVisible={showCountryPicker}",
-        "        onClose={() => {",
-        "          setShowCountryPicker(false);",
-        "        }}",
-        "        onSelectedCountry={(code) => {",
-        "          setShowCountryPicker(false);",
-        "          loginRefs.current?.updateCountryCode(code);",
+        "        InputForm={{",
+        "          component: {",
+        "            passwordIcon: <View />,",
+        "            usernameIcon: <>< />,",
+        "            suffixIcon: (",
+        "              <PasswordMask",
+        "                isVisible={isVisiblePassword}",
+        "                onPress={() => setVisiblePassword(!isVisiblePassword)}",
+        "              />",
+        "            ),",
+        "          },",
+        "          style: {",
+        "            passwordInputWrapperStyle: {",
+        "              marginTop: 24,",
+        "            },",
+        "            passwordInputFieldStyle: {",
+        "              contentContainerStyle: {",
+        "                backgroundColor: '#fff',",
+        "              },",
+        "            },",
+        "            userNameInputFieldStyle: {",
+        "              contentContainerStyle: {",
+        "                borderWidth: 1,",
+        "                borderRadius: 5,",
+        "                borderBottomWidth: 1,",
+        "                marginBottom: 20,",
+        "                backgroundColor: '#fff',",
+        "              },",
+        "              inputContainerStyle: {",
+        "                height: 42,",
+        "              },",
+        "              textInputStyle: {",
+        "                fontSize: 15,",
+        "                color: '#000000',",
+        "              },",
+        "            },",
+        "          },",
+        "          props: {",
+        "            onPressDialCode: () => {},",
+        "            withDialCode: false,",
+        "            withLabel: true,",
+        "            isVisiblePassword: isVisiblePassword,",
+        "          },",
         "        }}",
         "      />"
       ],
@@ -477,112 +508,24 @@
       ]
     },
     {
-      "id": "login-phonenumber-template-3",
-      "templateName": "Login with phone number template3",
+      "id": "register-template",
+      "templateName": "Simple register template",
       "componentName": "LoginComponent",
-      "imports": [
-        "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';",
-        "import { CountryPicker, ThemeContext } from 'react-native-theme-component';"
-      ],
-      "headers": [
-        "  const [showCountryPicker, setShowCountryPicker] = useState(false);",
-        "  const { deviceCountryCode } = useContext(ThemeContext);",
-        "  const loginRefs = useRef<LoginComponentRef>();",
-        "",
-        "  useEffect(() => {",
-        "    if (deviceCountryCode) {",
-        "      loginRefs?.current?.updateCountryCode(deviceCountryCode);",
-        "    }",
-        "  }, [deviceCountryCode]);"
-      ],
+      "imports": ["import { InviteCodeQuestionScreen } from 'react-native-register-component';"],
+      "headers": [],
       "renders": [
-        "      <LoginComponent",
-        "        ref={loginRefs}",
-        "        Root={{",
-        "          props: {",
-        "            onLoginSuccess: (profile) => {",
-        "              $fn-login-success",
-        "            },",
-        "            onLoginFailed: (error) => {",
-        "              $fn-login-failed",
-        "            },",
-        "            onPressForgotPassword: () => {",
-        "              $fn-forgot-password",
-        "            },",
-        "            onPressRegister: () => {",
-        "              $fn-register",
-        "            },",
-        "          },",
-        "        }}",
-        "        InputForm={{",
-        "          component: {",
-        "            passwordIcon: <View />,",
-        "            usernameIcon: <View />,",
-        "          },",
-        "          style: {",
-        "            passwordInputFieldStyle: {",
-        "              containerStyle: { marginTop: 24 },",
-        "            },",
-        "            userNameInputFieldStyle: {",
-        "              contentContainerStyle: {",
-        "                borderWidth: 1,",
-        "                borderRadius: 5,",
-        "                borderBottomWidth: 1,",
-        "              },",
-        "              inputContainerStyle: {",
-        "                height: 42,",
-        "              },",
-        "              textInputStyle: {",
-        "                fontSize: 15,",
-        "                color: '#000000',",
-        "              },",
-        "            },",
-        "          },",
-        "          props: {",
-        "            onPressDialCode: () => {",
-        "              setShowCountryPicker(true);",
-        "            },",
-        "          },",
-        "        }}",
-        "      />",
-        "      <CountryPicker",
-        "        isVisible={showCountryPicker}",
-        "        onClose={() => {",
-        "          setShowCountryPicker(false);",
-        "        }}",
-        "        onSelectedCountry={(code) => {",
-        "          setShowCountryPicker(false);",
-        "          loginRefs.current?.updateCountryCode(code);",
-        "        }}",
-        "      />"
-      ],
-      "functions": [
-        {
-          "id": "fn-login-success",
-          "params": [
-            {
-              "name": "profile",
-              "type": "Profile"
-            }
-          ]
-        },
-        {
-          "id": "fn-login-failed",
-          "params": [
-            {
-              "name": "error",
-              "type": "Error"
-            }
-          ]
-        },
-        {
-          "id": "fn-forgot-password",
-          "params": []
-        },
-        {
-          "id": "fn-register",
-          "params": []
-        }
+        "<InviteCodeQuestionScreen",
+        "  onPress={(data) => {",
+        "    if (data.withCode) {",
+        "      //navigation.navigate(Route.INVITATION_CODE_SCREEN, {});",
+        "    } else {",
+        "     // navigation.navigate(Route.JOIN_LIST_SCREEN, {});",
+        "    }",
+        "  }}",
+        "  onPressBack={() => {",
+        "    navigation.goBack();",
+        "  }}",
+        "/>"
       ]
     }
   ],

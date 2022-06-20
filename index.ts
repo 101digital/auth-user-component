@@ -8,7 +8,7 @@ export { default as ProfileComponent } from './src/profile-component';
 export {
   LoginComponentProps,
   LoginComponentRef,
-  LoginComponentStyles,
+  LoginComponentStyles
 } from './src/login-component/types';
 export { AuthContext, AuthProvider } from './src/auth-context';
 export * from './src/types';
@@ -22,3 +22,4 @@ export { default as InputPhoneNumberComponent } from './src/input-phone-number-c
 export { InputPhoneNumberComponentRef } from './src/input-phone-number-component/types';
 export { default as OtpVerification } from './src/otp-verification';
 export { OtpVerificationComponentRef } from './src/otp-verification/types';
+export { PasswordMask } from './src/change-password-component/password-mask';
