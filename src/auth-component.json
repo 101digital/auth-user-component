@@ -326,6 +326,155 @@
       "renders": [
         "      <Button label='LOGOUT' style={{ primaryContainerStyle: { margin: 20 } }} onPress={logout} />"
       ]
+    },
+    {
+      "id": "login-phonenumber-udtemplate",
+      "templateName": "Login with phone number template",
+      "componentName": "LoginComponent",
+      "imports": [
+        "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';",
+        "import { CountryPicker, ThemeContext } from 'react-native-theme-component';"
+      ],
+      "headers": [
+        "  const [showCountryPicker, setShowCountryPicker] = useState(false);",
+        "  const { deviceCountryCode } = useContext(ThemeContext);",
+        "  const loginRefs = useRef<LoginComponentRef>();",
+        "",
+        "  useEffect(() => {",
+        "    if (deviceCountryCode) {",
+        "      loginRefs?.current?.updateCountryCode(deviceCountryCode);",
+        "    }",
+        "  }, [deviceCountryCode]);"
+      ],
+      "renders": [
+        "      <LoginComponent",
+        "        ref={loginRefs}",
+        "        Root={{",
+        "          props: {",
+        "            onLoginSuccess: (profile) => {",
+        "              $fn-login-success",
+        "            },",
+        "            onLoginFailed: (error) => {",
+        "              $fn-login-failed",
+        "            },",
+        "            onPressForgotPassword: () => {",
+        "              $fn-forgot-password",
+        "            },",
+        "            onPressRegister: () => {",
+        "              $fn-register",
+        "            },",
+        "          },",
+        "          components: {",
+        "             header: <></>,",
+        "             footer: (",
+        "                 <View style={styles.footer}>",
+        "                   <Text style={styles.footerText}>",
+        "                       UnionDigital Bank is regulated by the Bangko Sentral ng Pilipinas.",
+        "                   </Text>",
+        "                   <Text style={styles.footerText}>",
+        "                       Deposits are insured by the Philippine Deposit Insurance",
+        "                   </Text>",
+        "                   <Text style={styles.footerText}>Corporation up to PHP500,000 per depositor.</Text>",
+        "                 </View>",
+        "             ),",
+        "          },",
+        "          style: {",
+        "             logoContainerStyle: {",
+        "                 alignSelf: 'flex-start',",
+        "                 marginTop: -40,",
+        "             },",
+        "             containerStyle: {",
+        "                 flex: 1,",
+        "                 padding: 24,",
+        "                 paddingTop: 0,",
+        "             },",
+        "             formTitleStyle: {",
+        "                 fontSize: 22,",
+        "                 color: '#5E0CBC',",
+        "                 marginBottom: 32,",
+        "                 marginTop: -32,",
+        "             },",
+        "             loginButtonStyle: {",
+        "                 primaryContainerStyle: {",
+        "                   marginTop: 220,",
+        "                 },",
+        "             },",
+        "             noneAccountLabelStyle: {",
+        "                 fontSize: 14,",
+        "                 color: '#000',",
+        "                 lineHeight: 20,",
+        "             },",
+        "             signUpContainerStyle: {",
+        "                 flexDirection: 'row',",
+        "                 marginVertical: 32,",
+        "                 alignSelf: 'center',",
+        "             },",
+        "             signUpLabelStyle: {",
+        "                 fontSize: 14,",
+        "                 color: '#FF9800',",
+        "                 lineHeight: 20,",
+        "                 textDecorationLine: 'none',",
+        "                 marginHorizontal: 8,",
+        "                 fontWeight: 'bold',",
+        "             },",
+        "             forgotPasswordLabelStyle: {",
+        "                 color: '#FF9800',",
+        "                 fontSize: 14,",
+        "                 fontWeight: '700',",
+        "             },",
+        "             forgotPasswordContainerStyle: {",
+        "                 alignSelf: 'center',",
+        "             },",
+        "         },",
+        "        }}",
+        "        InputForm={{",
+        "          style: { passwordInputFieldStyle: { containerStyle: { marginTop: 24 } } },",
+        "          props: {",
+        "            onPressDialCode: () => {",
+        "              setShowCountryPicker(true);",
+        "            },",
+        "          },",
+        "        }}",
+        "      />",
+        "      <CountryPicker",
+        "        isVisible={showCountryPicker}",
+        "        onClose={() => {",
+        "          setShowCountryPicker(false);",
+        "        }}",
+        "        onSelectedCountry={(code) => {",
+        "          setShowCountryPicker(false);",
+        "          loginRefs.current?.updateCountryCode(code);",
+        "        }}",
+        "      />"
+      ],
+      "functions": [
+        {
+          "id": "fn-login-success",
+          "params": [
+            {
+              "name": "profile",
+              "type": "Profile"
+            }
+          ]
+        },
+        {
+          "id": "fn-login-failed",
+          "params": [
+            {
+              "name": "error",
+              "type": "Error"
+            }
+          ]
+        },
+        {
+          "id": "fn-forgot-password",
+          "params": []
+        },
+        {
+          "id": "fn-register",
+          "params": []
+        }
+      ]
     }
   ],
   "texts": {
