@@ -527,6 +527,83 @@
         "  }}",
         "/>"
       ]
+    },
+    {
+      "id": "input-phonenumber-template",
+      "templateName": "Input phone number template",
+      "componentName": "InputPhoneNumberComponent",
+      "imports": [
+        "import { InputPhoneNumberComponent, InputPhoneNumberComponentRef } from 'react-native-auth-component';"
+      ],
+      "headers": ["  const inputPhoneNumberRefs = useRef<InputPhoneNumberComponentRef>();"],
+      "renders": [
+        "      <InputPhoneNumberComponent",
+        "       ref={inputPhoneNumberRefs}",
+        "       Root={{",
+        "         props: {",
+        "           onInputPhoneNumberSuccess: () => $fn-input-phone-number-success",
+        "           onPressBack: $fn-go-back",
+        "         },",
+        "       }}",
+        "     />"
+      ]
+    },
+    {
+      "id": "change-password-component",
+      "templateName": "change password template",
+      "componentName": "ChangePassword",
+      "imports": [
+        "import { ChangePassword } from 'react-native-auth-component';",
+        "import { PasswordMask } from 'react-native-register-component';",
+        "import { ChangePasswordRef } from 'react-native-auth-component/src/change-password-component/types';"
+      ],
+      "headers": [
+        "  const passwordRefs = useRef<ChangePasswordRef>();",
+        "  const [isVisiblePassword, setVisiblePassword] = useState(true);",
+        "  const [isNewVisiblePassword, setNewVisiblePassword] = useState(true);",
+        "  const [isConfirmVisiblePassword, setConfirmVisiblePassword] = useState(true);"
+      ],
+      "renders": [
+        "      <ChangePassword",
+        "       ref={passwordRefs}",
+        "       Root={{",
+        "         props: {",
+        "           onRequestResetSuccess: () => $fn-input-phone-number-success",
+        "           onPressBack: $fn-go-back",
+        "           onPress: $fn-on-press",
+        "         },",
+        "       }}",
+        "       InputForm: {{",
+        "         component: {",
+        "         usernameIcon: <View />,",
+        "         suffixIcon: (",
+        "           <PasswordMask",
+        "             isVisible={isVisiblePassword}",
+        "             onPress={() => setVisiblePassword(!isVisiblePassword)}",
+        "           />",
+        "         ),",
+        "         newSuffixIcon: (",
+        "           <PasswordMask",
+        "             isVisible={isNewVisiblePassword}",
+        "             onPress={() => setNewVisiblePassword(!isNewVisiblePassword)}",
+        "           />",
+        "         ),",
+        "         confirmSuffixIcon: (",
+        "           <PasswordMask",
+        "             isVisible={isConfirmVisiblePassword}",
+        "              onPress={() => setConfirmVisiblePassword(!isConfirmVisiblePassword)}",
+        "            />",
+        "         ),",
+        "       },",
+        "       }}", 
+        "       props: {",
+        "         onPressDialCode: $fn-on-press",
+        "         isVisiblePassword: isVisiblePassword,",
+        "         isNewVisiblePassword: isNewVisiblePassword,",
+        "         isConfirmVisiblePassword: isConfirmVisiblePassword,",
+        "       },",
+        "      />"
+      ]
     }
   ],
   "texts": {
@@ -559,6 +636,29 @@
       "lbl_success_title": "Success!",
       "msg_success": "Success!",
       "btn_success_next": "Proceed to dashboard"
+    },
+    "input_phone_number_component": {
+      "lbl_proceed": "Proceed",
+      "lbl_error_title": "Oops!",
+      "lbl_error_message": "Looks like the mobile number you entered is not linked to a UnionDigital Bank account. Please try another mobile number or login to your account.",
+      "lbl_forgot_password": "Forgot password",
+      "lbl_mobile_number": "Enter mobile number",
+      "lbl_enter_phone_number": "Enter your mobile number to verify your identity."
+    }, 
+    "reset_password": {
+      "lbl_title": "Nominate new password",
+      "lbl_subtitle": "Nominate your new password below.",
+      "lbl_btn_save": "Save new password.",
+      "lbl_success_title": "Success!",
+      "lbl_success_message": "Your password was successfully updated!",
+      "lbl_success_next_btn": "Proceed to Login",
+      "lbl_password_invalid_title": "Oops!",
+      "lbl_password_invalid_message": "New password is too similar to your current password. Please try another password."
+    },
+    "otp_verify_phone_number": {
+      "lbl_title": "Please enter One-Time Password",
+      "lbl_description": "We have sent you a One-Time Password (OTP) to the number *******",
+      "lbl_invalid_code": "Invalid OTP, Please try again"
     }
   }
 }
