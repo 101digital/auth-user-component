@@ -29,11 +29,13 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
     errorRequestResetPassword,
     requestResetUserPassword,
     clearUserVerificationData,
+    clearRecoveryUserPasswordError,
   } = useContext(AuthContext);
 
   const [value, setValue] = useState('');
   const [isSentOtp, setIsSentOtp] = useState(false);
-  const [isShowErrorModal, setShowErrorModal] = useState(false);
+  const [isShowErrorPasswordModal, setIsShowErrorPasswordModal] = useState(false);
+  const [isShowErrorPhoneNumberModal, setIsShowErrorPhoneNumberModal] = useState(false);
 
   const passwordErrorCode = '011.01.412.05';
   const errorOTPMessage = errorUserVerify
@@ -49,6 +51,10 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
   };
 
   useEffect(() => {
+    resendOtp();
+  }, []);
+
+  useEffect(() => {
     if (value && value.length === 6) {
       handleOnValidateAndResetPassword();
     }
@@ -62,13 +68,16 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
     const response = await recoveryUserPassword();
     if (response?.data[0]) {
       await requestResetUserPassword(response?.data[0]);
+    } else {
+      setIsShowErrorPhoneNumberModal(true);
     }
+
     setIsSentOtp(false);
   };
 
   useEffect(() => {
     if (errorUserVerify?.response?.data?.errors[0]?.code === passwordErrorCode) {
-      setShowErrorModal(true);
+      setIsShowErrorPasswordModal(true);
     }
   }, [errorUserVerify]);
 
@@ -172,16 +181,29 @@ const OtpVerification = forwardRef((props: OtpVerificationScreenProps) => {
             }}
           />
           <AlertModal
-            isVisible={isShowErrorModal}
+            isVisible={isShowErrorPasswordModal}
             title={i18n?.t('reset_password.lbl_password_invalid_title') ?? 'Oops!'}
             message={
               i18n?.t('reset_password.lbl_password_invalid_message') ??
               'New password is too similar to your current password. Please try another password.'
             }
             onConfirmed={() => {
-              setShowErrorModal(false);
+              setIsShowErrorPasswordModal(false);
               clearUserVerificationData();
               Root.props.onConfirmPasswordError();
+            }}
+          />
+          <AlertModal
+            isVisible={isShowErrorPhoneNumberModal}
+            title={i18n?.t('input_phone_number_component.lbl_error_title') ?? 'Oops!'}
+            message={
+              i18n?.t('input_phone_number_component.lbl_error_message') ??
+              'Looks like the mobile number you entered is not linked to a UnionDigital Bank account. Please try another mobile number or login to your account.'
+            }
+            onConfirmed={() => {
+              setIsShowErrorPhoneNumberModal(false);
+              clearRecoveryUserPasswordError();
+              Root.props.onVerifyPhoneNumberError();
             }}
           />
         </SafeAreaView>

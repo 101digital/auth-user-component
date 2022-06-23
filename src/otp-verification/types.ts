@@ -15,6 +15,7 @@ export type OtpVerificationScreenProps = {
       onVerifyOTPFailed: () => void;
       onPressBack: () => void;
       onConfirmPasswordError: () => void;
+      onVerifyPhoneNumberError: () => void;
     };
     components?: {
       header?: ReactNode;

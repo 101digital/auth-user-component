@@ -56,16 +56,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
     Keyboard.dismiss();
     try {
       if (isRecoveryMode) {
-        const respone = await recoveryUserPassword();
-        if (respone?.data[0]) {
-          const validInvitation = await requestResetUserPassword(respone?.data[0]);
-          if (validInvitation) {
-            saveUserNewPassword && saveUserNewPassword(data.password);
-            Root?.props.onRequestResetSuccess();
-          } else {
-            Root?.props.onRequestResetFailed();
-          }
-        }
+        Root?.props.onRequestResetSuccess();
       } else {
         await changeUserPassword(data.currentPassword, data.password, data.confirmPassword);
       }
