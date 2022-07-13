@@ -56,6 +56,7 @@ const ChangePassword = forwardRef((props: ChangePasswordProps) => {
     Keyboard.dismiss();
     try {
       if (isRecoveryMode) {
+        saveUserNewPassword && saveUserNewPassword(data.password);
         Root?.props.onRequestResetSuccess();
       } else {
         await changeUserPassword(data.currentPassword, data.password, data.confirmPassword);
