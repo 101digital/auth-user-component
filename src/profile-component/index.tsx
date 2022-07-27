@@ -1,11 +1,20 @@
 import { AuthContext } from '../auth-context/context';
 import React, { ReactNode, useContext } from 'react';
-import { SafeAreaView, StyleProp, Text, TextStyle, View, ViewStyle } from 'react-native';
+import {
+  SafeAreaView,
+  StyleProp,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+  TouchableOpacity
+} from 'react-native';
 import useMergeStyles from './styles';
 
 export type ProfileComponentProps = {
   style?: ProfileComponentStyles;
   appIcon?: ReactNode;
+  onClickProfile?: () => void;
 };
 
 export type ProfileComponentStyles = {
@@ -16,7 +25,7 @@ export type ProfileComponentStyles = {
   userNameTextStyle?: StyleProp<TextStyle>;
 };
 
-const ProfileComponent = ({ style, appIcon }: ProfileComponentProps) => {
+const ProfileComponent = ({ style, appIcon, onClickProfile }: ProfileComponentProps) => {
   const styles: ProfileComponentStyles = useMergeStyles(style);
   const { profile } = useContext(AuthContext);
 
@@ -30,9 +39,14 @@ const ProfileComponent = ({ style, appIcon }: ProfileComponentProps) => {
     <SafeAreaView style={styles.containerStyle}>
       <View style={styles.headerContainerStyle}>
         {appIcon ?? <View />}
-        <View style={styles.avatarContainerStyle}>
+        <TouchableOpacity
+          onPress={() => {
+            onClickProfile();
+          }}
+          style={styles.avatarContainerStyle}
+        >
           <Text style={styles.avatarTextStyle}>{shortName()}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
       <Text style={styles.userNameTextStyle}>{fullName}</Text>
     </SafeAreaView>
