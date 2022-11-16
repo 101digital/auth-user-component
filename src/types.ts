@@ -80,4 +80,5 @@ export type AuthComponentConfig = {
   authorizationBaseUrl?: string; // required for oauth2
   revocationBaseUrl?: string; // required for oauth2
   endSessionBaseUrl?: string; // required for oauth2
+  notificationBaseUrl?: string; //required for  notification
 };

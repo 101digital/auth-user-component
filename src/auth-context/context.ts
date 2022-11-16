@@ -53,6 +53,15 @@ export interface AuthContextData {
   errorUserVerify?: Error;
   errorRequestResetPassword?: Error;
   clearUserVerificationData: () => void;
+  registerDevice: (
+    token: string,
+    platform: 'IOS' | 'Android',
+    userId: string,
+    appId: string,
+    entityId: string
+  ) => boolean;
+  isDeviceRegistering: boolean;
+  isDeviceRegistered: boolean;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -86,6 +95,9 @@ export const authDefaultValue: AuthContextData = {
   errorUserVerify: undefined,
   errorRequestResetPassword: undefined,
   clearUserVerificationData: () => null,
+  registerDevice: () => false,
+  isDeviceRegistering: false,
+  isDeviceRegistered: false,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -114,6 +126,9 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isVerifying, setIsVerifying] = useState<boolean>(false);
   const [_errorUserVerify, setErrorUserVerify] = useState<Error | undefined>();
   const [_isChangePasswordSuccess, setIsChangePasswordSuccess] = useState<boolean>(false);
+
+  const [_isDeviceRegistering, setIsDeviceRegistering] = useState<boolean>(false);
+  const [_isDeviceRegistered, setIsDeviceRegistered] = useState<boolean>(false);
 
   useEffect(() => {
     checkLogin();
@@ -330,6 +345,29 @@ export const useAuthContextValue = (): AuthContextData => {
     [_userNewPassword]
   );
 
+  const registerDevice = useCallback(
+    async (
+      token: string,
+      platform: 'IOS' | 'Android',
+      userId: string,
+      appId: string,
+      entityId: string
+    ) => {
+      try {
+        setIsDeviceRegistering(true);
+        await AuthServices.instance().registerDevice(token, platform, userId, appId, entityId);
+        setIsDeviceRegistered(true);
+        return true;
+      } catch (error) {
+        setIsDeviceRegistering(false);
+        return false;
+      } finally {
+        setIsDeviceRegistering(false);
+      }
+    },
+    []
+  );
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -367,6 +405,9 @@ export const useAuthContextValue = (): AuthContextData => {
       isChangePasswordSuccess: _isChangePasswordSuccess,
       errorUserVerify: _errorUserVerify,
       clearUserVerificationData,
+      registerDevice,
+      isDeviceRegistering: _isDeviceRegistered,
+      isDeviceRegistered: _isDeviceRegistered,
     }),
     [
       _profile,
@@ -389,6 +430,8 @@ export const useAuthContextValue = (): AuthContextData => {
       _isChangePasswordSuccess,
       _errorUserVerify,
       _userNewPassword,
+      _isDeviceRegistering,
+      _isDeviceRegistered,
     ]
   );
 };

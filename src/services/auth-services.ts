@@ -30,14 +30,14 @@ export class AuthServices {
     const body = qs.stringify({
       grant_type: grantType ?? this._configs?.authGrantType ?? 'password',
       username,
-      password
+      password,
     });
     const response = await AuthApiClient.instance()
       .getAuthApiClient()
       .post('', body, {
         params: {
-          scope: scope ?? this._configs?.authScope ?? 'openid'
-        }
+          scope: scope ?? this._configs?.authScope ?? 'openid',
+        },
       });
     const { access_token, refresh_token } = response.data;
     await authComponentStore.storeAccessToken(access_token);
@@ -47,9 +47,7 @@ export class AuthServices {
 
   public refreshToken = async (refreshToken: string, grant_type = 'refresh_token') => {
     const body = qs.stringify({ grant_type, refresh_token: refreshToken });
-    const response = await AuthApiClient.instance()
-      .getAuthApiClient()
-      .post('', body);
+    const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
     const { access_token, refresh_token } = response.data;
     await authComponentStore.storeAccessToken(access_token);
     await authComponentStore.storeRefreshToken(refresh_token);
@@ -61,8 +59,8 @@ export class AuthServices {
     const accessToken = await authComponentStore.getAccessToken();
     const response = await axios.get(`${membershipBaseUrl}/users/me`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     const { data } = response.data;
     const organisationUser = data?.memberships?.filter((el: any) => el.organisationName);
@@ -78,11 +76,9 @@ export class AuthServices {
   fetchAppAccessToken = async () => {
     const body = qs.stringify({
       grant_type: this._configs?.appGrantType ?? 'client_credentials',
-      scope: this._configs?.appScope ?? 'PRODUCTION'
+      scope: this._configs?.appScope ?? 'PRODUCTION',
     });
-    const response = await AuthApiClient.instance()
-      .getAuthApiClient()
-      .post('', body);
+    const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
     return response.data.access_token;
   };
 
@@ -100,14 +96,14 @@ export class AuthServices {
       listCustomFields: [
         {
           customKey: 'logo',
-          customValue: profilePicture
-        }
-      ]
+          customValue: profilePicture,
+        },
+      ],
     };
     const response = await axios.put(`${membershipBaseUrl}/users/${userId}`, body, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     return response.data;
   };
@@ -124,7 +120,7 @@ export class AuthServices {
       authScope,
       authorizationBaseUrl,
       revocationBaseUrl,
-      endSessionBaseUrl
+      endSessionBaseUrl,
     } = this._configs;
     if (!authorizationBaseUrl) {
       throw new Error("Error: authorizationEndpoint can't be undefined");
@@ -141,8 +137,8 @@ export class AuthServices {
         authorizationEndpoint: authorizationBaseUrl,
         tokenEndpoint: tokenBaseUrl,
         revocationEndpoint: revocationBaseUrl,
-        endSessionEndpoint: endSessionBaseUrl
-      }
+        endSessionEndpoint: endSessionBaseUrl,
+      },
     };
     const response = await authorize(config);
     return response;
@@ -158,13 +154,13 @@ export class AuthServices {
     const body = {
       currentPassword,
       newPassword,
-      confirmNewPassword
+      confirmNewPassword,
     };
 
     const response = await axios.put(`${identityBaseUrl}/users/passwords`, body, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     return response.data;
   };
@@ -214,6 +210,31 @@ export class AuthServices {
       }
     );
 
+    return response.data;
+  };
+
+  registerDevice = async (
+    token: string,
+    platform: 'IOS' | 'Android',
+    userId: string,
+    appId: string,
+    entityId: string
+  ) => {
+    const { notificationBaseUrl } = this._configs!;
+    const publicAppToken = await this.fetchAppAccessToken();
+    const body = {
+      entityId,
+      appId,
+      userId,
+      token,
+      platform,
+    };
+    const response = await axios.post(`${notificationBaseUrl}/devices`, body, {
+      headers: {
+        Authorization: `Bearer ${publicAppToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data;
   };
 }
