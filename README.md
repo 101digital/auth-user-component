@@ -47,6 +47,7 @@ AuthComponent.instance()
     authorizationBaseUrl?: string; // required for oauth2
     revocationBaseUrl?: string; // required for oauth2
     endSessionBaseUrl?: string; // required for oauth2
+    notificationBaseUrl?: string // required for push notification
   })
   .then(() => {
     // init other component, such as Banking Component
@@ -134,6 +135,13 @@ export interface AuthContextData {
   isUpdatingProfile?: boolean; // Updating profile state
   errorUpdateProfile?: Error; // Error while update profile
   clearUpdateProfileError: () => void;
+  registerDevice: (
+    token: string,
+    platform: 'IOS' | 'Android',
+    userId: string,
+    appId: string,
+    entityId: string
+  ) => boolean; // registering device with fcm token for notification
 }
 ```
 
@@ -152,6 +160,7 @@ Provide functions to make authentication
 | logout              | Function                                                   | Promise function to clear current session                                                                                                                                                                                                                                 |
 | fetchAppAccessToken | Function                                                   | Promise function return app access token base on basic token                                                                                                                                                                                                              |
 | changeUserPassword  | Function (currentPassword, newPassword,confirmNewPassword) | Promise function using currentPassword, newPassword and confirmNewPassword to change account password.                                                                                                                                                                    |
+| registerDevice      | Function (fcmToken, platform, userId, appId, entityId)     | Function to register user deivce to get notification                                                                                                                                                                                                                      |
 
 ```javascript
 import { AuthServices } from 'react-native-auth-component';
