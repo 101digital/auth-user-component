@@ -1,7 +1,7 @@
 {
   "id": "auth-component",
   "name": "Auth Component",
-  "repository": "https://github.com/101digital/react-native-auth-component",
+  "repository": "https://github.com/101digital/auth-user-component",
   "config": {
     "env": {
       "development": {
@@ -61,7 +61,7 @@
       "templateName": "Login with email template",
       "componentName": "LoginComponent",
       "imports": [
-        "import { LoginComponent } from 'react-native-auth-component';",
+        "import { LoginComponent } from 'auth-user-component';",
         "import { ThemeContext } from 'react-native-theme-component';"
       ],
       "headers": ["  const { i18n } = useContext(ThemeContext);"],
@@ -126,7 +126,7 @@
       "templateName": "Login with phone number template",
       "componentName": "LoginComponent",
       "imports": [
-        "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';",
+        "import { LoginComponent, LoginComponentRef } from 'auth-user-component';",
         "import { CountryPicker, ThemeContext } from 'react-native-theme-component';"
       ],
       "headers": [
@@ -213,7 +213,7 @@
       "templateName": "Login with phone number template2",
       "componentName": "LoginComponent",
       "imports": [
-        "import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';",
+        "import { LoginComponent, LoginComponentRef } from 'auth-user-component';",
         "import { CountryPicker, ThemeContext } from 'react-native-theme-component';"
       ],
       "headers": [
@@ -322,7 +322,7 @@
       "templateName": "Simple logout template",
       "componentName": "LoginComponent",
       "imports": [
-        "import { AuthContext } from 'react-native-auth-component';",
+        "import { AuthContext } from 'auth-user-component';",
         "import { Button } from 'react-native-theme-component';"
       ],
       "headers": ["  const { logout } = useContext(AuthContext);"],
@@ -335,7 +335,7 @@
       "templateName": "Login with phone number template",
       "componentName": "LoginComponent",
       "imports": [
-        "import { LoginComponent, LoginComponentRef,DefaultLogoIcon,PasswordMask  } from 'react-native-auth-component';",
+        "import { LoginComponent, LoginComponentRef,DefaultLogoIcon,PasswordMask  } from 'auth-user-component';",
         "import { CountryPicker, ThemeContext } from 'react-native-theme-component';"
       ],
       "headers": [
@@ -533,7 +533,7 @@
       "templateName": "Input phone number template",
       "componentName": "InputPhoneNumberComponent",
       "imports": [
-        "import { InputPhoneNumberComponent, InputPhoneNumberComponentRef } from 'react-native-auth-component';"
+        "import { InputPhoneNumberComponent, InputPhoneNumberComponentRef } from 'auth-user-component';"
       ],
       "headers": ["  const inputPhoneNumberRefs = useRef<InputPhoneNumberComponentRef>();"],
       "renders": [
@@ -553,9 +553,9 @@
       "templateName": "change password template",
       "componentName": "ChangePassword",
       "imports": [
-        "import { ChangePassword } from 'react-native-auth-component';",
+        "import { ChangePassword } from 'auth-user-component';",
         "import { PasswordMask } from 'react-native-register-component';",
-        "import { ChangePasswordRef } from 'react-native-auth-component/src/change-password-component/types';"
+        "import { ChangePasswordRef } from 'auth-user-component/src/change-password-component/types';"
       ],
       "headers": [
         "  const passwordRefs = useRef<ChangePasswordRef>();",
@@ -595,7 +595,7 @@
         "            />",
         "         ),",
         "       },",
-        "       }}", 
+        "       }}",
         "       props: {",
         "         onPressDialCode: $fn-on-press",
         "         isVisiblePassword: isVisiblePassword,",
@@ -644,7 +644,7 @@
       "lbl_forgot_password": "Forgot password",
       "lbl_mobile_number": "Enter mobile number",
       "lbl_enter_phone_number": "Enter your mobile number to verify your identity."
-    }, 
+    },
     "reset_password": {
       "lbl_title": "Nominate new password",
       "lbl_subtitle": "Nominate your new password below.",

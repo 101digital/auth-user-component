@@ -2,7 +2,7 @@
   "initial": {
     "prefix": "auth-component-init",
     "body": [
-      "import { AuthComponent } from 'react-native-auth-component';",
+      "import { AuthComponent } from 'auth-user-component';",
       "",
       "AuthComponent.instance()",
       "  .configure({",

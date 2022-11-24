@@ -1,6 +1,6 @@
-# react-native-auth-component
+# auth-user-component
 
-**react-native-auth-component** is a reusable component for authentication and authorization that can be used across all the apps developed by 101 Digital.
+**auth-user-component** is a reusable component for authentication and authorization that can be used across all the apps developed by 101 Digital.
 
 ## Features
 
@@ -14,12 +14,12 @@
 To add this component to React Native app, run this command:
 
 ```sh
-yarn add git+ssh://git@github.com/101digital/react-native-auth-component.git
+yarn add git+ssh://git@github.com/101digital/auth-user-component.git
 ```
 
 Make sure you have permission to access this repository
 
-Because **react-native-auth-component** depends on some libraries, so make sure you installed all dependencies into your project.
+Because **auth-user-component** depends on some libraries, so make sure you installed all dependencies into your project.
 
 - [react-native-theme-component](https://github.com/101digital/react-native-theme-component.git)
 - [react-native-app-auth](https://github.com/FormidableLabs/react-native-app-auth). **Note** You need to see [Stetup](https://github.com/FormidableLabs/react-native-app-auth#setup) only. Other functions have been implemented.
@@ -30,7 +30,7 @@ Because **react-native-auth-component** depends on some libraries, so make sure 
 Before using this component, you must configure environment variables. That should be configure early in top of your `app.ts`
 
 ```javascript
-import { AuthComponent } from 'react-native-auth-component';
+import { AuthComponent } from 'auth-user-component';
 
 AuthComponent.instance()
   .configure({
@@ -69,7 +69,7 @@ const App = () => {
 export default App;
 ```
 
-**react-native-auth-component** also provides `AuthContext` using Context API to maintain authentication state. If you want to use `AuthContext` you **HAVE TO** wrap your components with `AuthProvider`. This is required if you use `LoginComponent`.
+**auth-user-component** also provides `AuthContext` using Context API to maintain authentication state. If you want to use `AuthContext` you **HAVE TO** wrap your components with `AuthProvider`. This is required if you use `LoginComponent`.
 
 ## API reference
 
@@ -80,7 +80,7 @@ Create client to excute API request that only required basic token.
 - `baseURL`: base url of services
 
 ```javascript
-import { createAppTokenApiClient } from 'react-native-auth-component';
+import { createAppTokenApiClient } from 'auth-user-component';
 
 const identityApiClient = createAppTokenApiClient(env.api.baseUrl.identity);
 ```
@@ -93,7 +93,7 @@ Create client to excute API requests that required Authentication
 - `withOrgToken`: this is OPTIONAL for request need `org-token` for Authentication
 
 ```javascript
-import { createAuthorizedApiClient } from 'react-native-auth-component';
+import { createAuthorizedApiClient } from 'auth-user-component';
 
 const authApiClient = createAuthorizedApiClient(env.api.baseUrl.identity);
 ```
@@ -104,7 +104,7 @@ Maintain authentication state using Context API. To retrieve Context data and fu
 
 ```javascript
 import React, { useContext } from 'react';
-import { AuthContext } from 'react-native-auth-component';
+import { AuthContext } from 'auth-user-component';
 
 const ReactComponentExample = () => {
   const { login, profile } = useContext(AuthContext);
@@ -163,7 +163,7 @@ Provide functions to make authentication
 | registerDevice      | Function (fcmToken, platform, userId, appId, entityId)     | Function to register user deivce to get notification                                                                                                                                                                                                                      |
 
 ```javascript
-import { AuthServices } from 'react-native-auth-component';
+import { AuthServices } from 'auth-user-component';
 
 // your logic
 const resp = await AuthServices.instance().login('username', 'password');
@@ -188,7 +188,7 @@ Provide functions to store and retrieve stored data in local storage
 | clearAuths        | Function                 | Clear current access_token, refresh_token, org_token, profile data |
 
 ```javascript
-import { authComponentStore } from 'react-native-auth-component';
+import { authComponentStore } from 'auth-user-component';
 ```
 
 ### Listen session expired
@@ -196,7 +196,7 @@ import { authComponentStore } from 'react-native-auth-component';
 If refresh token is failed (token full exipred), a callback function will be fired. You can listen that in your screen
 
 ```javascript
-import { AuthComponent } from 'react-native-auth-component';
+import { AuthComponent } from 'auth-user-component';
 
 useEffect(() => {
   AuthComponent.instance().addSessionListener(handleSessionExpired);
@@ -217,7 +217,7 @@ Provide a simple login form (that is optional, you can use your login form), sup
 **Important**: If you use LoginComponent, you **HAVE TO** wrap your `App` with `AuthProvider`
 
 ```javascript
-import { LoginComponent, LoginComponentRef } from 'react-native-auth-component';
+import { LoginComponent, LoginComponentRef } from 'auth-user-component';
 
 const LoginScreen = () => {
   const loginRefs = useRef<LoginComponentRef>(); // use to update country code
@@ -424,7 +424,7 @@ Provide a simple function to handle the change password .
 **Important**: If you use ChangePasswordComponent, you **HAVE TO** wrap your `App` with `AuthProvider`
 
 ```javascript
-import { ChangePassword, ChangePasswordRef,PasswordMask } from 'react-native-auth-component';
+import { ChangePassword, ChangePasswordRef,PasswordMask } from 'auth-user-component';
 
 const ChangePasswordScreen = () => {
   const passwordRefs = useRef<ChangePasswordRef>();
@@ -535,7 +535,7 @@ The component provides a form to input old, new password and confirm new passwor
 import {
   InputPhoneNumberComponent,
   InputPhoneNumberComponentRef,
-} from 'react-native-auth-component';
+} from 'auth-user-component';
 
 const RecoveryPasswordScreen = () => {
   const inputPhoneNumberRefs = useRef<InputPhoneNumberComponentRef>();
@@ -574,7 +574,7 @@ const RecoveryPasswordScreen = () => {
 The component provides a OTP input field, new password and confirm new password to verify user old password for change password.
 
 ```javascript
-import { colors, OtpVerification, OtpVerificationComponentRef } from 'react-native-auth-component';
+import { colors, OtpVerification, OtpVerificationComponentRef } from 'auth-user-component';
 
 export type ResetPasswordOtpVerificationParams = {};
 
