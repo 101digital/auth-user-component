@@ -8,3 +8,4 @@ export * from './oncompleted.icon';
 export * from './password-hide.icon';
 export * from './password-show.icon';
 export * from './default-logo.icon';
+export * from './image.icon';
