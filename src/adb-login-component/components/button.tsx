@@ -12,7 +12,7 @@ const Button: React.FC<IButton> = (props: IButton) => {
   return (
     <TouchableOpacity
       onPress={props.onPress}
-      style={[styles.container, { backgroundColor: props.background ?? colors.secondary }]}
+      style={[styles.container, { backgroundColor: props.background ?? '#1B1B1B' }]}
     >
       <Text style={[styles.label, { color: props.labelColor ?? colors.white }]}>{props.label}</Text>
     </TouchableOpacity>
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     padding: 16,
     borderWidth: 3,
-    borderColor: colors.secondary,
+    borderColor: '#1B1B1B',
   },
   label: {
     fontFamily: fonts.semiBold,
