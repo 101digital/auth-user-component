@@ -237,4 +237,26 @@ export class AuthServices {
     });
     return response.data;
   };
+
+  updateFullnameAndNickName = async (
+    userId: string,
+    fullName: string,
+    nickname: string,
+  ) => {
+    const { membershipBaseUrl } = this._configs!;
+    console.log('updateFullnameAndNickName -> membershipBaseUrl', membershipBaseUrl);
+    const accessToken = await authComponentStore.getAccessToken();
+    const body = {
+      fullName: fullName,
+      nickName: nickname,
+    };
+    console.log('updateFullnameAndNickName -> body', body);
+    const response = await axios.put(`${membershipBaseUrl}/users/${userId}`, body, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log('updateFullnameAndNickName -> response', response);
+    return response.data;
+  };
 }
