@@ -238,10 +238,11 @@ export class AuthServices {
     return response.data;
   };
 
-  updateFullnameAndNickName = async (
+  updateUserInfo = async (
     userId: string,
     fullName: string,
     nickname: string,
+    id: string
   ) => {
     const { membershipBaseUrl } = this._configs!;
     console.log('updateFullnameAndNickName -> membershipBaseUrl', membershipBaseUrl);
@@ -249,9 +250,15 @@ export class AuthServices {
     const body = {
       fullName: fullName,
       nickName: nickname,
+      kycDetails: {
+        idNumber: id,
+        idType: "MyKad",
+        idIssuingCountry: "Malaysia",
+        idExpiredDate: "2030-01-01"
+      }
     };
     console.log('updateFullnameAndNickName -> body', body);
-    const response = await axios.put(`${membershipBaseUrl}/users/${userId}`, body, {
+    const response = await axios.patch(`${membershipBaseUrl}/users/${userId}`, body, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

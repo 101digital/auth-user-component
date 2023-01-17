@@ -62,7 +62,7 @@ export interface AuthContextData {
   ) => boolean;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
-  updateFullNameAndNickName: (userId: string, fullName: string, nickName: string) => void;
+  updateUserInfo: (userId: string, fullName: string, nickName: string, id: string) => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -99,7 +99,7 @@ export const authDefaultValue: AuthContextData = {
   registerDevice: () => false,
   isDeviceRegistering: false,
   isDeviceRegistered: false,
-  updateFullNameAndNickName: () => false
+  updateUserInfo: () => false
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -371,11 +371,11 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const updateFullNameAndNickName= useCallback(
-    async (userId: string, fullName: string, nickName: string) => {
+  const updateUserInfo= useCallback(
+    async (userId: string, fullName: string, nickName: string, id: string) => {
       try {
         setIsUpdatingProfile(true);
-        await AuthServices.instance().updateFullnameAndNickName(userId, fullName, nickName);
+        await AuthServices.instance().updateUserInfo(userId, fullName, nickName, id);
         const { data } = await AuthServices.instance().fetchProfile();
         setProfile(data);
         await authComponentStore.storeProfile(data);
@@ -430,7 +430,7 @@ export const useAuthContextValue = (): AuthContextData => {
       registerDevice,
       isDeviceRegistering: _isDeviceRegistered,
       isDeviceRegistered: _isDeviceRegistered,
-      updateFullNameAndNickName
+      updateUserInfo
     }),
     [
       _profile,
