@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../assets';
 import { fonts } from '../assets/fonts';
 import Button from './components/button';
@@ -41,6 +41,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
 
   return (
     <View style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
         {({ submitForm }) => (
           <>
@@ -89,6 +90,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
           </>
         )}
       </Formik>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-    paddingHorizontal: 24,
+    paddingHorizontal: 12,
     paddingTop: 24,
   },
   rowInput: {
