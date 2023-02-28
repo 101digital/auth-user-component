@@ -4,7 +4,7 @@ import authComponentStore from './local-store';
 import axios from 'axios';
 import { AuthApiClient } from '../api-client/auth-api-client';
 import { AuthComponentConfig } from '../types';
-import { authorize } from 'react-native-app-auth';
+import { AuthConfiguration, authorize } from 'react-native-app-auth';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
@@ -25,6 +25,63 @@ export class AuthServices {
   public configure(configs: AuthComponentConfig) {
     this._configs = configs;
   }
+
+  public adbAuthorize = async () => {
+    const { redirectUrl, clientId, } = this._configs || {};
+
+    // console.log('adbAuthorize -> request', this._configs);
+    // const config: AuthConfiguration = {
+    //   redirectUrl: redirectUrl,
+    //   clientId,
+    //   clientSecret,
+    //   scopes: ["openid", "profile"],
+    //   serviceConfiguration: {
+    //     authorizationEndpoint: authorizationBaseUrl,
+    //     tokenEndpoint: tokenBaseUrl,
+    //     revocationEndpoint: revocationBaseUrl,
+    //     endSessionEndpoint: endSessionBaseUrl,
+    //   },
+    // };
+    // console.log('adbAuthorize -> config', config);
+    // const response = await authorize(config).then((value) => {
+    //   console.log('values', value);
+    // }).catch((reason) => {
+    //   console.log('reason', reason);
+    // });
+    // console.log('adbAuthorize -> response', response);
+    // const { access_token, refresh_token } = response.data;
+    // await authComponentStore.storeAccessToken(access_token);
+    // await authComponentStore.storeRefreshToken(refresh_token);
+    // return response.data;
+
+    const body = {
+      response_type: 'code',
+      client_id: clientId,
+      redirect_uri: redirectUrl,  
+      scope: 'openid profile profilep'
+    };
+
+    console.log('response -> body', body);
+
+
+    const response = await axios.post('https://auth.pingone.asia/0e19ac73-4f40-4080-aebc-d86add015de2/as/authorize', {
+      client_id: '3de6d91d-29f9-444b-8e26-770c4a236d79',
+      redirect_uri: 'https://example.com',
+      scope: 'openid profile profilep',
+      response_type: 'code',
+    }, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      maxRedirects: 0,
+      validateStatus: (status) => {
+        console.log('status', status);
+        return status >= 200 && status < 300 || status === 401; 
+      }
+    });
+
+    console.log('response', response);
+  };
 
   public login = async (username: string, password: string, grantType?: string, scope?: string) => {
     const body = qs.stringify({
@@ -78,7 +135,7 @@ export class AuthServices {
       grant_type: this._configs?.appGrantType ?? 'client_credentials',
       scope: this._configs?.appScope ?? 'PRODUCTION',
     });
-    const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
+    const response = await AuthApiClient.instance().getAuthApiClient().post('as/token', body);
     return response.data.access_token;
   };
 
@@ -115,7 +172,7 @@ export class AuthServices {
     const {
       clientId,
       clientSecret,
-      tokenBaseUrl,
+      authBaseUrl,
       redirectUrl,
       authScope,
       authorizationBaseUrl,
@@ -135,12 +192,14 @@ export class AuthServices {
       scopes: [authScope ?? 'openid'],
       serviceConfiguration: {
         authorizationEndpoint: authorizationBaseUrl,
-        tokenEndpoint: tokenBaseUrl,
+        tokenEndpoint: `${authBaseUrl}/as/token`,
         revocationEndpoint: revocationBaseUrl,
         endSessionEndpoint: endSessionBaseUrl,
       },
     };
+    console.log('loginOAuth2 -> config', config);
     const response = await authorize(config);
+    console.log('loginOAuth2 -> config -> response', response);
     return response;
   };
 

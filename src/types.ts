@@ -70,7 +70,7 @@ export type AuthComponentConfig = {
   clientId: string;
   clientSecret: string;
   ternantDomain: string;
-  tokenBaseUrl: string;
+  authBaseUrl: string;
   membershipBaseUrl: string;
   appGrantType?: string; // using for get app token
   appScope?: string; // using for get app token
@@ -81,4 +81,7 @@ export type AuthComponentConfig = {
   revocationBaseUrl?: string; // required for oauth2
   endSessionBaseUrl?: string; // required for oauth2
   notificationBaseUrl?: string; //required for  notification
+  appPublicId?: string;
+  appPublicSecret?: string;
+  identityBaseUrl?: string;
 };

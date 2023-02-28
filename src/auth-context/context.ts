@@ -59,10 +59,14 @@ export interface AuthContextData {
     userId: string,
     appId: string,
     entityId: string
-  ) => boolean;
+  ) => Promise<boolean>;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
-  updateUserInfo: (userId: string, fullName: string, nickName: string, id: string) => void;
+  updateUserInfo: (userId: string, fullName: string, nickName: string, id: string) => Promise<boolean>;
+  adbLogin: (
+    username: string,
+    password: string,
+    country?: CountryInformation) => Promise<boolean>;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -96,10 +100,11 @@ export const authDefaultValue: AuthContextData = {
   errorUserVerify: undefined,
   errorRequestResetPassword: undefined,
   clearUserVerificationData: () => null,
-  registerDevice: () => false,
+  registerDevice: async () => false,
   isDeviceRegistering: false,
   isDeviceRegistered: false,
-  updateUserInfo: () => false
+  updateUserInfo: async () => false,
+  adbLogin: async () => false
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -160,6 +165,7 @@ export const useAuthContextValue = (): AuthContextData => {
     async (username: string, password: string, country?: CountryInformation) => {
       try {
         setIsSigning(true);
+        
         await AuthServices.instance().login(username, password);
         const { data } = await AuthServices.instance().fetchProfile();
         await authComponentStore.storeProfile(data);
@@ -177,6 +183,30 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
+  const adbLogin = useCallback(
+    async (username: string, password: string, country?: CountryInformation) => {
+      try {
+        setIsSigning(true);
+        const response = await AuthServices.instance().adbAuthorize();
+        console.log('adbLogin -> response', response);
+        // await AuthServices.instance().login(username, password);
+        // const { data } = await AuthServices.instance().fetchProfile();
+        // await authComponentStore.storeProfile(data);
+        // setProfile({ ...data, country });
+        // setIsSignedIn(true);
+        // getProfilePicture(data);
+        // setIsSigning(false);
+        // return { ...data, country };
+      } catch (error) {
+        setIsSigning(false);
+        setErrorSignIn(error as Error);
+      }
+      return true;
+    },
+    []
+  );
+  
+  
   const getProfilePicture = (profile: Profile) => {
     const profileImage = profile?.listCustomFields.filter((p: ProfileCustomField) => {
       return p.customKey === 'logo';
@@ -430,7 +460,8 @@ export const useAuthContextValue = (): AuthContextData => {
       registerDevice,
       isDeviceRegistering: _isDeviceRegistered,
       isDeviceRegistered: _isDeviceRegistered,
-      updateUserInfo
+      updateUserInfo,
+      adbLogin
     }),
     [
       _profile,

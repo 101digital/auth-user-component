@@ -16,7 +16,7 @@ const shouldIntercept = (error: AxiosError) => {
 };
 
 const attachTokenToRequest = (request: AxiosRequestConfig, token?: string) => {
-  request.headers.Authorization = 'Bearer ' + token;
+  request.headers.Authorization = token;
 };
 
 const fetchAppAccessToken = (): Promise<string> => {
@@ -50,7 +50,7 @@ export const createAppTokenApiClient = (baseURL: string) => {
     if (!appToken) {
       appToken = await fetchAppAccessToken();
     }
-    request.headers.Authorization = `Bearer ${appToken}`;
+    request.headers.Authorization = ` ${appToken}`;
     return request;
   };
 

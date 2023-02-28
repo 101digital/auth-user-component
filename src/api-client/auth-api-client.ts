@@ -1,5 +1,5 @@
 import { Base64 } from 'js-base64';
-import { AuthComponentConfig } from '..';
+import { AuthComponentConfig } from '../types';
 import axios, { AxiosInstance } from 'axios';
 
 export class AuthApiClient {
@@ -20,13 +20,12 @@ export class AuthApiClient {
 
   public configure(configs: AuthComponentConfig) {
     if (!this._axiosInstance) {
-      const { tokenBaseUrl, ternantDomain, clientId, clientSecret } = configs;
-      const baseURL = `${tokenBaseUrl}?tenantDomain=${ternantDomain}`;
+      const { authBaseUrl, appPublicId, appPublicSecret } = configs;
       this._axiosInstance = axios.create({
-        baseURL,
+        baseURL: authBaseUrl,
         headers: {
-          Authorization: `Basic ${Base64.encode(`${clientId}:${clientSecret}`)}`,
-          'content-type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${Base64.encode(`${appPublicId}:${appPublicSecret}`)}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
     }
