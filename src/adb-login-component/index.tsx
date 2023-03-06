@@ -19,26 +19,25 @@ export class SignInData {
 export interface ILogin {
   onLoginSuccess: () => void;
   onLoginFailed: () => void;
+  onForgotPassword: () => void;
 }
 
 const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onLoginSuccess, onLoginFailed } = props;
+  const { onLoginSuccess, onLoginFailed, onForgotPassword } = props;
   const { i18n, deviceCountryCode, countries } = useContext(ThemeContext);
-  const { adbLogin} = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
     const { username, password } = values;
     const _username = username.replace(/\D+/g, '');
     const _country = countries.find((country) => country.attributes.idd === deviceCountryCode);
-    const response = await adbLogin(_username, password, _country);
-    console.log('handleOnSignIn -> response', response);
-    // const profile = await login(_username, password, _country);
-    // if (profile) {
-    //   onLoginSuccess();
-    // } else {
-    //   onLoginFailed();
-    // }
+    const profile = await login(_username, password, _country);
+    if (profile) {
+      onLoginSuccess();
+    } else {
+      onLoginFailed();
+    }
   };
 
   return (
@@ -75,7 +74,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   </View>
                 </View>
                 <View style={styles.rowBetween}>
-                  <TouchableOpacity style={styles.flex}>
+                  <TouchableOpacity style={styles.flex} onPress={onForgotPassword}>
                     <Text style={styles.forgotPasswordTitle}>{`${
                       i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
                     }?`}</Text>
