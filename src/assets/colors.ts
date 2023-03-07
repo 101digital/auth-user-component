@@ -39,5 +39,5 @@ export const colors = {
   pinkishGrey: '#bfbfbf',
   red: '#F40000',
   black: '#000000',
-  primaryTextBlack:'#1b1b1b'
+  primaryBlack: '#1b1b1b',
 };

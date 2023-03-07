@@ -11,7 +11,6 @@ export class ForgotPasswordData {
         );
     }
 }
-const regex = /^\+?\d{9,13}$/
 export const ForgotPasswordSchema = Yup.object().shape({
-    email: Yup.string().trim().email().required('Invalid Email!'),
+    email: Yup.string().trim().email().required('This field is required'),
 });

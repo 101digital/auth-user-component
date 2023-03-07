@@ -23,4 +23,5 @@ export { OtpVerificationComponentRef } from './src/otp-verification/types';
 export { PasswordMask } from './src/change-password-component/password-mask';
 export { default as ADBLoginComponent } from './src/adb-login-component';
 export { default as ADBForgotPasswordComponent } from './src/forgot-password-component';
-
+export { default as NricverifyComponent } from './src/nric-verify-component';
+export { default as NewPasswordComponent } from './src/new-password-component';
