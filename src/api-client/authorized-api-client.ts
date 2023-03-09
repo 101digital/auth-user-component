@@ -29,7 +29,7 @@ const attachTokenToRequest = (
   orgToken?: string,
   withOrgToken?: boolean
 ) => {
-  request.headers.Authorization = 'Bearer ' + token;
+  request.headers.Authorization = token;
   if (withOrgToken) {
     request.headers['org-token'] = orgToken;
   }
@@ -86,7 +86,7 @@ export const createAuthorizedApiClient = (baseURL: string, withOrgToken: boolean
     const authBearer = await authComponentStore.getAccessToken();
     const orgToken = await authComponentStore.getOrgToken();
     if (authBearer) {
-      request.headers.Authorization = `Bearer ${authBearer}`;
+      request.headers.Authorization = `${authBearer}`;
     }
     if (withOrgToken) {
       request.headers['org-token'] = orgToken;

@@ -1,12 +1,19 @@
 import React, { useContext } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { colors } from '../assets';
 import { fonts } from '../assets/fonts';
-import Button from './components/button';
 import ImageIcon from '../assets/icons/image.icon';
 import { AuthContext } from '../auth-context';
 import { Formik } from 'formik';
-import { InputField, ThemeContext } from 'react-native-theme-component';
+import { ADBButton, InputField, ThemeContext } from 'react-native-theme-component';
 
 export class SignInData {
   constructor(readonly username: string, readonly password: string) {}
@@ -23,16 +30,20 @@ export interface ILogin {
 
 const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { onLoginSuccess, onLoginFailed } = props;
-  const { i18n, deviceCountryCode, countries } = useContext(ThemeContext);
-  const { adbLogin} = useContext(AuthContext);
+  const { i18n } = useContext(ThemeContext);
+  const { adbLogin, isSigning } = useContext(AuthContext);
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
     const { username, password } = values;
-    const _username = username.replace(/\D+/g, '');
-    const _country = countries.find((country) => country.attributes.idd === deviceCountryCode);
-    const response = await adbLogin(_username, password, _country);
-    console.log('handleOnSignIn -> response', response);
+    const _username = username;
+    const isSuccess = await adbLogin(_username, password);
+    console.log('handleOnSignIn -> response', isSuccess);
+    if (isSuccess) {
+      onLoginSuccess();
+    } else {
+      onLoginFailed();
+    }
     // const profile = await login(_username, password, _country);
     // if (profile) {
     //   onLoginSuccess();
@@ -43,55 +54,58 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-      <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
-        {({ submitForm }) => (
-          <>
-            <View style={styles.content}>
-              <View style={styles.contentWrapper}>
-                <View style={styles.imageWrapper}>
-                  <ImageIcon width={50} height={50} color={'white'} />
-                </View>
-                <Text style={styles.title}>
-                  {i18n.t('login_component.lbl_sign_in') ?? 'Hi, Welcome!'}
-                </Text>
-                <View style={styles.fullWidth}>
-                  <View style={styles.rowInput}>
-                    <InputField
-                      name="username"
-                      returnKeyType="done"
-                      placeholder={'Mobile number'}
-                      autoCapitalize="none"
-                    />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
+          {({ submitForm }) => (
+            <>
+              <View style={styles.content}>
+                <View style={styles.contentWrapper}>
+                  <View style={styles.imageWrapper}>
+                    <ImageIcon width={50} height={50} color={'white'} />
                   </View>
-                  <View style={styles.rowInput}>
-                    <InputField
-                      name="password"
-                      returnKeyType="done"
-                      secureTextEntry={true}
-                      placeholder={'Password'}
-                      autoCapitalize="none"
-                    />
+                  <Text style={styles.title}>
+                    {i18n.t('login_component.lbl_sign_in') ?? 'Hi, Welcome!'}
+                  </Text>
+                  <View style={styles.fullWidth}>
+                    <View style={styles.rowInput}>
+                      <InputField
+                        name="username"
+                        returnKeyType="done"
+                        placeholder={'Mobile number'}
+                        autoCapitalize="none"
+                      />
+                    </View>
+                    <View style={styles.rowInput}>
+                      <InputField
+                        name="password"
+                        returnKeyType="done"
+                        secureTextEntry={true}
+                        placeholder={'Password'}
+                        autoCapitalize="none"
+                      />
+                    </View>
                   </View>
-                </View>
-                <View style={styles.rowBetween}>
-                  <TouchableOpacity style={styles.flex}>
-                    <Text style={styles.forgotPasswordTitle}>{`${
-                      i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                    }?`}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={styles.helpTitle}>{`${
-                      i18n.t('login_component.lbl_help') ?? 'Help'
-                    }?`}</Text>
-                  </TouchableOpacity>
+                  <View style={styles.rowBetween}>
+                    <TouchableOpacity style={styles.flex}>
+                      <Text style={styles.forgotPasswordTitle}>{`${
+                        i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
+                      }?`}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                      <Text style={styles.helpTitle}>{`${
+                        i18n.t('login_component.lbl_help') ?? 'Help'
+                      }?`}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
-            <Button label="Login" onPress={submitForm} />
-          </>
-        )}
-      </Formik>
+              <ADBButton isLoading={isSigning} label="Login" onPress={submitForm} />
+            </>
+          )}
+        </Formik>
       </KeyboardAvoidingView>
     </View>
   );
