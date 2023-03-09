@@ -41,7 +41,7 @@ const NricverifyComponent: React.FC<INricverify> = (props: INricverify) => {
                                 />
                             </View>
                             <View style={[styles.bottomSection, styles.absolute]}>
-                                <Button label={'Continue'} disabled={Object.keys(errors).length !== 0 || values.nric === ''} onPress={onPressContinue} />
+                                <Button label={'Continue'} background={Object.keys(errors).length !== 0 || values.nric === '' ? colors.secondaryButton : colors.primaryBlack} disabled={Object.keys(errors).length !== 0 || values.nric === ''} onPress={onPressContinue} />
                             </View>
                         </>
                     )

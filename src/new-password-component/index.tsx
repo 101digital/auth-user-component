@@ -34,17 +34,24 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
     }
 
     function checkAtLeast1digit(text: string) {
-        return /^(?=.*?[0-9])$/.test(text)
+        return /\d/.test(text)
     }
 
     function checkAtLeast1upperandLower(text: string) {
-        return /^(?=.*?[A-Z])(?=.*?[a-z])$/.test(text)
+        return /[A-Z][a-z]/.test(text)
     }
 
     function checkSpecialCharacter(text: string) {
-        return /^(?=.*?[#?!@$%^&*-])$/.test(text)
+        return /[#?!@$%^&*-]/.test(text)
     }
 
+    function validationCheck(val: string) {
+        if (checkIs8Character(val) && checkAtLeast1upperandLower(val) && checkAtLeast1digit(val) && checkSpecialCharacter(val)) {
+            return true
+        } else {
+            return false
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -56,7 +63,7 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
                 onSubmit={(values) => {
                 }}
             >
-                {({ setFieldValue, handleChange, setFieldError, setFieldTouched, errors, touched, isValid, submitForm, values }) => {
+                {({ setFieldTouched, errors, values }) => {
                     return (
                         <>
                             <View style={styles.inputContainer}>
@@ -65,8 +72,9 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
                                     onBlur={() => {
                                         setFieldTouched('createNew')
                                     }}
-                                    placeholder={'Create new password'}
+                                    placeholder={i18n.t('reset_password.lbl_title_create_new_password') ?? 'Create new password'}
                                     secureTextEntry={showNewPass}
+                                    autoCapitalize='none'
                                     suffixIcon={<PasswordMask onPress={() => { setShowNewPass(!showNewPass) }} isVisible={showNewPass} />}
                                 />
                                 <View style={{ height: 16 }} />
@@ -75,43 +83,44 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
                                     onBlur={() => {
                                         setFieldTouched('confirmNew')
                                     }}
-                                    placeholder={'Confirm new password'}
+                                    placeholder={i18n.t('reset_password.lbl_title_confirm_password') ?? 'Confirm new password'}
                                     secureTextEntry={showConfirmPass}
+                                    autoCapitalize='none'
                                     suffixIcon={<PasswordMask onPress={() => { setShowConfirmPass(!showConfirmPass) }} isVisible={showConfirmPass} />}
                                 />
                                 <View>
                                     <View style={styles.row}>
                                         {checkSpecialCharacter(values.createNew) ? tickIcon : closeIcon}
                                         <View style={styles.width} />
-                                        <Text style={styles.subTitle12}>At least one special character</Text>
+                                        <Text style={styles.subTitle12}>{i18n.t('reset_password.lbl_at_least_one_special_char') ?? 'At least one special character'}</Text>
                                     </View>
                                     <View style={styles.row}>
                                         {checkAtLeast1upperandLower(values.createNew) ? tickIcon : closeIcon}
                                         <View style={styles.width} />
-                                        <Text style={styles.subTitle12}>At least one uppercase and lowercase letter</Text>
+                                        <Text style={styles.subTitle12}>{i18n.t('reset_password.lbl_at_least_one_lower_uper') ?? 'At least one uppercase and lowercase letter'}</Text>
                                     </View>
                                     <View style={styles.row}>
                                         {checkAtLeast1digit(values.createNew) ? tickIcon : closeIcon}
                                         <View style={styles.width} />
-                                        <Text style={styles.subTitle12}>At least one number</Text>
+                                        <Text style={styles.subTitle12}>{i18n.t('reset_password.lbl_at_least_one_number') ?? 'At least one number'}</Text>
                                     </View>
                                     <View style={styles.row}>
                                         {checkIs8Character(values.createNew) ? tickIcon : closeIcon}
                                         <View style={styles.width} />
-                                        <Text style={styles.subTitle12}>Be at least 8 characters</Text>
+                                        <Text style={styles.subTitle12}>{i18n.t('reset_password.lbl_be_at_least_8_char') ?? 'Be at least 8 characters'}</Text>
                                     </View>
                                     <View style={styles.row}>
                                         {values.confirmNew !== values.createNew ? closeIcon : tickIcon}
                                         <View style={styles.width} />
-                                        <Text style={styles.subTitle12}>Both passwords match</Text>
+                                        <Text style={styles.subTitle12}>{i18n.t('reset_password.lbl_both_password_match') ?? 'Both passwords match'}</Text>
                                     </View>
                                 </View>
                             </View>
                             <View style={[styles.bottomSection, styles.absolute]}>
                                 <Button
-                                    label={'Continue'}
-                                    background={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew ? colors.secondaryButton : colors.primaryBlack}
-                                    disabled={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew} onPress={() => setSuccessModal(true)} />
+                                    label={i18n.t('reset_password.btn_continue') ?? 'Continue'}
+                                    background={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || validationCheck(values.confirmNew) || validationCheck(values.createNew) ? colors.secondaryButton : colors.primaryBlack}
+                                    disabled={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || validationCheck(values.confirmNew)} onPress={() => setSuccessModal(true)} />
                             </View>
                         </>
                     )
@@ -122,10 +131,10 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
                 <View style={styles.errorContainer}>
                     <AlertCircleIcon size={55.5} />
                     <View style={{ height: 30 }} />
-                    <Text style={[styles.title, { textAlign: 'center' }]}>Sorry, there was a problem</Text>
-                    <Text style={[styles.subTitle, { textAlign: 'center' }]}>Please try again.</Text>
+                    <Text style={[styles.title, { textAlign: 'center' }]}>{i18n.t('reset_password.lbl_sorry_there_was_problem') ?? 'Sorry, there was a problem'}</Text>
+                    <Text style={[styles.subTitle, { textAlign: 'center' }]}>{i18n.t('reset_password.lbl_please_try_again') ?? 'Please try again.'}</Text>
                     <View style={{ height: 8 }} />
-                    <Button label={'Done'} onPress={() => { setErrorModal(false) }} />
+                    <Button label={i18n.t('reset_password.btn_done') ?? 'Done'} onPress={() => { setErrorModal(false) }} />
                 </View>
             </BottomSheetModal>
 
@@ -133,10 +142,10 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
                 <View style={styles.errorContainer}>
                     <SuccessIcon size={72} />
                     <View style={{ height: 30 }} />
-                    <Text style={[styles.title, { textAlign: 'center' }]}>Password has been updated!</Text>
-                    <Text style={[styles.subTitle, { textAlign: 'center' }]}>Now, let’s login to your account.</Text>
+                    <Text style={[styles.title, { textAlign: 'center' }]}>{i18n.t('reset_password.lbl_password_updated') ?? 'Password has been updated!'}</Text>
+                    <Text style={[styles.subTitle, { textAlign: 'center' }]}>{i18n.t('reset_password.lbl_lets_login') ?? 'Now, let’s login to your account.'}</Text>
                     <View style={{ height: 8 }} />
-                    <Button label={'Login'} onPress={onPressContinue} />
+                    <Button label={i18n.t('reset_password.btn_login') ?? 'Login'} onPress={onPressContinue} />
                 </View>
             </BottomSheetModal>
         </View>

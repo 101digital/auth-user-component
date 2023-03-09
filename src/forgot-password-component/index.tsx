@@ -25,7 +25,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
         onSubmit={(values) => {
         }}
       >
-        {({ setFieldValue, handleChange, setFieldError, setFieldTouched, errors, touched, isValid, submitForm, values }) => {
+        {({ setFieldTouched, errors, values }) => {
           return (
             <>
               <View style={styles.inputContainer}>
@@ -38,7 +38,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                 />
               </View>
               <View style={[styles.bottomSection, styles.absolute]}>
-                <Button label={'Continue'} disabled={Object.keys(errors).length !== 0 || values.email === ''} background={Object.keys(errors).length !== 0 || values.email === '' ? colors.secondaryButton : colors.primaryBlack} onPress={onPressContinue} />
+                <Button label={i18n.t('reset_password.btn_continue') ?? 'Continue'} disabled={Object.keys(errors).length !== 0 || values.email === ''} background={Object.keys(errors).length !== 0 || values.email === '' ? colors.secondaryButton : colors.primaryBlack} onPress={onPressContinue} />
               </View>
             </>
           )
