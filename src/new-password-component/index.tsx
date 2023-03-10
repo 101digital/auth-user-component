@@ -119,8 +119,8 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
                             <View style={[styles.bottomSection, styles.absolute]}>
                                 <Button
                                     label={i18n.t('reset_password.btn_continue') ?? 'Continue'}
-                                    background={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || validationCheck(values.confirmNew) || validationCheck(values.createNew) ? colors.secondaryButton : colors.primaryBlack}
-                                    disabled={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || validationCheck(values.confirmNew)} onPress={() => setSuccessModal(true)} />
+                                    background={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || values.confirmNew == ''  || !validationCheck(values.confirmNew) || !validationCheck(values.createNew) ? colors.secondaryButton : colors.primaryBlack}
+                                    disabled={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || values.confirmNew == '' || !validationCheck(values.confirmNew) || !validationCheck(values.createNew)} onPress={() => setSuccessModal(true)} />
                             </View>
                         </>
                     )
