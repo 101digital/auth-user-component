@@ -62,11 +62,19 @@ export interface AuthContextData {
   ) => Promise<boolean>;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
-  updateUserInfo: (userId: string, fullName: string, nickName: string, id: string) => Promise<boolean>;
-  adbLogin: (
-    username: string,
-    password: string,
-    country?: CountryInformation) => Promise<boolean>;
+  updateUserInfo: (
+    userId: string,
+    fullName: string,
+    nickName: string,
+    id: string
+  ) => Promise<boolean>;
+  adbLogin: (username: string, password: string) => Promise<boolean>;
+  isVerifyLogin: boolean;
+  errorVerifySignIn?: Error;
+  adbLoginVerifyOtp: (otp: string) => Promise<boolean>;
+  adbResendOTP: () => void;
+  adbLoginWithoutOTP: (username: string, password: string) => Promise<string | undefined>;
+  flowId?: string;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -104,7 +112,11 @@ export const authDefaultValue: AuthContextData = {
   isDeviceRegistering: false,
   isDeviceRegistered: false,
   updateUserInfo: async () => false,
-  adbLogin: async () => false
+  adbLogin: async () => false,
+  isVerifyLogin: false,
+  adbLoginVerifyOtp: async () => false,
+  adbResendOTP: () => false,
+  adbLoginWithoutOTP: async () => undefined,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -136,6 +148,11 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const [_isDeviceRegistering, setIsDeviceRegistering] = useState<boolean>(false);
   const [_isDeviceRegistered, setIsDeviceRegistered] = useState<boolean>(false);
+  const [_flowId, setFlowId] = useState<string>();
+  const [_isVerifyLogin, setIsVerifyLogin] = useState<boolean>(false);
+  const [_errorVerifySignIn, setErrorVerifySignIn] = useState<Error | undefined>();
+  const [_username, setUsername] = useState<string>();
+  const [_password, setPassword] = useState<string>();
 
   useEffect(() => {
     checkLogin();
@@ -165,7 +182,7 @@ export const useAuthContextValue = (): AuthContextData => {
     async (username: string, password: string, country?: CountryInformation) => {
       try {
         setIsSigning(true);
-        
+
         await AuthServices.instance().login(username, password);
         const { data } = await AuthServices.instance().fetchProfile();
         await authComponentStore.storeProfile(data);
@@ -183,30 +200,104 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const adbLogin = useCallback(
-    async (username: string, password: string, country?: CountryInformation) => {
+  const adbLogin = useCallback(async (username: string, password: string) => {
+    try {
+      setIsSigning(true);
+      const data = await AuthServices.instance().adbLogin(username, password);
+      console.log('adbLogin -> response', data);
+      if (data && data.id) {
+        console.log('set flow ID');
+        setFlowId(data.id);
+        setUsername(username);
+        setPassword(password);
+      }
+    } catch (error) {
+      setIsSigning(false);
+      setErrorSignIn(error as Error);
+      return false;
+    }
+    return true;
+  }, []);
+
+  const adbLoginWithoutOTP = useCallback(async (username: string, password: string) => {
+    console.log('adbLoginWithoutOTP', username, password);
+    try {
+      setIsSigning(true);
+      const resLogin = await AuthServices.instance().adbLogin(
+        username,
+        password,
+        '0eb2b7cf-1817-48ec-a62d-eae404776cff',
+        'openid profile profilepsf'
+      );
+      const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
+      await AuthServices.instance().obtainTokenSingleFactor(
+        resAfterValidate.authorizeResponse.code
+      );
+      setIsSignedIn(true);
+      return resLogin._embedded.user.id;
+    } catch (error) {
+      setErrorSignIn(error as Error);
+    } finally {
+      setIsSigning(false);
+    }
+  }, []);
+
+  const adbResendOTP = useCallback(async () => {
+    try {
+      setIsSigning(true);
+      console.log('adbResendOTP -> _username', _username);
+      console.log('adbResendOTP -> _password', _password);
+      if (_username && _username.length > 0 && _password && _password.length > 0) {
+        const data = await AuthServices.instance().adbLogin(_username, _password);
+        console.log('adbLogin -> data', data);
+        if (data && data.id) {
+          console.log('set flow ID');
+          setFlowId(data.id);
+        }
+      }
+    } catch (error) {
+      setErrorSignIn(error as Error);
+      return false;
+    }
+    setIsSigning(false);
+    return true;
+  }, [_username, _password]);
+
+  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const adbLoginVerifyOtp = useCallback(
+    async (otp: string) => {
       try {
-        setIsSigning(true);
-        const response = await AuthServices.instance().adbAuthorize();
-        console.log('adbLogin -> response', response);
-        // await AuthServices.instance().login(username, password);
-        // const { data } = await AuthServices.instance().fetchProfile();
-        // await authComponentStore.storeProfile(data);
-        // setProfile({ ...data, country });
-        // setIsSignedIn(true);
-        // getProfilePicture(data);
-        // setIsSigning(false);
-        // return { ...data, country };
+        setIsVerifyLogin(true);
+        console.log('adbLoginVerifyOtp => flowId', _flowId, otp);
+        if (_flowId && _flowId.length > 0) {
+          const loginData = await AuthServices.instance().adbVerifyLogin(otp, _flowId);
+          await delay(1000);
+          console.log('adbLoginVerifyOtp -> response', loginData);
+          const afterValidateData = await AuthServices.instance().afterValidateOtp(
+            loginData.resumeUrl
+          );
+          await delay(1000);
+          console.log('afterValidateData', afterValidateData);
+          const obtainTokenData = await AuthServices.instance().obtainToken(
+            afterValidateData.authorizeResponse.code
+          );
+          console.log('getObtainToken -> obtainTokenData', obtainTokenData);
+          const { data } = await AuthServices.instance().fetchProfile();
+          setProfile({ ...data });
+          console.log('adbLoginVerifyOtp -> data', data);
+          setIsSignedIn(true);
+          setIsVerifyLogin(false);
+        }
       } catch (error) {
-        setIsSigning(false);
-        setErrorSignIn(error as Error);
+        setIsVerifyLogin(false);
+        setErrorVerifySignIn(error as Error);
       }
       return true;
     },
-    []
+    [_flowId]
   );
-  
-  
+
   const getProfilePicture = (profile: Profile) => {
     const profileImage = profile?.listCustomFields.filter((p: ProfileCustomField) => {
       return p.customKey === 'logo';
@@ -254,7 +345,6 @@ export const useAuthContextValue = (): AuthContextData => {
     },
     []
   );
-
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -401,12 +491,19 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const updateUserInfo= useCallback(
+  const updateUserInfo = useCallback(
     async (userId: string, fullName: string, nickName: string, id: string) => {
+      console.log('updateUserInfo -> requset');
       try {
         setIsUpdatingProfile(true);
-        await AuthServices.instance().updateUserInfo(userId, fullName, nickName, id);
-        const { data } = await AuthServices.instance().fetchProfile();
+        const response = await AuthServices.instance().updateUserInfo(
+          userId,
+          fullName,
+          nickName,
+          id
+        );
+        console.log('updateUserInfo -> response', response);
+        const { data } = response;
         setProfile(data);
         await authComponentStore.storeProfile(data);
         setIsUpdatingProfile(false);
@@ -461,7 +558,13 @@ export const useAuthContextValue = (): AuthContextData => {
       isDeviceRegistering: _isDeviceRegistered,
       isDeviceRegistered: _isDeviceRegistered,
       updateUserInfo,
-      adbLogin
+      adbLogin,
+      adbLoginVerifyOtp,
+      isVerifyLogin: _isVerifyLogin,
+      errorVerifySignIn: _errorVerifySignIn,
+      adbResendOTP,
+      adbLoginWithoutOTP,
+      flowId: _flowId,
     }),
     [
       _profile,
@@ -486,6 +589,11 @@ export const useAuthContextValue = (): AuthContextData => {
       _userNewPassword,
       _isDeviceRegistering,
       _isDeviceRegistered,
+      _isVerifyLogin,
+      _flowId,
+      _errorVerifySignIn,
+      _username,
+      _password,
     ]
   );
 };
