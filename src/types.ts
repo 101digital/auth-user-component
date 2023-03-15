@@ -84,4 +84,5 @@ export type AuthComponentConfig = {
   appPublicId?: string;
   appPublicSecret?: string;
   identityBaseUrl?: string;
+  identityPingUrl?: string;
 };
