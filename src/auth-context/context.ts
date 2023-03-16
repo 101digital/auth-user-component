@@ -76,6 +76,11 @@ export interface AuthContextData {
   adbLoginWithoutOTP: (username: string, password: string) => Promise<string | undefined>;
   flowId?: string;
   forgotUserPassword: (username: string) => void;
+  isForgotPassword: boolean;
+  isForgotPasswordError?: Error;
+  resetUserPassword: (recoveryCode: string, newPassword: string) => void;
+  isResetPassword: boolean;
+  isResetPasswordError?: boolean;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -119,6 +124,11 @@ export const authDefaultValue: AuthContextData = {
   adbResendOTP: () => false,
   adbLoginWithoutOTP: async () => undefined,
   forgotUserPassword: async () => undefined,
+  isForgotPassword: false,
+  isForgotPasswordError: undefined,
+  resetUserPassword: () => undefined,
+  isResetPassword: false,
+  isResetPasswordError: false,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -158,6 +168,9 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const [_isForgotPassword, setIsForgotPassword] = useState<boolean>(false);
   const [_errorForgotPassword, setErrorForgotPassword] = useState<Error | undefined>();
+
+  const [_isResetPassword, setResetPassword] = useState<boolean>(false);
+  const [_errorResetPassword, setErrorResetPassword] = useState<boolean>(false);
 
   useEffect(() => {
     checkLogin();
@@ -530,17 +543,42 @@ export const useAuthContextValue = (): AuthContextData => {
         '0eb2b7cf-1817-48ec-a62d-eae404776cff',
         'openid profile profilepsf'
       );
-      // const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
-      // await AuthServices.instance().obtainTokenSingleFactor(
-      //   resAfterValidate.authorizeResponse.code
-      // );
+      console.log("resLogin",resLogin.id)
+      if (resLogin && resLogin.id) {
+        setFlowId(resLogin.id);
+      }
+
       setIsForgotPassword(true);
     } catch (error) {
       setErrorForgotPassword(error as Error);
+      setIsForgotPassword(false);
     } finally {
       setIsForgotPassword(false);
     }
   }, []);
+
+  const resetUserPassword = useCallback(async (recoveryCode: string, newPassword: string) => {
+      try {
+        setResetPassword(true);
+        const data = await AuthServices.instance().pingResetPassword(
+          recoveryCode,
+          newPassword,
+          '09f88f4c-8848-44d7-ba04-c1e8f0e65782'
+        );
+        console.log("USER FLOW ID",_flowId)
+        console.log('resetUserPassword Response', data);
+        if(data?.status === 'COMPLETED'){
+          setResetPassword(true);
+        }else{
+          setErrorResetPassword(true);
+        }
+      } catch (error) {
+        setErrorResetPassword(true);
+        setResetPassword(false);
+      } finally {
+        setResetPassword(false);
+      }
+  }, [_flowId]);
 
   return useMemo(
     () => ({
@@ -590,6 +628,12 @@ export const useAuthContextValue = (): AuthContextData => {
       adbResendOTP,
       adbLoginWithoutOTP,
       flowId: _flowId,
+      forgotUserPassword,
+      isForgotPassword: _isForgotPassword,
+      isForgotPasswordError: _errorForgotPassword,
+      resetUserPassword,
+      isResetPassword: _isResetPassword,
+      isResetPasswordError: _errorResetPassword,
     }),
     [
       _profile,
@@ -619,6 +663,10 @@ export const useAuthContextValue = (): AuthContextData => {
       _errorVerifySignIn,
       _username,
       _password,
+      _isForgotPassword,
+      _errorForgotPassword,
+      _isResetPassword,
+      _errorResetPassword,
     ]
   );
 };

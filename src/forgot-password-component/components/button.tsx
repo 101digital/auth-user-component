@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { colors, fonts } from '../../assets';
 
 interface IButton {
@@ -8,16 +8,18 @@ interface IButton {
     onPress?: () => void;
     labelColor?: string;
     disabled?: boolean;
-
+    loader?: boolean;
 }
 const Button: React.FC<IButton> = (props: IButton) => {
+    const { onPress, background, label, labelColor, disabled, loader } = props;
     return (
         <TouchableOpacity
-            onPress={props.onPress}
-            style={[styles.container, { backgroundColor: props.background ?? colors.primaryBlack, borderColor: props.disabled ? colors.secondaryButton : colors.primaryBlack, }]}
-            disabled={props.disabled}
+            onPress={onPress}
+            style={[styles.container, { backgroundColor: background ?? colors.primaryBlack, borderColor: disabled ? colors.secondaryButton : colors.primaryBlack, }]}
+            disabled={disabled}
         >
-            <Text style={[styles.label, { color: props.labelColor ?? colors.white }]}>{props.label}</Text>
+            {loader && <ActivityIndicator size={20} color={colors.white} />}
+            {!loader && <Text style={[styles.label, { color: labelColor ?? colors.white }]}>{label}</Text>}
         </TouchableOpacity>
     );
 };

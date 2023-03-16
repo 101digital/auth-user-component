@@ -1,40 +1,27 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BackIcon, colors } from 'react-native-auth-component/src/assets';
 import { fonts } from 'react-native-auth-component/src/assets/fonts';
 import { Formik } from 'formik';
 import { ADBInputField, ThemeContext } from 'react-native-theme-component';
-import { ForgotPasswordData, ForgotPasswordSchema } from 'react-native-auth-component/src/forgot-password-component/model';
-import Button from './components/button';
-import { AuthContext } from 'react-native-auth-component/src/auth-context';
+import Button from 'react-native-auth-component/src/forgot-password-component/components/button';
+import { RecoverCodeData, RecoverCodeSchema } from './model';
 
-export interface IForgotPassword {
-  onPressContinue: () => void;
+export interface IVerifyOTPRecover {
+  onPressContinue: (recoverCode: string) => void;
 }
 
-const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPassword) => {
+const ADBVerifyOTPRecoverComponent: React.FC<IVerifyOTPRecover> = (props: IVerifyOTPRecover) => {
   const { i18n } = useContext(ThemeContext);
   const formikRef = useRef(null);
   const { onPressContinue } = props;
-  const { forgotUserPassword, isForgotPassword, isForgotPasswordError } = useContext(AuthContext)
-
-  useEffect(() => {
-    if (isForgotPassword) {
-      onPressContinue()
-    }
-  }, [isForgotPassword])
-
-  const forgotPasswordCall = (val: string) => {
-    forgotUserPassword(val)
-  }
-
   return (
     <View style={styles.container}>
       <Formik
         innerRef={formikRef}
         enableReinitialize={true}
-        initialValues={ForgotPasswordData.empty()}
-        validationSchema={ForgotPasswordSchema}
+        initialValues={RecoverCodeData.empty()}
+        validationSchema={RecoverCodeSchema}
         onSubmit={(values) => {
         }}
       >
@@ -43,23 +30,18 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
             <>
               <View style={styles.inputContainer}>
                 <ADBInputField
-                  name={'email'}
+                  name={'recoverCode'}
                   onBlur={() => {
-                    setFieldTouched('email')
+                    setFieldTouched('recoverCode')
                   }}
-                  placeholder={'Email'}
-                />
-                <View style={{ height: 16 }} />
-                <ADBInputField
-                  name={'nric'}
-                  onBlur={() => {
-                    setFieldTouched('nric')
-                  }}
-                  placeholder={'NRIC number'}
+                  placeholder={'Recovery code'}
                 />
               </View>
               <View style={[styles.bottomSection, styles.absolute]}>
-                <Button loader={isForgotPassword} label={i18n.t('reset_password.btn_continue') ?? 'Continue'} disabled={Object.keys(errors).length !== 0 || values.email === '' || values.nric === ''} background={Object.keys(errors).length !== 0 || values.email === '' || values.nric === '' ? colors.secondaryButton : colors.primaryBlack} onPress={() => forgotPasswordCall(values.email)} />
+                <Button label={i18n.t('reset_password.btn_continue') ?? 'Continue'}
+                  disabled={Object.keys(errors).length !== 0 || values.recoverCode === ''}
+                  background={Object.keys(errors).length !== 0 || values.recoverCode === '' ? colors.secondaryButton : colors.primaryBlack}
+                  onPress={() => onPressContinue(values?.recoverCode)} />
               </View>
             </>
           )
@@ -69,7 +51,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
   );
 };
 
-export default ADBForgotPasswordComponent;
+export default ADBVerifyOTPRecoverComponent;
 
 const styles = StyleSheet.create({
   container: {

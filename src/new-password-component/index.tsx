@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { fonts } from 'react-native-auth-component/src/assets/fonts';
 import { Formik } from 'formik';
@@ -13,9 +13,11 @@ import { CloseIcon } from 'react-native-theme-component/src/assets';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from 'react-native-auth-component/src/assets/alert-circle.icon';
 import { SuccessIcon } from 'react-native-theme-component/src/assets/success.icon';
+import { AuthContext } from 'react-native-auth-component/src/auth-context';
 
 export interface INewPasswordComponent {
     onPressContinue: () => void;
+    recoveryCode: string;
 }
 
 const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswordComponent) => {
@@ -25,9 +27,16 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
     const [errorModal, setErrorModal] = useState(false);
     const [successModal, setSuccessModal] = useState(false);
     const formikRef = useRef(null);
-    const { onPressContinue } = props;
+    const { onPressContinue, recoveryCode } = props;
     const tickIcon = <TickIcon height={11} width={17} />;
     const closeIcon = <CloseIcon height={11} width={17} />;
+    const { resetUserPassword, isResetPassword, isResetPasswordError } = useContext(AuthContext)
+
+    useEffect(() => {
+        if (isResetPassword) {
+            setSuccessModal(true);
+        }
+    }, [isResetPassword])
 
     function checkIs8Character(text: string) {
         return /^.{8,}$/.test(text)
@@ -51,6 +60,10 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
         } else {
             return false
         }
+    }
+
+    const resetPasswordCall = (val: string) => {
+        resetUserPassword(recoveryCode, val)
     }
 
     return (
@@ -119,8 +132,10 @@ const NewPasswordComponent: React.FC<INewPasswordComponent> = (props: INewPasswo
                             <View style={[styles.bottomSection, styles.absolute]}>
                                 <Button
                                     label={i18n.t('reset_password.btn_continue') ?? 'Continue'}
-                                    background={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || values.confirmNew == ''  || !validationCheck(values.confirmNew) || !validationCheck(values.createNew) ? colors.secondaryButton : colors.primaryBlack}
-                                    disabled={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || values.confirmNew == '' || !validationCheck(values.confirmNew) || !validationCheck(values.createNew)} onPress={() => setSuccessModal(true)} />
+                                    background={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || values.confirmNew == '' || !validationCheck(values.confirmNew) || !validationCheck(values.createNew) ? colors.secondaryButton : colors.primaryBlack}
+                                    disabled={Object.keys(errors).length !== 0 || values.confirmNew !== values.createNew || values.confirmNew == '' || !validationCheck(values.confirmNew) || !validationCheck(values.createNew)}
+                                    onPress={() => resetPasswordCall(values.confirmNew)}
+                                    loader={isResetPassword} />
                             </View>
                         </>
                     )

@@ -416,4 +416,24 @@ export class AuthServices {
       return response.data;
     }
   };
+
+  public pingResetPassword = async (recoveryCode: string, newPassword: string, flowId: string) => {
+    console.log(`flows/${flowId}`)
+    const response = await AuthApiClient.instance()
+        .getAuthApiClient()
+        .post(
+          `flows/${flowId}`,
+          {
+            recoveryCode,
+            newPassword,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/vnd.pingidentity.password.recover+json',
+            },
+          }
+        );
+        
+      return response.data;
+  };
 }

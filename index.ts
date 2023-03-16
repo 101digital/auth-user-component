@@ -27,4 +27,5 @@ export { default as ADBLoginComponent } from './src/adb-login-component';
 export { default as ADBForgotPasswordComponent } from './src/forgot-password-component';
 export { default as NricverifyComponent } from './src/nric-verify-component';
 export { default as NewPasswordComponent } from './src/new-password-component';
+export { default as ADBVerifyOTPRecoverComponent } from './src/otp-recover-code-verify';
 
