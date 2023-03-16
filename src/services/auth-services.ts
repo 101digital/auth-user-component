@@ -376,4 +376,44 @@ export class AuthServices {
     });
     return response.data;
   };
+
+  public forgotPassword = async (username: string, clientIdInit?: string, scope?: string) => {
+    const { clientId } = this._configs || {};
+    const responseAuth = await AuthApiClient.instance()
+      .getAuthApiClient()
+      .get('as/authorize', {
+        params: {
+          response_type: 'code',
+          client_id: clientIdInit ? clientIdInit : clientId,
+          scope: scope ? scope : 'openid profile profilep',
+          code_challenge:
+            'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+          redirect_uri: 'https://example.com',
+          response_mode: 'pi.flow',
+        },
+        headers: {
+          Cookie:
+            'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
+        },
+      });
+
+    const flowId = responseAuth.data?.id;
+
+    if (flowId?.length > 0) {
+      const response = await AuthApiClient.instance()
+        .getAuthApiClient()
+        .post(
+          `flows/${flowId}`,
+          {
+            username,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/vnd.pingidentity.password.forgot+json',
+            },
+          }
+        );
+      return response.data;
+    }
+  };
 }

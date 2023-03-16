@@ -75,6 +75,7 @@ export interface AuthContextData {
   adbResendOTP: () => void;
   adbLoginWithoutOTP: (username: string, password: string) => Promise<string | undefined>;
   flowId?: string;
+  forgotUserPassword: (username: string) => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -117,6 +118,7 @@ export const authDefaultValue: AuthContextData = {
   adbLoginVerifyOtp: async () => false,
   adbResendOTP: () => false,
   adbLoginWithoutOTP: async () => undefined,
+  forgotUserPassword: async () => undefined,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -153,6 +155,9 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_errorVerifySignIn, setErrorVerifySignIn] = useState<Error | undefined>();
   const [_username, setUsername] = useState<string>();
   const [_password, setPassword] = useState<string>();
+
+  const [_isForgotPassword, setIsForgotPassword] = useState<boolean>(false);
+  const [_errorForgotPassword, setErrorForgotPassword] = useState<Error | undefined>();
 
   useEffect(() => {
     checkLogin();
@@ -516,6 +521,26 @@ export const useAuthContextValue = (): AuthContextData => {
     },
     []
   );
+
+  const forgotUserPassword = useCallback(async (username: string) => {
+    try {
+      setIsForgotPassword(true);
+      const resLogin = await AuthServices.instance().forgotPassword(
+        username,
+        '0eb2b7cf-1817-48ec-a62d-eae404776cff',
+        'openid profile profilepsf'
+      );
+      // const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
+      // await AuthServices.instance().obtainTokenSingleFactor(
+      //   resAfterValidate.authorizeResponse.code
+      // );
+      setIsForgotPassword(true);
+    } catch (error) {
+      setErrorForgotPassword(error as Error);
+    } finally {
+      setIsForgotPassword(false);
+    }
+  }, []);
 
   return useMemo(
     () => ({

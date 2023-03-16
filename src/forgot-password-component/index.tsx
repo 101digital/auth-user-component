@@ -36,9 +36,17 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                   }}
                   placeholder={'Email'}
                 />
+                <View style={{ height: 16 }} />
+                <ADBInputField
+                  name={'nric'}
+                  onBlur={() => {
+                    setFieldTouched('nric')
+                  }}
+                  placeholder={'NRIC number'}
+                />
               </View>
               <View style={[styles.bottomSection, styles.absolute]}>
-                <Button label={i18n.t('reset_password.btn_continue') ?? 'Continue'} disabled={Object.keys(errors).length !== 0 || values.email === ''} background={Object.keys(errors).length !== 0 || values.email === '' ? colors.secondaryButton : colors.primaryBlack} onPress={onPressContinue} />
+                <Button label={i18n.t('reset_password.btn_continue') ?? 'Continue'} disabled={Object.keys(errors).length !== 0 || values.email === '' || values.nric === ''} background={Object.keys(errors).length !== 0 || values.email === '' || values.nric === '' ? colors.secondaryButton : colors.primaryBlack} onPress={onPressContinue} />
               </View>
             </>
           )
@@ -78,5 +86,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  absolute: { position: 'absolute', bottom: 0, width: '100%', marginHorizontal: 24 }
+  absolute: { position: 'absolute', bottom: 10, width: '100%', marginHorizontal: 24 }
 });

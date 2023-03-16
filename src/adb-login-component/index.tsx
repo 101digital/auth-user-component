@@ -30,7 +30,7 @@ export interface ILogin {
 }
 
 const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onLoginSuccess, onLoginFailed } = props;
+  const { onLoginSuccess, onLoginFailed, onForgotPassword } = props;
   const { i18n } = useContext(ThemeContext);
   const { adbLogin, isSigning } = useContext(AuthContext);
 
@@ -90,15 +90,13 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                     </View>
                   </View>
                   <View style={styles.rowBetween}>
-                    <TouchableOpacity style={styles.flex}>
-                      <Text style={styles.forgotPasswordTitle}>{`${
-                        i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                      }?`}</Text>
+                    <TouchableOpacity onPress={onForgotPassword} style={styles.flex}>
+                      <Text style={styles.forgotPasswordTitle}>{`${i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
+                        }?`}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity>
-                      <Text style={styles.helpTitle}>{`${
-                        i18n.t('login_component.lbl_help') ?? 'Help'
-                      }?`}</Text>
+                      <Text style={styles.helpTitle}>{`${i18n.t('login_component.lbl_help') ?? 'Help'
+                        }?`}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
