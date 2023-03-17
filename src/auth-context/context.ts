@@ -126,7 +126,7 @@ export const authDefaultValue: AuthContextData = {
   isManualLogin: false,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
-  verificationMethodKey: 0,
+  verificationMethodKey: 1,
   setVerificationMethodKey: () => undefined
 };
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -165,7 +165,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_password, setPassword] = useState<string>();
   const [_isManualLogin, setisManualLogin] = useState<boolean>(false);
   const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
-  const [_verificationMethodKey, setVerificationMethodKey] = useState<number>(0);
+  const [_verificationMethodKey, setVerificationMethodKey] = useState<number>(1);
   
   useEffect(() => {
     checkLogin();
