@@ -3,6 +3,7 @@ import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
 import { AuthServices } from '../services/auth-services';
+import _ from 'lodash';
 
 export interface AuthContextData {
   profile?: Profile;
@@ -75,6 +76,11 @@ export interface AuthContextData {
   adbResendOTP: () => void;
   adbLoginWithoutOTP: (username: string, password: string) => Promise<string | undefined>;
   flowId?: string;
+  isManualLogin: boolean;
+  isValidatedSubsequenceLogin: boolean;
+  setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
+  verificationMethodKey: number;
+  setVerificationMethodKey: (key: number) => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -116,9 +122,13 @@ export const authDefaultValue: AuthContextData = {
   isVerifyLogin: false,
   adbLoginVerifyOtp: async () => false,
   adbResendOTP: () => false,
-  adbLoginWithoutOTP: async () => undefined
+  adbLoginWithoutOTP: async () => undefined,
+  isManualLogin: false,
+  isValidatedSubsequenceLogin: false,
+  setIsValidatedSubsequenceLogin: () => undefined,
+  verificationMethodKey: 1,
+  setVerificationMethodKey: () => undefined
 };
-
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
 export const useAuthContextValue = (): AuthContextData => {
@@ -153,7 +163,10 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_errorVerifySignIn, setErrorVerifySignIn] = useState<Error | undefined>();
   const [_username, setUsername] = useState<string>();
   const [_password, setPassword] = useState<string>();
-
+  const [_isManualLogin, setisManualLogin] = useState<boolean>(false);
+  const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
+  const [_verificationMethodKey, setVerificationMethodKey] = useState<number>(1);
+  
   useEffect(() => {
     checkLogin();
   }, []);
@@ -236,6 +249,7 @@ export const useAuthContextValue = (): AuthContextData => {
         resAfterValidate.authorizeResponse.code
       );
       setIsSignedIn(true);
+      setisManualLogin(true);
       return resLogin._embedded.user.id;
     } catch (error) {
       setErrorSignIn(error as Error);
@@ -274,20 +288,20 @@ export const useAuthContextValue = (): AuthContextData => {
         console.log('adbLoginVerifyOtp => flowId', _flowId, otp);
         if (_flowId && _flowId.length > 0) {
           const loginData = await AuthServices.instance().adbVerifyLogin(otp, _flowId);
-          await delay(1000);
           console.log('adbLoginVerifyOtp -> response', loginData);
           const afterValidateData = await AuthServices.instance().afterValidateOtp(
             loginData.resumeUrl
           );
-          await delay(1000);
           console.log('afterValidateData', afterValidateData);
           const obtainTokenData = await AuthServices.instance().obtainToken(
             afterValidateData.authorizeResponse.code
           );
           console.log('getObtainToken -> obtainTokenData', obtainTokenData);
           const { data } = await AuthServices.instance().fetchProfile();
+          await authComponentStore.storeProfile(data);
           setProfile({ ...data });
           console.log('adbLoginVerifyOtp -> data', data);
+          setisManualLogin(true);
           setIsSignedIn(true);
           setIsVerifyLogin(false);
         }
@@ -347,6 +361,22 @@ export const useAuthContextValue = (): AuthContextData => {
     },
     []
   );
+
+  const loginSubSequence = useCallback(async () => {
+    try {
+      setIsUpdatingProfile(true);
+      const { data } = await AuthServices.instance().fetchProfile();
+      setProfile(data);
+      getProfilePicture(data);
+      await authComponentStore.storeProfile(data);
+      setIsUpdatingProfile(false);
+      return true;
+    } catch (error) {
+      setIsUpdatingProfile(false);
+      setErrorUpdateProfile(error as Error);
+      return false;
+    }
+  }, []);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -567,6 +597,11 @@ export const useAuthContextValue = (): AuthContextData => {
       adbResendOTP,
       adbLoginWithoutOTP,
       flowId: _flowId,
+      isManualLogin: _isManualLogin,
+      isValidatedSubsequenceLogin: _isValidatedSubsequenceLogin,
+      setIsValidatedSubsequenceLogin,
+      verificationMethodKey: _verificationMethodKey,
+      setVerificationMethodKey
     }),
     [
       _profile,
@@ -596,6 +631,9 @@ export const useAuthContextValue = (): AuthContextData => {
       _errorVerifySignIn,
       _username,
       _password,
+      _isManualLogin,
+      _isValidatedSubsequenceLogin,
+      _verificationMethodKey
     ]
   );
 };

@@ -55,14 +55,31 @@ const refreshTokens = async () => {
   });
 };
 
+const refreshLoginHint = async () => {
+  return new Promise<TokenData>((resolve, reject) => {
+    AuthServices.instance()
+      .adbRefreshToken()
+      .then(async ({ refresh_token, access_token }) => {
+        return [refresh_token, access_token];
+      })
+      .then(([refresh_token, access_token]) => {
+        resolve({
+          accessToken: access_token,
+          refreshToken: refresh_token,
+        });
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 const forceLogout = async () => {
   DeviceEventEmitter.emit('authcomponent.session.expired');
 };
 
-export const createAuthorizedApiClient = (baseURL: string, withOrgToken: boolean = false) => {
+export const createAuthorizedApiClient = (baseURL: string) => {
   const options = {
     attachTokenToRequest,
-    refreshTokens,
+    refreshLoginHint,
     shouldIntercept,
     forceLogout,
   };
@@ -84,12 +101,8 @@ export const createAuthorizedApiClient = (baseURL: string, withOrgToken: boolean
 
   const onRequest = async (request: AxiosRequestConfig) => {
     const authBearer = await authComponentStore.getAccessToken();
-    const orgToken = await authComponentStore.getOrgToken();
     if (authBearer) {
       request.headers.Authorization = `${authBearer}`;
-    }
-    if (withOrgToken) {
-      request.headers['org-token'] = orgToken;
     }
     return request;
   };
@@ -115,9 +128,7 @@ export const createAuthorizedApiClient = (baseURL: string, withOrgToken: boolean
             originalRequest.queued = true;
             options.attachTokenToRequest(
               originalRequest,
-              data.accessToken,
-              data.orgToken,
-              withOrgToken
+              data.accessToken
             );
             return axios.request(originalRequest);
           }
@@ -130,13 +141,12 @@ export const createAuthorizedApiClient = (baseURL: string, withOrgToken: boolean
     originalRequest.retry = true;
     return new Promise((resolve, reject) => {
       options
-        .refreshTokens()
+        .refreshLoginHint()
         .then((data) => {
           options.attachTokenToRequest(
             originalRequest,
             data.accessToken,
-            data.orgToken,
-            withOrgToken
+            data.orgToken
           );
           isRefreshed = true;
           processQueue(null, data.accessToken, data.orgToken);

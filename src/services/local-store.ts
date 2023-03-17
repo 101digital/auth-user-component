@@ -4,6 +4,7 @@ const REFRESH_TOKEN_KEY = 'authcomponent.refreshToken';
 const ACCESS_TOKEN_KEY = 'authcomponent.accessToken';
 const ORG_TOKEN_KEY = 'authcomponent.orgToken';
 const PROFILE_KEY = 'authcomponent.profile';
+const LOGIN_TOKEN_HINT = 'authcomponent.loginTokenHint';
 
 class AuthComponentStore {
   storeRefreshToken = (refreshToken: string) =>
@@ -13,6 +14,7 @@ class AuthComponentStore {
 
   storeAccessToken = (accessToken: string) => AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
 
+
   getAccessToken = () => AsyncStorage.getItem(ACCESS_TOKEN_KEY);
 
   storeOrgToken = (orgToken: string) => AsyncStorage.setItem(ORG_TOKEN_KEY, orgToken);
@@ -20,6 +22,10 @@ class AuthComponentStore {
   getOrgToken = () => AsyncStorage.getItem(ORG_TOKEN_KEY);
 
   storeProfile = (profile: Profile) => AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+
+  storeLoginTokenHint = (hint: string) => AsyncStorage.setItem(LOGIN_TOKEN_HINT, hint);
+
+  getLoginTokenHint = () => AsyncStorage.getItem(LOGIN_TOKEN_HINT);
 
   getProfile = async () => {
     try {
@@ -35,6 +41,7 @@ class AuthComponentStore {
     await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
     await AsyncStorage.removeItem(ORG_TOKEN_KEY);
     await AsyncStorage.removeItem(PROFILE_KEY);
+    await AsyncStorage.removeItem(LOGIN_TOKEN_HINT);
   };
 }
 
