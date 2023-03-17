@@ -75,7 +75,6 @@ export interface AuthContextData {
   adbResendOTP: () => void;
   adbLoginWithoutOTP: (username: string, password: string) => Promise<string | undefined>;
   flowId?: string;
-  isSignInLocked: boolean;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -117,8 +116,7 @@ export const authDefaultValue: AuthContextData = {
   isVerifyLogin: false,
   adbLoginVerifyOtp: async () => false,
   adbResendOTP: () => false,
-  adbLoginWithoutOTP: async () => undefined,
-  isSignInLocked: false,
+  adbLoginWithoutOTP: async () => undefined
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -128,7 +126,6 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_recovery, setRecovery] = useState<Recovery | undefined>(undefined);
   const [_isSignedIn, setIsSignedIn] = useState<boolean>(false);
   const [_isSigning, setIsSigning] = useState<boolean>(false);
-  const [_isSignInLocked, setSignInLocked] = useState<boolean>(false);
   const [_errorSignIn, setErrorSignIn] = useState<Error | undefined>();
   const [_profilePicture, setProfilePicture] = useState<string | undefined>(undefined);
   const [_errorUpdateProfile, setErrorUpdateProfile] = useState<Error | undefined>();
@@ -214,12 +211,9 @@ export const useAuthContextValue = (): AuthContextData => {
         setUsername(username);
         setPassword(password);
       }
-      if(data?.error?.code === 'PASSWORD_LOCKED_OUT'){
-        setSignInLocked(true)
-        setIsSigning(false);
-      }
+      return data;
     } catch (error) {
-      console.log('adbLogin -> error', error);
+      console.log('adbLogin -> error', error?.response);
       setIsSigning(false);
       setErrorSignIn(error as Error);
       return false;
@@ -573,7 +567,6 @@ export const useAuthContextValue = (): AuthContextData => {
       adbResendOTP,
       adbLoginWithoutOTP,
       flowId: _flowId,
-      isSignInLocked:_isSignInLocked,
     }),
     [
       _profile,
@@ -603,7 +596,6 @@ export const useAuthContextValue = (): AuthContextData => {
       _errorVerifySignIn,
       _username,
       _password,
-      _isSignInLocked,
     ]
   );
 };

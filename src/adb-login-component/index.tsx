@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -14,9 +14,12 @@ import ImageIcon from '../assets/icons/image.icon';
 import { AuthContext } from '../auth-context';
 import { Formik } from 'formik';
 import { ADBButton, InputField, ThemeContext } from 'react-native-theme-component';
+import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
+import { AlertCircleIcon } from 'react-native-auth-component/src/assets/icons';
+import Button from 'react-native-auth-component/src/adb-login-component/components/button';
 
 export class SignInData {
-  constructor(readonly username: string, readonly password: string) {}
+  constructor(readonly username: string, readonly password: string) { }
 
   static empty(): SignInData {
     return new SignInData('', '');
@@ -31,16 +34,20 @@ export interface ILogin {
 const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { onLoginSuccess, onLoginFailed } = props;
   const { i18n } = useContext(ThemeContext);
-  const { adbLogin, isSigning } = useContext(AuthContext);
-
-  const handleOnSignIn = async (values: SignInData) => {
+  const { adbLogin, isSigning, isSignInLocked } = useContext(AuthContext);
+  const [errorModal, setErrorModal] = useState(false);
+  const handleOnSignIn =  async (values: SignInData) => {
     Keyboard.dismiss();
     const { username, password } = values;
     const _username = username;
     const isSuccess = await adbLogin(_username, password);
     console.log('handleOnSignIn -> response', isSuccess);
     if (isSuccess) {
-      onLoginSuccess();
+      if (isSuccess?.error?.code === 'PASSWORD_LOCKED_OUT') {
+        setErrorModal(true)
+      } else {
+        onLoginSuccess();
+      }
     } else {
       onLoginFailed();
     }
@@ -90,14 +97,12 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   </View>
                   <View style={styles.rowBetween}>
                     <TouchableOpacity style={styles.flex}>
-                      <Text style={styles.forgotPasswordTitle}>{`${
-                        i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                      }?`}</Text>
+                      <Text style={styles.forgotPasswordTitle}>{`${i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
+                        }?`}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity>
-                      <Text style={styles.helpTitle}>{`${
-                        i18n.t('login_component.lbl_help') ?? 'Help'
-                      }?`}</Text>
+                      <Text style={styles.helpTitle}>{`${i18n.t('login_component.lbl_help') ?? 'Help'
+                        }?`}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -107,6 +112,17 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
           )}
         </Formik>
       </KeyboardAvoidingView>
+      <BottomSheetModal isVisible={errorModal}>
+        <View style={styles.cameraDisableContainer}>
+          <AlertCircleIcon size={72} />
+          <View style={styles.gap40} />
+          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>{`Oops! Your account is temporarily locked`}</Text>
+          <View style={styles.gap8} />
+          <Text style={[styles.subTitle, { textAlign: 'center' }]}>{`You’ve entered the wrong password 3 times. Please try again after 1 hour.`}</Text>
+          <View style={{ height: 32 }} />
+          <Button label={'Done'} onPress={() => { setErrorModal(false) }} />
+        </View>
+      </BottomSheetModal>
     </View>
   );
 };
@@ -175,4 +191,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   flex: { flex: 1 },
+  cameraDisableContainer: {
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 24
+  },
+  gap16: {
+    height: 16
+  },
+  gap40: {
+    height: 40
+  },
+  gap8: {
+    height: 8
+  },
+  subTitle: {
+    fontSize: 14,
+    color: colors.primaryBlack,
+    fontFamily: fonts.regular,
+    marginTop: 8,
+  },
+  loginTitle: {
+    fontSize: 24,
+    color: colors.primaryBlack,
+    fontFamily: fonts.semiBold,
+  },
 });
