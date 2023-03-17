@@ -116,11 +116,11 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
         <View style={styles.cameraDisableContainer}>
           <AlertCircleIcon size={72} />
           <View style={styles.gap40} />
-          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>{`Oops! Your account is temporarily locked`}</Text>
+          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>{i18n.t('login_component.lbl_account_locked') ?? `Oops! Your account is temporarily locked`}</Text>
           <View style={styles.gap8} />
-          <Text style={[styles.subTitle, { textAlign: 'center' }]}>{`You’ve entered the wrong password 3 times. Please try again after 1 hour.`}</Text>
+          <Text style={[styles.subTitle, { textAlign: 'center' }]}>{i18n.t('login_component.lbl_entered_wrong_password') ?? `You’ve entered the wrong password 3 times. Please try again after 1 hour.`}</Text>
           <View style={{ height: 32 }} />
-          <Button label={'Done'} onPress={() => { setErrorModal(false) }} />
+          <Button label={i18n.t('login_component.btn_done') ?? 'Done'} onPress={() => { setErrorModal(false) }} />
         </View>
       </BottomSheetModal>
     </View>
