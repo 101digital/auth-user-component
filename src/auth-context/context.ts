@@ -224,6 +224,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setUsername(username);
         setPassword(password);
       }
+      setIsSigning(false);
       return data;
     } catch (error) {
       console.log('adbLogin -> error', error?.response);
