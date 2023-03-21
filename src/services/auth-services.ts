@@ -117,15 +117,14 @@ export class AuthServices {
       });
 
     await authComponentStore.storeAccessToken(response.data.access_token);
-    // const accessToken = await authComponentStore.getAccessToken();
 
-    // const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
-    //   headers: {
-    //     Authorization: `${accessToken}`,
-    //   },
-    // });
+    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
+      headers: {
+        Authorization: `${response.data.access_token}`,
+      },
+    });
 
-    // await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
+    await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
     console.log({
       access_token: response.data.access_token,
       refresh_token: 'responseTokenHint.data.data[0].token',
@@ -159,16 +158,15 @@ export class AuthServices {
 
     await authComponentStore.storeAccessToken(response.data.access_token);
 
-    // const accessToken = await authComponentStore.getAccessToken();
-    // console.log('obtainTokenSingleFactor => accessToken', accessToken);
-    // const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
-    //   headers: {
-    //     Authorization: `${accessToken}`,
-    //   },
-    // });
+    console.log('obtainTokenSingleFactor => accessToken', response.data.access_token);
+    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
+      headers: {
+        Authorization: `${response.data.access_token}`,
+      },
+    });
 
     console.log('obtainTokenSingleFactor => responseTokenHint');
-    // await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
+    await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
     return {
       access_token: response.data.access_token,
       refresh_token: 'responseTokenHint.data.data[0].token',
