@@ -74,7 +74,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                       <InputField
                         name="username"
                         returnKeyType="done"
-                        placeholder={'Mobile number'}
+                        placeholder={'Email'}
                         autoCapitalize="none"
                       />
                     </View>
