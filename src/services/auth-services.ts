@@ -136,6 +136,19 @@ export class AuthServices {
     };
   };
 
+  public getLoginHintToken = async () => {
+    const { identityPingUrl } = this._configs || {};
+
+    const access_token = await authComponentStore.getAccessToken();
+    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
+      headers: {
+        Authorization: `${access_token}`,
+      },
+    });
+
+    return responseTokenHint.data.data[0].token;
+  };
+
   public obtainTokenSingleFactor = async (authorizeCode: string) => {
     const { identityPingUrl } = this._configs || {};
     const body = qs.stringify({

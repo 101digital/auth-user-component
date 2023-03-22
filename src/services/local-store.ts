@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AESCryptoStore from './aes-crypto';
 import SInfo from 'react-native-sensitive-info';
 import base64 from 'react-native-base64';
+import { AuthServices } from '../services/auth-services';
 import { generateSecureRandom } from 'react-native-securerandom';
 
 const REFRESH_TOKEN_KEY = 'authcomponent.refreshToken';
@@ -14,7 +15,7 @@ const PIN_TOKEN = 'authcomponent.pinToken';
 const BIO_TOKEN = 'authcomponent.bioToken';
 
 const keySize = 256;
-const cost = 1000;
+const cost = 10000;
 const saltLength = 12;
 
 const sensitiveInfoOptions = {
@@ -112,6 +113,11 @@ class AuthComponentStore {
     } catch (error) {
       console.log('error', error);
     }
+  };
+
+  setPin = async () => {
+    const loginHintToken = await AuthServices.instance().getLoginHintToken();
+    console.log('setPin -> loginHintToken', loginHintToken);
   };
 }
 
