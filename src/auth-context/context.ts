@@ -81,6 +81,8 @@ export interface AuthContextData {
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
   verificationMethodKey: number;
   setVerificationMethodKey: (key: number) => void;
+  verifyPassword: (password: string) => Promise<boolean>;
+  adbGetAccessToken: (username: string, password: string) => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -128,6 +130,8 @@ export const authDefaultValue: AuthContextData = {
   setIsValidatedSubsequenceLogin: () => undefined,
   verificationMethodKey: 1,
   setVerificationMethodKey: () => undefined,
+  verifyPassword: async () => false,
+  adbGetAccessToken: () => false,
 };
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
@@ -222,7 +226,8 @@ export const useAuthContextValue = (): AuthContextData => {
         console.log('set flow ID');
         setFlowId(data.id);
         setUsername(username);
-        setPassword(password);
+        setPassword(undefined);
+        await authComponentStore.storeUserName(username);
       }
     } catch (error) {
       setIsSigning(false);
@@ -232,10 +237,8 @@ export const useAuthContextValue = (): AuthContextData => {
     return true;
   }, []);
 
-  const adbLoginWithoutOTP = useCallback(async (username: string, password: string) => {
-    console.log('adbLoginWithoutOTP', username, password);
+  const adbGetAccessToken = useCallback(async (username: string, password: string) => {
     try {
-      setIsSigning(true);
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
@@ -246,17 +249,62 @@ export const useAuthContextValue = (): AuthContextData => {
       await AuthServices.instance().obtainTokenSingleFactor(
         resAfterValidate.authorizeResponse.code
       );
+    } catch (error) {}
+  }, []);
+
+  const adbLoginWithoutOTP = useCallback(async (username: string, password: string) => {
+    try {
+      console.log('adbLoginWithoutOTP -> username', username, password);
+      setIsSigning(true);
+      const resLogin = await AuthServices.instance().adbLogin(
+        username,
+        password,
+        '0eb2b7cf-1817-48ec-a62d-eae404776cff',
+        'openid profile profilepsf'
+      );
+      const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
+      console.log('adbLoginWithoutOTP -> resAfterValidate', resAfterValidate);
+      await AuthServices.instance().obtainTokenSingleFactor(
+        resAfterValidate.authorizeResponse.code
+      );
       const { data } = await AuthServices.instance().fetchProfile();
       await authComponentStore.storeProfile(data);
+      await authComponentStore.storeUserName(username);
+      setPassword(undefined);
       setProfile({ ...data });
       setIsSignedIn(true);
       setisManualLogin(true);
       return resLogin._embedded.user.id;
     } catch (error) {
+      console.log('adbLoginWithoutOTP -> error', error);
       setErrorSignIn(error as Error);
+      throw error;
     } finally {
       setIsSigning(false);
     }
+  }, []);
+
+  const verifyPassword = useCallback(async (password: string) => {
+    try {
+      setIsSigning(true);
+      if (_username) {
+        const resLogin = await AuthServices.instance().adbLogin(
+          _username,
+          password,
+          '0eb2b7cf-1817-48ec-a62d-eae404776cff',
+          'openid profile profilepsf'
+        );
+        if (resLogin.resumeUrl) {
+          return true;
+        }
+      }
+    } catch (error) {
+      setErrorSignIn(error as Error);
+      return false;
+    } finally {
+      setIsSigning(false);
+    }
+    return false;
   }, []);
 
   const adbResendOTP = useCallback(async () => {
@@ -526,7 +574,7 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const updateUserInfo = useCallback(
     async (userId: string, fullName: string, nickName: string, id: string) => {
-      console.log('updateUserInfo -> requset');
+      console.log('updateUserInfo -> requset', userId, fullName, nickName, id);
       try {
         setIsUpdatingProfile(true);
         const response = await AuthServices.instance().updateUserInfo(
@@ -603,6 +651,8 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsValidatedSubsequenceLogin,
       verificationMethodKey: _verificationMethodKey,
       setVerificationMethodKey,
+      verifyPassword,
+      adbGetAccessToken,
     }),
     [
       _profile,
