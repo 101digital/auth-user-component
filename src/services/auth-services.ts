@@ -97,7 +97,7 @@ export class AuthServices {
 
   public obtainToken = async (authorizeCode: string) => {
     const { identityPingUrl } = this._configs || {};
-    
+
     const body = qs.stringify({
       grant_type: 'authorization_code',
       code: authorizeCode,
@@ -116,25 +116,37 @@ export class AuthServices {
         },
       });
 
-      await authComponentStore.storeAccessToken(response.data.access_token);
-      const accessToken = await authComponentStore.getAccessToken();
+    await authComponentStore.storeAccessToken(response.data.access_token);
 
-      const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
-        headers: {
-          Authorization: `${accessToken}`,
-        },
-      });
-  
-      await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
+    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
+      headers: {
+        Authorization: `${response.data.access_token}`,
+      },
+    });
+
+    await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
     console.log({
       access_token: response.data.access_token,
-      refresh_token: responseTokenHint.data.data[0].token
+      refresh_token: 'responseTokenHint.data.data[0].token',
     });
-    
+
     return {
       access_token: response.data.access_token,
-      refresh_token: responseTokenHint.data.data[0].token
+      refresh_token: 'responseTokenHint.data.data[0].token',
     };
+  };
+
+  public getLoginHintToken = async () => {
+    const { identityPingUrl } = this._configs || {};
+
+    const access_token = await authComponentStore.getAccessToken();
+    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
+      headers: {
+        Authorization: `${access_token}`,
+      },
+    });
+
+    return responseTokenHint.data.data[0].token;
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string) => {
@@ -159,19 +171,18 @@ export class AuthServices {
 
     await authComponentStore.storeAccessToken(response.data.access_token);
 
-    const accessToken = await authComponentStore.getAccessToken();
-    console.log("obtainTokenSingleFactor => accessToken", accessToken);
+    console.log('obtainTokenSingleFactor => accessToken', response.data.access_token);
     const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
       headers: {
-        Authorization: `${accessToken}`,
+        Authorization: `${response.data.access_token}`,
       },
     });
 
-    console.log("obtainTokenSingleFactor => responseTokenHint", responseTokenHint);
+    console.log('obtainTokenSingleFactor => responseTokenHint');
     await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
     return {
       access_token: response.data.access_token,
-      refresh_token: responseTokenHint.data.data[0].token
+      refresh_token: 'responseTokenHint.data.data[0].token',
     };
   };
 
@@ -205,14 +216,14 @@ export class AuthServices {
 
   public adbRefreshToken = async () => {
     const loginHintToken = await authComponentStore.getLoginTokenHint();
-    const body = qs.stringify({ 
+    const body = qs.stringify({
       response_type: 'code',
       client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
       redirect_uri: 'https://example.com',
       scope: 'openid profile profilep',
       code_challenge: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
       response_mode: 'pi.flow',
-      login_hint_token: loginHintToken 
+      login_hint_token: loginHintToken,
     });
     const responseAuthorize = await AuthApiClient.instance()
       .getAuthApiClient()

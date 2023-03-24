@@ -34,13 +34,14 @@ export interface ILogin {
 const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { onLoginSuccess, onLoginFailed } = props;
   const { i18n } = useContext(ThemeContext);
-  const { adbLogin, isSigning, isSignInLocked } = useContext(AuthContext);
   const [errorModal, setErrorModal] = useState(false);
-  const handleOnSignIn =  async (values: SignInData) => {
+  const { adbLoginWithoutOTP, isSigning } = useContext(AuthContext);
+
+  const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
     const { username, password } = values;
     const _username = username;
-    const isSuccess = await adbLogin(_username, password);
+    const isSuccess = await adbLoginWithoutOTP(_username, password);
     console.log('handleOnSignIn -> response', isSuccess);
     if (isSuccess) {
       if (isSuccess?.error?.code === 'PASSWORD_LOCKED_OUT') {
@@ -81,7 +82,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                       <InputField
                         name="username"
                         returnKeyType="done"
-                        placeholder={'Mobile number'}
+                        placeholder={'Email'}
                         autoCapitalize="none"
                       />
                     </View>

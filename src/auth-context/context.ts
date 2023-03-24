@@ -127,7 +127,7 @@ export const authDefaultValue: AuthContextData = {
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
   verificationMethodKey: 1,
-  setVerificationMethodKey: () => undefined
+  setVerificationMethodKey: () => undefined,
 };
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
@@ -166,7 +166,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isManualLogin, setisManualLogin] = useState<boolean>(false);
   const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
   const [_verificationMethodKey, setVerificationMethodKey] = useState<number>(1);
-  
+
   useEffect(() => {
     checkLogin();
   }, []);
@@ -224,10 +224,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setUsername(username);
         setPassword(password);
       }
-      setIsSigning(false);
-      return data;
     } catch (error) {
-      console.log('adbLogin -> error', error?.response);
       setIsSigning(false);
       setErrorSignIn(error as Error);
       return false;
@@ -245,13 +242,21 @@ export const useAuthContextValue = (): AuthContextData => {
         '0eb2b7cf-1817-48ec-a62d-eae404776cff',
         'openid profile profilepsf'
       );
-      const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
-      await AuthServices.instance().obtainTokenSingleFactor(
-        resAfterValidate.authorizeResponse.code
-      );
-      setIsSignedIn(true);
-      setisManualLogin(true);
-      return resLogin._embedded.user.id;
+      if(resLogin.error){
+        return resLogin
+      }else{
+        const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
+        await AuthServices.instance().obtainTokenSingleFactor(
+          resAfterValidate.authorizeResponse.code
+        );
+        const { data } = await AuthServices.instance().fetchProfile();
+        await authComponentStore.storeProfile(data);
+        setProfile({ ...data });
+        setIsSignedIn(true);
+        setisManualLogin(true);
+        return resLogin._embedded.user.id;
+      }
+     
     } catch (error) {
       setErrorSignIn(error as Error);
     } finally {
@@ -602,7 +607,7 @@ export const useAuthContextValue = (): AuthContextData => {
       isValidatedSubsequenceLogin: _isValidatedSubsequenceLogin,
       setIsValidatedSubsequenceLogin,
       verificationMethodKey: _verificationMethodKey,
-      setVerificationMethodKey
+      setVerificationMethodKey,
     }),
     [
       _profile,
@@ -634,7 +639,7 @@ export const useAuthContextValue = (): AuthContextData => {
       _password,
       _isManualLogin,
       _isValidatedSubsequenceLogin,
-      _verificationMethodKey
+      _verificationMethodKey,
     ]
   );
 };
