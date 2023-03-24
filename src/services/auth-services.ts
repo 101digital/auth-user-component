@@ -118,21 +118,14 @@ export class AuthServices {
 
     await authComponentStore.storeAccessToken(response.data.access_token);
 
-    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
-      headers: {
-        Authorization: `${response.data.access_token}`,
-      },
-    });
-
-    await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
     console.log({
       access_token: response.data.access_token,
-      refresh_token: 'responseTokenHint.data.data[0].token',
+      refresh_token: '',
     });
 
     return {
       access_token: response.data.access_token,
-      refresh_token: 'responseTokenHint.data.data[0].token',
+      refresh_token: '',
     };
   };
 
@@ -150,7 +143,6 @@ export class AuthServices {
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string) => {
-    const { identityPingUrl } = this._configs || {};
     const body = qs.stringify({
       grant_type: 'authorization_code',
       code: authorizeCode,
@@ -171,18 +163,9 @@ export class AuthServices {
 
     await authComponentStore.storeAccessToken(response.data.access_token);
 
-    console.log('obtainTokenSingleFactor => accessToken', response.data.access_token);
-    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
-      headers: {
-        Authorization: `${response.data.access_token}`,
-      },
-    });
-
-    console.log('obtainTokenSingleFactor => responseTokenHint');
-    await authComponentStore.storeLoginTokenHint(responseTokenHint.data.data[0].token);
     return {
       access_token: response.data.access_token,
-      refresh_token: 'responseTokenHint.data.data[0].token',
+      refresh_token: '',
     };
   };
 
@@ -214,8 +197,29 @@ export class AuthServices {
     return response.data;
   };
 
+  public adbAuthorizeToken = async (token: string) => {
+    try {
+      const body = qs.stringify({
+        response_type: 'code',
+        client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
+        redirect_uri: 'https://example.com',
+        scope: 'openid profile profilep',
+        code_challenge:
+          'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+        response_mode: 'pi.flow',
+        login_hint_token: token,
+      });
+
+      await AuthApiClient.instance().getAuthApiClient().post('as/authorize', body);
+      return true;
+    } catch (error) {
+      console.log('error', error);
+      return false;
+    }
+  };
+
   public adbRefreshToken = async () => {
-    const loginHintToken = await authComponentStore.getLoginTokenHint();
+    const loginHintToken = await this.getLoginHintToken();
     const body = qs.stringify({
       response_type: 'code',
       client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
@@ -423,10 +427,7 @@ export class AuthServices {
       fullName: fullName,
       nickName: nickname,
       kycDetails: {
-        idNumber: id,
-        idType: 'MyKad',
-        idIssuingCountry: 'Malaysia',
-        idExpiredDate: '2030-01-01',
+        altIdNumber: id,
       },
     };
 

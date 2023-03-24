@@ -7,8 +7,10 @@ import { AuthServices } from '../services/auth-services';
 import { generateSecureRandom } from 'react-native-securerandom';
 
 const REFRESH_TOKEN_KEY = 'authcomponent.refreshToken';
+const USER_NAME = 'authcomponent.userName';
 const ACCESS_TOKEN_KEY = 'authcomponent.accessToken';
 const ORG_TOKEN_KEY = 'authcomponent.orgToken';
+const IS_ENABLE_BIOMETRIC = 'authcomponent.enableBio';
 const PROFILE_KEY = 'authcomponent.profile';
 const LOGIN_TOKEN_HINT = 'authcomponent.loginTokenHint';
 const PIN_TOKEN = 'authcomponent.pinToken';
@@ -29,6 +31,10 @@ class AuthComponentStore {
 
   getRefreshToken = () => AsyncStorage.getItem(REFRESH_TOKEN_KEY);
 
+  storeUserName = (userName: string) => AsyncStorage.setItem(USER_NAME, userName);
+
+  getUserName = () => AsyncStorage.getItem(USER_NAME);
+
   storeAccessToken = (accessToken: string) => AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
 
   getAccessToken = () => AsyncStorage.getItem(ACCESS_TOKEN_KEY);
@@ -39,17 +45,10 @@ class AuthComponentStore {
 
   storeProfile = (profile: Profile) => AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 
-  storeLoginTokenHint = async (hint: string) => this.storeSensitiveData(hint, LOGIN_TOKEN_HINT);
+  storeIsEnableBiometric = (isEnable: boolean) =>
+    AsyncStorage.setItem(IS_ENABLE_BIOMETRIC, JSON.stringify(isEnable));
 
-  getLoginTokenHint = async () => this.getSensitiveData(LOGIN_TOKEN_HINT);
-
-  storePinToken = async (pin: string) => this.storeSensitiveData(pin, PIN_TOKEN);
-
-  getPinToken = async () => this.getSensitiveData(PIN_TOKEN);
-
-  storeBiometricToken = async (hint: string) => this.storeSensitiveData(hint, BIO_TOKEN);
-
-  getBiometricToken = async () => this.getSensitiveData(BIO_TOKEN);
+  getIsEnableBiometric = () => AsyncStorage.getItem(IS_ENABLE_BIOMETRIC);
 
   getProfile = async () => {
     try {
@@ -84,40 +83,73 @@ class AuthComponentStore {
     }
   };
 
-  storeSensitiveData = async (data: string, keyPassword: string) => {
-    console.log('storeSensitiveData -> data', data);
-    try {
-      const salt = await this.getSalt();
-      console.log('storeSensitiveData -> salt', salt);
-      const key = await AESCryptoStore.generateKey(keyPassword, salt, cost, keySize);
-      console.log('Key:', key);
-
-      const encryptedData = await AESCryptoStore.encryptData(data, key);
-
-      await SInfo.setItem(keyPassword, JSON.stringify(encryptedData), sensitiveInfoOptions);
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-
-  getSensitiveData = async (keyPassword: string) => {
-    console.log('getSensitiveData => keyPassword', keyPassword);
-    try {
-      const dataEncrypted = await SInfo.getItem(keyPassword, sensitiveInfoOptions);
-      const salt = await this.getSalt();
-      console.log('salt', salt);
-      const key = await AESCryptoStore.generateKey(keyPassword, salt, cost, keySize);
-      const decryptedData = await AESCryptoStore.decryptData(JSON.parse(dataEncrypted), key);
-      console.log('getSensitiveData => decryptedData', decryptedData);
-      return decryptedData;
-    } catch (error) {
-      console.log('error', error);
-    }
-  };
-
-  setPin = async () => {
+  setPin = async (pinNumber: string) => {
+    // get loginhint token
     const loginHintToken = await AuthServices.instance().getLoginHintToken();
+    // generate salt
     console.log('setPin -> loginHintToken', loginHintToken);
+    const salt = await this.getSalt();
+    // generate key with pin number
+    const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost 10000
+    // encrypt loginhint token
+    const encryptedData = await AESCryptoStore.encryptData(loginHintToken, key);
+
+    console.log('setPin -> encryptedData', encryptedData);
+    // store encrypted loginhint token
+    await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
+  };
+
+  setBiometric = async () => {
+    // get loginhint token
+    const loginHintToken = await AuthServices.instance().getLoginHintToken();
+
+    console.log('setBiometric -> loginHintToken', loginHintToken);
+    // check if any sensor is available on iOS/Android
+    const hasAnySensors = await SInfo.isSensorAvailable();
+    console.log('setBiometric -> hasAnySensors', hasAnySensors);
+    if (hasAnySensors) {
+      await SInfo.setItem(LOGIN_TOKEN_HINT, loginHintToken, {
+        ...sensitiveInfoOptions,
+        touchID: true, // will store and protect your data by requiring to unlock using fingerprint or FaceID
+        showModal: true,
+        kSecAccessControl: 'kSecAccessControlBiometryAny',
+      });
+    }
+  };
+
+  validatePin = async (pinNumber: string) => {
+    // get pin token (encrypted)
+    try {
+      const dataEncrypted = await SInfo.getItem(PIN_TOKEN, sensitiveInfoOptions);
+      console.log('validatePin -> dataEncrypted', dataEncrypted);
+      // generate salt
+      const salt = await this.getSalt();
+      // generate key (with user pin inputted number )
+      const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost = 10000
+      // decrypted loginhint token (with user pin inputted number)
+      const loginHintToken = await AESCryptoStore.decryptData(JSON.parse(dataEncrypted), key);
+      console.log('validatePin -> loginHintToken', loginHintToken);
+      // authorize loginhint token => calling api authorize token => return true/false
+      return await AuthServices.instance().adbAuthorizeToken(loginHintToken);
+    } catch (error) {
+      return false;
+    }
+  };
+
+  validateBiometric = async () => {
+    console.log('validateBiometric -> init');
+    const loginHintToken = await SInfo.getItem(LOGIN_TOKEN_HINT, {
+      ...sensitiveInfoOptions,
+      touchID: true,
+      showModal: true, //required (Android) - Will prompt user's fingerprint on Android
+      // required (iOS) -  A fallback string for iOS
+      kSecUseOperationPrompt: 'We need your permission to retrieve encrypted data',
+    });
+
+    console.log('validateBiometric -> loginHintToken', loginHintToken);
+
+    // authorize loginhint token => calling api authorize token => return true/false
+    return await AuthServices.instance().adbAuthorizeToken(loginHintToken);
   };
 }
 
