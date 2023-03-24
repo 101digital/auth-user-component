@@ -221,9 +221,7 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsSigning(true);
       const data = await AuthServices.instance().adbLogin(username, password);
-      console.log('adbLogin -> response', data);
       if (data && data.id) {
-        console.log('set flow ID');
         setFlowId(data.id);
         setUsername(username);
         setPassword(undefined);
@@ -254,7 +252,6 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const adbLoginWithoutOTP = useCallback(async (username: string, password: string) => {
     try {
-      console.log('adbLoginWithoutOTP -> username', username, password);
       setIsSigning(true);
       const resLogin = await AuthServices.instance().adbLogin(
         username,
@@ -263,7 +260,6 @@ export const useAuthContextValue = (): AuthContextData => {
         'openid profile profilepsf'
       );
       const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
-      console.log('adbLoginWithoutOTP -> resAfterValidate', resAfterValidate);
       await AuthServices.instance().obtainTokenSingleFactor(
         resAfterValidate.authorizeResponse.code
       );
@@ -276,7 +272,6 @@ export const useAuthContextValue = (): AuthContextData => {
       setisManualLogin(true);
       return resLogin._embedded.user.id;
     } catch (error) {
-      console.log('adbLoginWithoutOTP -> error', error);
       setErrorSignIn(error as Error);
       throw error;
     } finally {
@@ -310,13 +305,9 @@ export const useAuthContextValue = (): AuthContextData => {
   const adbResendOTP = useCallback(async () => {
     try {
       setIsSigning(true);
-      console.log('adbResendOTP -> _username', _username);
-      console.log('adbResendOTP -> _password', _password);
       if (_username && _username.length > 0 && _password && _password.length > 0) {
         const data = await AuthServices.instance().adbLogin(_username, _password);
-        console.log('adbLogin -> data', data);
         if (data && data.id) {
-          console.log('set flow ID');
           setFlowId(data.id);
         }
       }
@@ -328,28 +319,19 @@ export const useAuthContextValue = (): AuthContextData => {
     return true;
   }, [_username, _password]);
 
-  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
   const adbLoginVerifyOtp = useCallback(
     async (otp: string) => {
       try {
         setIsVerifyLogin(true);
-        console.log('adbLoginVerifyOtp => flowId', _flowId, otp);
         if (_flowId && _flowId.length > 0) {
           const loginData = await AuthServices.instance().adbVerifyLogin(otp, _flowId);
-          console.log('adbLoginVerifyOtp -> response', loginData);
           const afterValidateData = await AuthServices.instance().afterValidateOtp(
             loginData.resumeUrl
           );
-          console.log('afterValidateData', afterValidateData);
-          const obtainTokenData = await AuthServices.instance().obtainToken(
-            afterValidateData.authorizeResponse.code
-          );
-          console.log('getObtainToken -> obtainTokenData', obtainTokenData);
+          await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeProfile(data);
           setProfile({ ...data });
-          console.log('adbLoginVerifyOtp -> data', data);
           setisManualLogin(true);
           setIsSignedIn(true);
           setIsVerifyLogin(false);
@@ -410,22 +392,6 @@ export const useAuthContextValue = (): AuthContextData => {
     },
     []
   );
-
-  const loginSubSequence = useCallback(async () => {
-    try {
-      setIsUpdatingProfile(true);
-      const { data } = await AuthServices.instance().fetchProfile();
-      setProfile(data);
-      getProfilePicture(data);
-      await authComponentStore.storeProfile(data);
-      setIsUpdatingProfile(false);
-      return true;
-    } catch (error) {
-      setIsUpdatingProfile(false);
-      setErrorUpdateProfile(error as Error);
-      return false;
-    }
-  }, []);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -574,7 +540,6 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const updateUserInfo = useCallback(
     async (userId: string, fullName: string, nickName: string, id: string) => {
-      console.log('updateUserInfo -> requset', userId, fullName, nickName, id);
       try {
         setIsUpdatingProfile(true);
         const response = await AuthServices.instance().updateUserInfo(
@@ -583,7 +548,6 @@ export const useAuthContextValue = (): AuthContextData => {
           nickName,
           id
         );
-        console.log('updateUserInfo -> response', response);
         const { data } = response;
         setProfile(data);
         await authComponentStore.storeProfile(data);
