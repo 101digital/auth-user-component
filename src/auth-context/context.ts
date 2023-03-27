@@ -1,4 +1,4 @@
-import { Profile, ProfileCustomField, CountryInformation, Recovery } from '../types';
+import { Profile, ProfileCustomField, CountryInformation, Recovery, VerificationMethod } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
@@ -79,8 +79,8 @@ export interface AuthContextData {
   isManualLogin: boolean;
   isValidatedSubsequenceLogin: boolean;
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
-  verificationMethodKey: number;
-  setVerificationMethodKey: (key: number) => void;
+  verificationMethodKey: VerificationMethod;
+  setVerificationMethodKey: (method: VerificationMethod) => void;
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => void;
 }
@@ -128,7 +128,7 @@ export const authDefaultValue: AuthContextData = {
   isManualLogin: false,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
-  verificationMethodKey: 1,
+  verificationMethodKey: VerificationMethod.BIO,
   setVerificationMethodKey: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: () => false,
@@ -169,7 +169,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_password, setPassword] = useState<string>();
   const [_isManualLogin, setisManualLogin] = useState<boolean>(false);
   const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
-  const [_verificationMethodKey, setVerificationMethodKey] = useState<number>(1);
+  const [_verificationMethodKey, setVerificationMethodKey] = useState<VerificationMethod>(VerificationMethod.BIO);
 
   useEffect(() => {
     checkLogin();

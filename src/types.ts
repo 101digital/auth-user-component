@@ -86,3 +86,9 @@ export type AuthComponentConfig = {
   identityBaseUrl?: string;
   identityPingUrl?: string;
 };
+
+export enum VerificationMethod {
+  BIO = 'BIOMETRIC',
+  PIN = 'PIN',
+  PASSWORD = 'PASSWORD',
+}
