@@ -96,8 +96,6 @@ export class AuthServices {
   };
 
   public obtainToken = async (authorizeCode: string) => {
-    const { identityPingUrl } = this._configs || {};
-
     const body = qs.stringify({
       grant_type: 'authorization_code',
       code: authorizeCode,
@@ -117,11 +115,6 @@ export class AuthServices {
       });
 
     await authComponentStore.storeAccessToken(response.data.access_token);
-
-    console.log({
-      access_token: response.data.access_token,
-      refresh_token: '',
-    });
 
     return {
       access_token: response.data.access_token,
