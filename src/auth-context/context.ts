@@ -263,7 +263,6 @@ export const useAuthContextValue = (): AuthContextData => {
         return resLogin;
       } else {
         const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
-        console.log('adbLoginWithoutOTP -> resAfterValidate', resAfterValidate);
         await AuthServices.instance().obtainTokenSingleFactor(
           resAfterValidate.authorizeResponse.code
         );
