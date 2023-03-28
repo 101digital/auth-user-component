@@ -87,7 +87,7 @@ class AuthComponentStore {
     const loginHintToken = await AuthServices.instance().getLoginHintToken();
     const salt = await this.getSalt();
     const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost 10000
-    const encryptedData = await AESCryptoStore.encryptData(loginHintToken, key);
+    const encryptedData = await AESCryptoStore.encryptData(loginHintToken.token, key);
 
     await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
   };
@@ -97,7 +97,7 @@ class AuthComponentStore {
 
     const hasAnySensors = await SInfo.isSensorAvailable();
     if (hasAnySensors) {
-      await SInfo.setItem(LOGIN_TOKEN_HINT, loginHintToken, {
+      await SInfo.setItem(LOGIN_TOKEN_HINT, loginHintToken.token, {
         ...sensitiveInfoOptions,
         touchID: true, // will store and protect your data by requiring to unlock using fingerprint or FaceID
         showModal: true,

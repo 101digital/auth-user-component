@@ -132,7 +132,7 @@ export class AuthServices {
       },
     });
 
-    return responseTokenHint.data.data[0].token;
+    return responseTokenHint.data.data[0];
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string) => {
@@ -220,7 +220,7 @@ export class AuthServices {
       scope: 'openid profile profilep',
       code_challenge: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
       response_mode: 'pi.flow',
-      login_hint_token: loginHintToken,
+      login_hint_token: loginHintToken.token,
     });
     const responseAuthorize = await AuthApiClient.instance()
       .getAuthApiClient()
