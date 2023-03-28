@@ -66,9 +66,6 @@ class AuthComponentStore {
     await AsyncStorage.removeItem(PROFILE_KEY);
     await AsyncStorage.removeItem(LOGIN_TOKEN_HINT);
     await SInfo.setItem('key', '', sensitiveInfoOptions);
-    await SInfo.setItem(PIN_TOKEN, '', sensitiveInfoOptions);
-    await SInfo.setItem(BIO_TOKEN, '', sensitiveInfoOptions);
-    await SInfo.setItem(LOGIN_TOKEN_HINT, '', sensitiveInfoOptions);
   };
 
   getSalt = async () => {
@@ -119,6 +116,7 @@ class AuthComponentStore {
       // authorize loginhint token => calling api authorize token => return true/false
       return await AuthServices.instance().adbAuthorizeToken(loginHintToken);
     } catch (error) {
+      console.log('error', error);
       return false;
     }
   };
