@@ -68,7 +68,6 @@ export interface Currency {
 
 export type AuthComponentConfig = {
   clientId: string;
-  clientSecret: string;
   ternantDomain: string;
   authBaseUrl: string;
   membershipBaseUrl: string;
