@@ -83,6 +83,7 @@ export interface AuthContextData {
   setVerificationMethodKey: (key: number) => void;
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => void;
+  adbGetLoginHintToken: () => Promise<undefined>;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -132,6 +133,7 @@ export const authDefaultValue: AuthContextData = {
   setVerificationMethodKey: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: () => false,
+  adbGetLoginHintToken: async () => undefined,
 };
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
@@ -271,6 +273,18 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsSignedIn(true);
       setisManualLogin(true);
       return resLogin._embedded.user.id;
+    } catch (error) {
+      setErrorSignIn(error as Error);
+      throw error;
+    } finally {
+      setIsSigning(false);
+    }
+  }, []);
+
+  const adbGetLoginHintToken = useCallback(async () => {
+    try {
+      const loginHintToken = await AuthServices.instance().getLoginHintToken();
+      return loginHintToken;
     } catch (error) {
       setErrorSignIn(error as Error);
       throw error;
@@ -617,6 +631,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setVerificationMethodKey,
       verifyPassword,
       adbGetAccessToken,
+      adbGetLoginHintToken,
     }),
     [
       _profile,
