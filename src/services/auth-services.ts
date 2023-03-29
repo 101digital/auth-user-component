@@ -138,6 +138,19 @@ export class AuthServices {
     return responseTokenHint.data.data[0].token;
   };
 
+  public getPairingCode = async () => {
+    const { identityPingUrl } = this._configs || {};
+
+    const access_token = await authComponentStore.getAccessToken();
+    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
+      headers: {
+        Authorization: `${access_token}`,
+      },
+    });
+
+    return responseTokenHint.data.data[0].pairingCode;
+  };
+
   public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
     const { redirectUrl, clientId, authBaseUrl } = this._configs || {};
     const body = qs.stringify({

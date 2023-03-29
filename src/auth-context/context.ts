@@ -1,4 +1,10 @@
-import { Profile, ProfileCustomField, CountryInformation, Recovery, VerificationMethod } from '../types';
+import {
+  Profile,
+  ProfileCustomField,
+  CountryInformation,
+  Recovery,
+  VerificationMethod,
+} from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
@@ -83,6 +89,7 @@ export interface AuthContextData {
   setVerificationMethodKey: (method: VerificationMethod) => void;
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => void;
+  adbGetPairingCode: () => Promise<string>;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -132,6 +139,7 @@ export const authDefaultValue: AuthContextData = {
   setVerificationMethodKey: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: () => false,
+  adbGetPairingCode: async () => '',
 };
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
@@ -169,7 +177,9 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_password, setPassword] = useState<string>();
   const [_isManualLogin, setisManualLogin] = useState<boolean>(false);
   const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
-  const [_verificationMethodKey, setVerificationMethodKey] = useState<VerificationMethod>(VerificationMethod.BIO);
+  const [_verificationMethodKey, setVerificationMethodKey] = useState<VerificationMethod>(
+    VerificationMethod.BIO
+  );
 
   useEffect(() => {
     checkLogin();
@@ -565,6 +575,13 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
+  const adbGetPairingCode = useCallback(async () => {
+    try {
+      const response = await AuthServices.instance().getPairingCode();
+      return response;
+    } catch (error) {}
+  }, []);
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -620,6 +637,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setVerificationMethodKey,
       verifyPassword,
       adbGetAccessToken,
+      adbGetPairingCode,
     }),
     [
       _profile,
