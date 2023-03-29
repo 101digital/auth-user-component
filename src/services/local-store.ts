@@ -14,7 +14,6 @@ const IS_ENABLE_BIOMETRIC = 'authcomponent.enableBio';
 const PROFILE_KEY = 'authcomponent.profile';
 const LOGIN_TOKEN_HINT = 'authcomponent.loginTokenHint';
 const PIN_TOKEN = 'authcomponent.pinToken';
-const BIO_TOKEN = 'authcomponent.bioToken';
 
 const keySize = 256;
 const cost = 10000;
@@ -65,7 +64,6 @@ class AuthComponentStore {
     await AsyncStorage.removeItem(ORG_TOKEN_KEY);
     await AsyncStorage.removeItem(PROFILE_KEY);
     await AsyncStorage.removeItem(LOGIN_TOKEN_HINT);
-    await SInfo.setItem('key', '', sensitiveInfoOptions);
   };
 
   getSalt = async () => {
@@ -74,9 +72,10 @@ class AuthComponentStore {
       return base64.decode(salt);
     } else {
       const random = await generateSecureRandom(saltLength);
-      SInfo.setItem('key', base64.encodeFromByteArray(random), sensitiveInfoOptions);
+      const encoded = base64.encodeFromByteArray(random);
+      SInfo.setItem('key', encoded, sensitiveInfoOptions);
 
-      return Buffer.from(random.buffer).toString();
+      return base64.decode(encoded);
     }
   };
 
