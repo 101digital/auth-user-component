@@ -84,6 +84,8 @@ export type AuthComponentConfig = {
   appPublicSecret?: string;
   identityBaseUrl?: string;
   identityPingUrl?: string;
+  responseType?: string;
+  responseMode?: string;
 };
 
 export enum VerificationMethod {

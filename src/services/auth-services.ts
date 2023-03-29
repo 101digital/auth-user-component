@@ -33,18 +33,18 @@ export class AuthServices {
     clientIdInit?: string,
     scope?: string
   ) => {
-    const { clientId } = this._configs || {};
+    const { clientId, redirectUrl, responseType, responseMode } = this._configs || {};
     const responseAuth = await AuthApiClient.instance()
       .getAuthApiClient()
       .get('as/authorize', {
         params: {
-          response_type: 'code',
+          response_type: responseType,
           client_id: clientIdInit ? clientIdInit : clientId,
           scope: scope ? scope : 'openid profile profilep',
           code_challenge:
             'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
-          redirect_uri: 'https://example.com',
-          response_mode: 'pi.flow',
+          redirect_uri: redirectUrl,
+          response_mode: responseMode,
         },
         headers: {
           Cookie:
@@ -96,10 +96,11 @@ export class AuthServices {
   };
 
   public obtainToken = async (authorizeCode: string) => {
+    const { redirectUrl } = this._configs || {};
     const body = qs.stringify({
       grant_type: 'authorization_code',
       code: authorizeCode,
-      redirect_uri: 'https://example.com',
+      redirect_uri: redirectUrl,
       scope: 'openid  profilep',
       code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
     });
@@ -136,10 +137,11 @@ export class AuthServices {
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string) => {
+    const { redirectUrl } = this._configs || {};
     const body = qs.stringify({
       grant_type: 'authorization_code',
       code: authorizeCode,
-      redirect_uri: 'https://example.com',
+      redirect_uri: redirectUrl,
       scope: 'openid  profilep',
       code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
     });
@@ -191,11 +193,12 @@ export class AuthServices {
   };
 
   public adbAuthorizeToken = async (token: string) => {
+    const { redirectUrl } = this._configs!;
     try {
       const body = qs.stringify({
         response_type: 'code',
         client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-        redirect_uri: 'https://example.com',
+        redirect_uri: redirectUrl,
         scope: 'openid profile profilep',
         code_challenge:
           'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
@@ -213,10 +216,11 @@ export class AuthServices {
 
   public adbRefreshToken = async () => {
     const loginHintToken = await this.getLoginHintToken();
+    const { redirectUrl } = this._configs!;
     const body = qs.stringify({
       response_type: 'code',
       client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-      redirect_uri: 'https://example.com',
+      redirect_uri: redirectUrl,
       scope: 'openid profile profilep',
       code_challenge: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
       response_mode: 'pi.flow',
