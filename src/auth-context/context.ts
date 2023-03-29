@@ -241,11 +241,12 @@ export const useAuthContextValue = (): AuthContextData => {
         username,
         password,
         '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
-        'openid profile profilepsf'
+        'profilepsf'
       );
       const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
-        resAfterValidate.authorizeResponse.code
+        resAfterValidate.authorizeResponse.code,
+        'profilepsf'
       );
     } catch (error) {}
   }, []);
@@ -257,11 +258,13 @@ export const useAuthContextValue = (): AuthContextData => {
         username,
         password,
         '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
-        'openid profile profilepsf'
+        'profilepsf',
+        'Single_Factor'
       );
       const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
-        resAfterValidate.authorizeResponse.code
+        resAfterValidate.authorizeResponse.code,
+        'profilepsf'
       );
       const { data } = await AuthServices.instance().fetchProfile();
       await authComponentStore.storeProfile(data);
@@ -287,7 +290,7 @@ export const useAuthContextValue = (): AuthContextData => {
           _username,
           password,
           '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-          'openid profile profilepsf'
+          'profilepsf'
         );
         if (resLogin.resumeUrl) {
           return true;

@@ -31,7 +31,8 @@ export class AuthServices {
     username: string,
     password: string,
     clientIdInit?: string,
-    scope?: string
+    scope?: string,
+    acr_values = 'Multi_Factor',
   ) => {
     const { clientId, redirectUrl, responseType, responseMode } = this._configs || {};
     const responseAuth = await AuthApiClient.instance()
@@ -40,11 +41,12 @@ export class AuthServices {
         params: {
           response_type: responseType,
           client_id: clientIdInit ? clientIdInit : clientId,
-          scope: scope ? scope : 'openid profile profilep',
+          scope: scope ? scope : 'openid profilep',
           code_challenge:
             'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
           redirect_uri: redirectUrl,
           response_mode: responseMode,
+          acr_values: 'Single_Factor'
         },
         headers: {
           Cookie:
@@ -136,25 +138,18 @@ export class AuthServices {
     return responseTokenHint.data.data[0].token;
   };
 
-  public obtainTokenSingleFactor = async (authorizeCode: string) => {
-    const { redirectUrl } = this._configs || {};
+  public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
+    const { redirectUrl, clientId, authBaseUrl } = this._configs || {};
     const body = qs.stringify({
       grant_type: 'authorization_code',
       code: authorizeCode,
       redirect_uri: redirectUrl,
-      scope: 'openid  profilep',
+      scope: scope ? scope : 'openid  profilep',
       code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+      client_id: clientId
     });
 
-    const response = await AuthApiClient.instance()
-      .getAuthApiClient()
-      .post('as/token', body, {
-        headers: {
-          Authorization: `Basic ${Base64.encode(
-            `${'0eb2b7cf-1817-48ec-a62d-eae404776cff'}:${'iM5hazmu41rdyiEVpbnSm.6IovUmwMr_wh1nEJBvJ-gDUULGfyAMtjYaL48fve~V'}`
-          )}`,
-        },
-      });
+    const response = await axios.post(`${authBaseUrl}/as/token`, body);
 
     await authComponentStore.storeAccessToken(response.data.access_token);
 
@@ -293,7 +288,6 @@ export class AuthServices {
     }
     const {
       clientId,
-      clientSecret,
       authBaseUrl,
       redirectUrl,
       authScope,
@@ -309,7 +303,6 @@ export class AuthServices {
     }
     const config = {
       clientId,
-      clientSecret,
       redirectUrl: redirectUrl,
       scopes: [authScope ?? 'openid'],
       serviceConfiguration: {
