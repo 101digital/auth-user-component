@@ -12,7 +12,6 @@ import { colors } from '../assets';
 import { fonts } from '../assets/fonts';
 import { AuthContext } from '../auth-context';
 import { Formik } from 'formik';
-// import { ADBButton, InputField, ThemeContext } from 'react-native-theme-component';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from 'react-native-auth-component/src/assets/icons';
 import Button from 'react-native-auth-component/src/adb-login-component/components/button';
@@ -50,7 +49,6 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const { username, password } = values;
     const _username = username;
     const isSuccess = await adbLoginWithoutOTP(_username, password);
-    console.log('handleOnSignIn -> response', isSuccess);
     if (isSuccess) {
       if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
         setErrorModal(true)
