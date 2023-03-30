@@ -68,7 +68,6 @@ export interface Currency {
 
 export type AuthComponentConfig = {
   clientId: string;
-  clientSecret: string;
   ternantDomain: string;
   authBaseUrl: string;
   membershipBaseUrl: string;
@@ -85,4 +84,12 @@ export type AuthComponentConfig = {
   appPublicSecret?: string;
   identityBaseUrl?: string;
   identityPingUrl?: string;
+  responseType?: string;
+  responseMode?: string;
 };
+
+export enum VerificationMethod {
+  BIO = 'BIOMETRIC',
+  PIN = 'PIN',
+  PASSWORD = 'PASSWORD',
+}

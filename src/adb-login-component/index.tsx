@@ -10,14 +10,15 @@ import {
 } from 'react-native';
 import { colors } from '../assets';
 import { fonts } from '../assets/fonts';
-import ImageIcon from '../assets/icons/image.icon';
 import { AuthContext } from '../auth-context';
 import { Formik } from 'formik';
-import { ADBButton, InputField, ThemeContext } from 'react-native-theme-component';
+// import { ADBButton, InputField, ThemeContext } from 'react-native-theme-component';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from 'react-native-auth-component/src/assets/icons';
 import Button from 'react-native-auth-component/src/adb-login-component/components/button';
-
+import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
+import { EyesClosedIcon, EyesIcon } from 'account-origination-component/src/assets/icons';
+import {PASSWORD_LOCKED_OUT} from '../utils/index'
 export class SignInData {
   constructor(readonly username: string, readonly password: string) { }
 
@@ -35,7 +36,14 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { onLoginSuccess, onLoginFailed } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
-  const { adbLoginWithoutOTP, isSigning } = useContext(AuthContext);
+  const { adbLoginWithoutOTP, isSigning, errorSignIn } = useContext(AuthContext);
+  const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
+
+  useEffect(()=>{
+    if(errorSignIn){
+      onLoginFailed()
+    }
+  },[errorSignIn])
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
@@ -44,7 +52,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const isSuccess = await adbLoginWithoutOTP(_username, password);
     console.log('handleOnSignIn -> response', isSuccess);
     if (isSuccess) {
-      if (isSuccess?.error?.code === 'PASSWORD_LOCKED_OUT') {
+      if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
         setErrorModal(true)
       } else {
         onLoginSuccess();
@@ -60,6 +68,10 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     // }
   };
 
+  const onToggleVisiblePassword = () => {
+    setIsVisiblePassword(!isVisiblePassword);
+  };
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -67,48 +79,50 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
         style={styles.container}
       >
         <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
-          {({ submitForm }) => (
+          {({ submitForm, values }) => (
             <>
               <View style={styles.content}>
-                <View style={styles.contentWrapper}>
-                  <View style={styles.imageWrapper}>
-                    <ImageIcon width={50} height={50} color={'white'} />
-                  </View>
-                  <Text style={styles.title}>
-                    {i18n.t('login_component.lbl_sign_in') ?? 'Hi, Welcome!'}
-                  </Text>
-                  <View style={styles.fullWidth}>
-                    <View style={styles.rowInput}>
-                      <InputField
-                        name="username"
-                        returnKeyType="done"
-                        placeholder={'Email'}
-                        autoCapitalize="none"
-                      />
-                    </View>
-                    <View style={styles.rowInput}>
-                      <InputField
-                        name="password"
-                        returnKeyType="done"
-                        secureTextEntry={true}
-                        placeholder={'Password'}
-                        autoCapitalize="none"
-                      />
-                    </View>
-                  </View>
-                  <View style={styles.rowBetween}>
-                    <TouchableOpacity style={styles.flex}>
-                      <Text style={styles.forgotPasswordTitle}>{`${i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                        }?`}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                      <Text style={styles.helpTitle}>{`${i18n.t('login_component.lbl_help') ?? 'Help'
-                        }?`}</Text>
-                    </TouchableOpacity>
-                  </View>
+                <View style={styles.rowInput}>
+                  <ADBInputField
+                    name="username"
+                    returnKeyType="done"
+                    placeholder={'Email'}
+                    autoCapitalize="none"
+                  />
+                </View>
+                <View style={styles.rowInput}>
+                  <ADBInputField
+                    name="password"
+                    returnKeyType="done"
+                    secureTextEntry={!isVisiblePassword}
+                    placeholder={'Password'}
+                    autoCapitalize="none"
+                    suffixIcon={
+                      <TouchableOpacity onPress={onToggleVisiblePassword} style={styles.iconBtn}>
+                        {isVisiblePassword ? <EyesClosedIcon size={25} /> : <EyesIcon size={25} />}
+                      </TouchableOpacity>
+                    }
+                  />
+                </View>
+                <View style={styles.rowBetween}>
+                  <TouchableOpacity style={styles.flex}>
+                    <Text style={styles.forgotPasswordTitle}>{`${
+                      i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
+                    }?`}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity>
+                    <Text style={styles.helpTitle}>{`${
+                      i18n.t('login_component.lbl_help') ?? 'Help'
+                    }?`}</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
-              <ADBButton isLoading={isSigning} label="Login" onPress={submitForm} />
+              <ADBButton
+                isLoading={isSigning}
+                label="Login"
+                onPress={submitForm}
+                disabled={values.password.length === 0 || values.username.length === 0}
+              />
             </>
           )}
         </Formik>
@@ -135,7 +149,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     paddingHorizontal: 12,
-    paddingTop: 24,
+    paddingTop: 7,
   },
   rowInput: {
     marginTop: 15,
@@ -147,7 +161,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 10,
   },
-  fullWidth: { width: '100%' },
   input: {
     borderBottomWidth: 1,
     borderColor: '#C2C2C2',
@@ -159,22 +172,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-  },
-  contentWrapper: {
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    width: '100%',
-  },
-  imageWrapper: {
-    backgroundColor: '#A5A5A5',
-    borderRadius: 90,
-    padding: 35,
-    width: 180,
-    height: 180,
-    alignItems: 'center',
-    justifyContent: 'space-around',
   },
   lowerContainer: {
     flexDirection: 'row',
@@ -217,5 +214,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.primaryBlack,
     fontFamily: fonts.semiBold,
+  },
+  iconBtn: {
+    marginRight: 10,
   },
 });

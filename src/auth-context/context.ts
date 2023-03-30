@@ -1,4 +1,10 @@
-import { Profile, ProfileCustomField, CountryInformation, Recovery } from '../types';
+import {
+  Profile,
+  ProfileCustomField,
+  CountryInformation,
+  Recovery,
+  VerificationMethod,
+} from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
@@ -79,10 +85,11 @@ export interface AuthContextData {
   isManualLogin: boolean;
   isValidatedSubsequenceLogin: boolean;
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
-  verificationMethodKey: number;
-  setVerificationMethodKey: (key: number) => void;
+  verificationMethodKey: VerificationMethod;
+  setVerificationMethodKey: (method: VerificationMethod) => void;
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => void;
+  adbGetPairingCode: () => Promise<string>;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -128,10 +135,11 @@ export const authDefaultValue: AuthContextData = {
   isManualLogin: false,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
-  verificationMethodKey: 1,
+  verificationMethodKey: VerificationMethod.BIO,
   setVerificationMethodKey: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: () => false,
+  adbGetPairingCode: async () => '',
 };
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
@@ -169,7 +177,9 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_password, setPassword] = useState<string>();
   const [_isManualLogin, setisManualLogin] = useState<boolean>(false);
   const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
-  const [_verificationMethodKey, setVerificationMethodKey] = useState<number>(1);
+  const [_verificationMethodKey, setVerificationMethodKey] = useState<VerificationMethod>(
+    VerificationMethod.BIO
+  );
 
   useEffect(() => {
     checkLogin();
@@ -240,12 +250,13 @@ export const useAuthContextValue = (): AuthContextData => {
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
-        '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-        'openid profile profilepsf'
+        '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
+        'profilepsf'
       );
       const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
-        resAfterValidate.authorizeResponse.code
+        resAfterValidate.authorizeResponse.code,
+        'profilepsf'
       );
     } catch (error) {}
   }, []);
@@ -256,8 +267,9 @@ export const useAuthContextValue = (): AuthContextData => {
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
-        '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-        'openid profile profilepsf'
+        '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
+        'profilepsf',
+        'Single_Factor'
       );
       if (resLogin.error) {
         return resLogin;
@@ -291,7 +303,7 @@ export const useAuthContextValue = (): AuthContextData => {
           _username,
           password,
           '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-          'openid profile profilepsf'
+          'profilepsf'
         );
         if (resLogin.resumeUrl) {
           return true;
@@ -566,6 +578,13 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
+  const adbGetPairingCode = useCallback(async () => {
+    try {
+      const response = await AuthServices.instance().getPairingCode();
+      return response;
+    } catch (error) {}
+  }, []);
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -621,6 +640,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setVerificationMethodKey,
       verifyPassword,
       adbGetAccessToken,
+      adbGetPairingCode,
     }),
     [
       _profile,
