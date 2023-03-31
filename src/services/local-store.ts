@@ -96,6 +96,7 @@ class AuthComponentStore {
     const loginHintToken = await AuthServices.instance().getLoginHintToken();
 
     const hasAnySensors = await SInfo.isSensorAvailable();
+
     if (hasAnySensors) {
       await SInfo.setItem(LOGIN_TOKEN_HINT, loginHintToken, {
         ...sensitiveInfoOptions,
@@ -125,6 +126,8 @@ class AuthComponentStore {
   };
 
   validateBiometric = async () => {
+    const hasAnyFingerprintsEnrolled = await SInfo.hasEnrolledFingerprints();
+    console.log('validateBiometric -> hasAnyFingerprintsEnrolled', hasAnyFingerprintsEnrolled);
     const loginHintToken = await SInfo.getItem(LOGIN_TOKEN_HINT, {
       ...sensitiveInfoOptions,
       touchID: true,
@@ -133,6 +136,10 @@ class AuthComponentStore {
       kSecUseOperationPrompt: 'We need your permission to retrieve encrypted data',
     });
 
+    console.log('loginHintToken -> ', loginHintToken);
+    if (!loginHintToken || loginHintToken.length == 0) {
+      return false;
+    }
     return await AuthServices.instance().adbAuthorizeToken(loginHintToken);
   };
 }

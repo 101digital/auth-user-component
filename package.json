@@ -1,6 +1,6 @@
 {
   "name": "auth-user-component",
-  "version": "1.0.92",
+  "version": "1.0.93",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/auth-user-component.git",
   "main": "index.ts",

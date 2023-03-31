@@ -89,6 +89,7 @@ export type AuthComponentConfig = {
 };
 
 export enum VerificationMethod {
+  PENDING = 'PENDING',
   BIO = 'BIOMETRIC',
   PIN = 'PIN',
   PASSWORD = 'PASSWORD',
