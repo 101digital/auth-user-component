@@ -90,6 +90,8 @@ export interface AuthContextData {
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => void;
   adbGetPairingCode: () => Promise<string>;
+  adbAuthorizePushOnly: (loginHintToken: string) => Promise<boolean>;
+  adbGetLoginHintToken: () => Promise<string>;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -578,6 +580,28 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
+  const adbGetLoginHintToken = useCallback(async () => {
+    try {
+      setIsSigning(true);
+      const data = await AuthServices.instance().getLoginHintToken();
+      return data;
+    } catch (error) {
+      setIsSigning(false);
+      setErrorSignIn(error as Error);
+      return '';
+    }
+  }, []);
+
+  const adbAuthorizePushOnly = useCallback(async (loginHintToken: string) => {
+    try {
+      setIsSigning(true);
+      const data = await AuthServices.instance().authorizePushOnly(loginHintToken);
+    } catch (error) {
+      return false;
+    }
+    return true;
+  }, []);
+
   const adbGetPairingCode = useCallback(async () => {
     try {
       const response = await AuthServices.instance().getPairingCode();
@@ -641,6 +665,8 @@ export const useAuthContextValue = (): AuthContextData => {
       verifyPassword,
       adbGetAccessToken,
       adbGetPairingCode,
+      adbAuthorizePushOnly,
+      adbGetLoginHintToken,
     }),
     [
       _profile,

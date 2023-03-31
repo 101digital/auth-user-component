@@ -441,4 +441,32 @@ export class AuthServices {
     });
     return response.data;
   };
+
+  public authorizePushOnly = async (
+    loginHintToken:string,
+    clientIdInit?: string,
+    scope?: string,
+    acr_values = 'Push_Only',
+  ) => {
+    const { clientId, redirectUrl, responseType, responseMode } = this._configs || {};
+    const responseAuth = await AuthApiClient.instance()
+      .getAuthApiClient()
+      .get('as/authorize', {
+        params: {
+          response_type: responseType,
+          client_id: clientIdInit ? clientIdInit : clientId,
+          scope: scope ? scope : 'openid profilep',
+          code_challenge:
+            'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+          redirect_uri: redirectUrl,
+          response_mode: responseMode,
+          acr_values: 'Push_Only'
+        },
+        headers: {
+          Cookie:
+            'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
+        },
+      });
+
+  };
 }
