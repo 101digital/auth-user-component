@@ -271,19 +271,22 @@ export const useAuthContextValue = (): AuthContextData => {
         'profilepsf',
         'Single_Factor'
       );
-      const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
-      await AuthServices.instance().obtainTokenSingleFactor(
-        resAfterValidate.authorizeResponse.code,
-        'profilepsf'
-      );
-      const { data } = await AuthServices.instance().fetchProfile();
-      await authComponentStore.storeProfile(data);
-      await authComponentStore.storeUserName(username);
-      setPassword(undefined);
-      setProfile({ ...data });
-      setIsSignedIn(true);
-      setisManualLogin(true);
-      return resLogin._embedded.user.id;
+      if (resLogin.error) {
+        return resLogin;
+      } else {
+        const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
+        await AuthServices.instance().obtainTokenSingleFactor(
+          resAfterValidate.authorizeResponse.code
+        );
+        const { data } = await AuthServices.instance().fetchProfile();
+        await authComponentStore.storeProfile(data);
+        await authComponentStore.storeUserName(username);
+        setPassword(undefined);
+        setProfile({ ...data });
+        setIsSignedIn(true);
+        setisManualLogin(true);
+        return resLogin._embedded.user.id;
+      }
     } catch (error) {
       setErrorSignIn(error as Error);
       throw error;
