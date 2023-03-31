@@ -14,6 +14,7 @@ const IS_ENABLE_BIOMETRIC = 'authcomponent.enableBio';
 const PROFILE_KEY = 'authcomponent.profile';
 const LOGIN_TOKEN_HINT = 'authcomponent.loginTokenHint';
 const PIN_TOKEN = 'authcomponent.pinToken';
+const QR_INBOUND_IMAGE = 'qr.inboundImage'
 
 const keySize = 256;
 const cost = 10000;
@@ -59,11 +60,14 @@ class AuthComponentStore {
   };
 
   clearAuths = async () => {
-    await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
-    await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
-    await AsyncStorage.removeItem(ORG_TOKEN_KEY);
-    await AsyncStorage.removeItem(PROFILE_KEY);
-    await AsyncStorage.removeItem(LOGIN_TOKEN_HINT);
+    await AsyncStorage.multiRemove([
+      REFRESH_TOKEN_KEY,
+      ACCESS_TOKEN_KEY,
+      ORG_TOKEN_KEY,
+      PROFILE_KEY,
+      LOGIN_TOKEN_HINT,
+      QR_INBOUND_IMAGE,
+    ]);
   };
 
   getSalt = async () => {
