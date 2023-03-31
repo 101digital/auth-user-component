@@ -135,7 +135,7 @@ export const authDefaultValue: AuthContextData = {
   isManualLogin: false,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
-  verificationMethodKey: VerificationMethod.BIO,
+  verificationMethodKey: VerificationMethod.PENDING,
   setVerificationMethodKey: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: () => false,
@@ -178,7 +178,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isManualLogin, setisManualLogin] = useState<boolean>(false);
   const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
   const [_verificationMethodKey, setVerificationMethodKey] = useState<VerificationMethod>(
-    VerificationMethod.BIO
+    VerificationMethod.PENDING
   );
 
   useEffect(() => {
