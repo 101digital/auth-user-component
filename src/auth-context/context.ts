@@ -90,8 +90,8 @@ export interface AuthContextData {
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => void;
   adbGetPairingCode: () => Promise<string>;
-  adbAuthorizePushOnly:(loginHintToken: string) =>Promise<boolean>;
-  adbGetLoginHintToken:() => Promise<string>;
+  adbAuthorizePushOnly: (loginHintToken: string) =>Promise<boolean>;
+  adbGetLoginHintToken: () => Promise<string>;
 }
 
 export const authDefaultValue: AuthContextData = {
