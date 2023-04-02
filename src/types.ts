@@ -6,6 +6,8 @@ export interface Profile {
   mobileNumber: string;
   status: string;
   lastLoginAt: string;
+  fullName: string;
+  nickName: string;
   listCustomFields: ProfileCustomField[];
   memberships: MemberShip[];
   createdAt: string;
