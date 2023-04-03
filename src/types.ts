@@ -96,3 +96,10 @@ export enum VerificationMethod {
   PIN = 'PIN',
   PASSWORD = 'PASSWORD',
 }
+
+export enum BiometricMethod {
+  DISABLED = 'DISABLED',
+  FACEID = 'FACEID',
+  TOUCHID = 'TOUCHID',
+  BIOMETRICS = 'BIOMETRICS',
+}

@@ -429,6 +429,8 @@ export class AuthServices {
     const body = {
       fullName: fullName,
       nickName: nickname,
+      firstName: 'firstName',
+      lastName: 'lastName',
       kycDetails: {
         altIdNumber: id,
       },
