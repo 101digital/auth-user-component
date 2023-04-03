@@ -416,7 +416,7 @@ export class AuthServices {
     };
     const response = await axios.post(`${notificationBaseUrl}/devices`, body, {
       headers: {
-        Authorization: `${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
     });
