@@ -32,7 +32,7 @@ export class AuthServices {
     password: string,
     clientIdInit?: string,
     scope?: string,
-    acr_values = 'Multi_Factor',
+    acr_values = 'Multi_Factor'
   ) => {
     const { clientId, redirectUrl, responseType, responseMode } = this._configs || {};
     const responseAuth = await AuthApiClient.instance()
@@ -46,7 +46,7 @@ export class AuthServices {
             'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
           redirect_uri: redirectUrl,
           response_mode: responseMode,
-          acr_values: 'Single_Factor'
+          acr_values: 'Single_Factor',
         },
         headers: {
           Cookie:
@@ -159,7 +159,7 @@ export class AuthServices {
       redirect_uri: redirectUrl,
       scope: scope ? scope : 'openid  profilep',
       code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
-      client_id: clientId
+      client_id: clientId,
     });
 
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
@@ -406,7 +406,7 @@ export class AuthServices {
     entityId: string
   ) => {
     const { notificationBaseUrl } = this._configs!;
-    const publicAppToken = await this.fetchAppAccessToken();
+    const accessToken = await authComponentStore.getAccessToken();
     const body = {
       entityId,
       appId,
@@ -416,7 +416,7 @@ export class AuthServices {
     };
     const response = await axios.post(`${notificationBaseUrl}/devices`, body, {
       headers: {
-        Authorization: `${publicAppToken}`,
+        Authorization: `${accessToken}`,
         'Content-Type': 'application/json',
       },
     });
@@ -443,10 +443,10 @@ export class AuthServices {
   };
 
   public authorizePushOnly = async (
-    loginHintToken:string,
+    loginHintToken: string,
     clientIdInit?: string,
     scope?: string,
-    acr_values = 'Push_Only',
+    acr_values = 'Push_Only'
   ) => {
     const { clientId, redirectUrl, responseType, responseMode } = this._configs || {};
     const responseAuth = await AuthApiClient.instance()
@@ -460,13 +460,12 @@ export class AuthServices {
             'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
           redirect_uri: redirectUrl,
           response_mode: responseMode,
-          acr_values: 'Push_Only'
+          acr_values: 'Push_Only',
         },
         headers: {
           Cookie:
             'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
         },
       });
-
   };
 }
