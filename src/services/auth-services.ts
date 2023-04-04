@@ -406,7 +406,7 @@ export class AuthServices {
     entityId: string
   ) => {
     const { notificationBaseUrl } = this._configs!;
-    const publicAppToken = await this.fetchAppAccessToken();
+    const accessToken = await authComponentStore.getAccessToken();
     const body = {
       entityId,
       appId,
@@ -416,7 +416,7 @@ export class AuthServices {
     };
     const response = await axios.post(`${notificationBaseUrl}/devices`, body, {
       headers: {
-        Authorization: `${publicAppToken}`,
+        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
     });
