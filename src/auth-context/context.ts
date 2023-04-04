@@ -594,12 +594,11 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const adbAuthorizePushOnly = useCallback(async (loginHintToken: string) => {
     try {
-      setIsSigning(true);
-      const data = await AuthServices.instance().authorizePushOnly(loginHintToken);
+      await AuthServices.instance().authorizePushOnly(loginHintToken);
+      return true;
     } catch (error) {
       return false;
     }
-    return true;
   }, []);
 
   const adbGetPairingCode = useCallback(async () => {

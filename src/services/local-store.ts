@@ -117,7 +117,7 @@ class AuthComponentStore {
       const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost = 10000
       const loginHintToken = await AESCryptoStore.decryptData(JSON.parse(dataEncrypted), key);
 
-      return await AuthServices.instance().adbAuthorizeToken(loginHintToken);
+      return await AuthServices.instance().authorizePushOnly(loginHintToken);
     } catch (error) {
       console.log('error', error);
       return false;
@@ -132,7 +132,7 @@ class AuthComponentStore {
       const key = await AESCryptoStore.generateKey(bioPublicKey, salt, cost, keySize); //cost = 10000
       const loginHintToken = await AESCryptoStore.decryptData(JSON.parse(dataEncrypted), key);
 
-      return await AuthServices.instance().adbAuthorizeToken(loginHintToken);
+      return await AuthServices.instance().authorizePushOnly(loginHintToken);
     } catch (error) {
       console.log('error', error);
       return false;
