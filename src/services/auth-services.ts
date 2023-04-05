@@ -92,7 +92,7 @@ export class AuthServices {
     return response.data;
   };
 
-  public afterValidateOtp = async (url: string) => {
+  public resumeUrl = async (url: string) => {
     const response = await axios.get(url);
     return response.data;
   };
@@ -163,7 +163,7 @@ export class AuthServices {
     });
 
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
-
+    const access_token = response.data.access_token;
     await authComponentStore.storeAccessToken(response.data.access_token);
 
     return {
@@ -472,7 +472,7 @@ export class AuthServices {
         });
       console.log('responseAuth -> response', responseAuth);
       if (responseAuth) {
-        return true;
+        return responseAuth.data;
       }
     } catch (error) {
       console.log('error', error);

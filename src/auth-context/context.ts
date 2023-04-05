@@ -92,6 +92,8 @@ export interface AuthContextData {
   adbGetPairingCode: () => Promise<string>;
   adbAuthorizePushOnly: (loginHintToken: string) => Promise<boolean>;
   adbGetLoginHintToken: () => Promise<string>;
+  obtainNewAccessToken: () => Promise<boolean>;
+  saveResumeURL: (url: string) => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -142,6 +144,10 @@ export const authDefaultValue: AuthContextData = {
   verifyPassword: async () => false,
   adbGetAccessToken: () => false,
   adbGetPairingCode: async () => '',
+  adbAuthorizePushOnly: async () => false,
+  adbGetLoginHintToken: async () => '',
+  obtainNewAccessToken: async () => false,
+  saveResumeURL: () => false,
 };
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
@@ -182,6 +188,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_verificationMethodKey, setVerificationMethodKey] = useState<VerificationMethod>(
     VerificationMethod.PENDING
   );
+  const [_resumeURL, saveResumeURL] = useState<string>();
 
   useEffect(() => {
     checkLogin();
@@ -255,7 +262,7 @@ export const useAuthContextValue = (): AuthContextData => {
         '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
         'profilepsf'
       );
-      const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
+      const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
         resAfterValidate.authorizeResponse.code,
         'profilepsf'
@@ -276,7 +283,7 @@ export const useAuthContextValue = (): AuthContextData => {
       if (resLogin.error) {
         return resLogin;
       } else {
-        const resAfterValidate = await AuthServices.instance().afterValidateOtp(resLogin.resumeUrl);
+        const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
         await AuthServices.instance().obtainTokenSingleFactor(
           resAfterValidate.authorizeResponse.code
         );
@@ -343,9 +350,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setIsVerifyLogin(true);
         if (_flowId && _flowId.length > 0) {
           const loginData = await AuthServices.instance().adbVerifyLogin(otp, _flowId);
-          const afterValidateData = await AuthServices.instance().afterValidateOtp(
-            loginData.resumeUrl
-          );
+          const afterValidateData = await AuthServices.instance().resumeUrl(loginData.resumeUrl);
           await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeProfile(data);
@@ -594,12 +599,32 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const adbAuthorizePushOnly = useCallback(async (loginHintToken: string) => {
     try {
-      await AuthServices.instance().authorizePushOnly(loginHintToken);
+      const data = await AuthServices.instance().resumeUrl(loginHintToken);
+      if (data) {
+        saveResumeURL(data.resumeUrl);
+      }
       return true;
     } catch (error) {
       return false;
     }
   }, []);
+
+  const obtainNewAccessToken = useCallback(async () => {
+    try {
+      if (_resumeURL) {
+        const authResponse = await AuthServices.instance().resumeUrl(_resumeURL);
+        if (authResponse && authResponse.authorizeResponse?.code) {
+          await AuthServices.instance().obtainTokenSingleFactor(
+            authResponse.authorizeResponse.code
+          );
+        }
+        return true;
+      }
+      return false;
+    } catch (error) {
+      return false;
+    }
+  }, [_resumeURL]);
 
   const adbGetPairingCode = useCallback(async () => {
     try {
@@ -666,6 +691,8 @@ export const useAuthContextValue = (): AuthContextData => {
       adbGetPairingCode,
       adbAuthorizePushOnly,
       adbGetLoginHintToken,
+      obtainNewAccessToken,
+      saveResumeURL,
     }),
     [
       _profile,
@@ -698,6 +725,7 @@ export const useAuthContextValue = (): AuthContextData => {
       _isManualLogin,
       _isValidatedSubsequenceLogin,
       _verificationMethodKey,
+      _resumeURL,
     ]
   );
 };

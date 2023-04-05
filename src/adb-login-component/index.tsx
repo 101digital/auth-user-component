@@ -17,9 +17,10 @@ import { AlertCircleIcon } from 'react-native-auth-component/src/assets/icons';
 import Button from 'react-native-auth-component/src/adb-login-component/components/button';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { EyesClosedIcon, EyesIcon } from 'account-origination-component/src/assets/icons';
-import {PASSWORD_LOCKED_OUT} from '../utils/index'
+import { PASSWORD_LOCKED_OUT } from '../utils/index';
+import { AccountOriginationContext } from 'account-origination-component';
 export class SignInData {
-  constructor(readonly username: string, readonly password: string) { }
+  constructor(readonly username: string, readonly password: string) {}
 
   static empty(): SignInData {
     return new SignInData('', '');
@@ -36,27 +37,31 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const { adbLoginWithoutOTP, isSigning, errorSignIn } = useContext(AuthContext);
+  const { checkInternetConnection } = useContext(AccountOriginationContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
 
-  useEffect(()=>{
-    if(errorSignIn){
-      onLoginFailed()
+  useEffect(() => {
+    if (errorSignIn) {
+      onLoginFailed();
     }
-  },[errorSignIn])
+  }, [errorSignIn]);
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
-    const { username, password } = values;
-    const _username = username;
-    const isSuccess = await adbLoginWithoutOTP(_username, password);
-    if (isSuccess) {
-      if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
-        setErrorModal(true)
+    const isConnected = await checkInternetConnection();
+    if (isConnected) {
+      const { username, password } = values;
+      const _username = username;
+      const isSuccess = await adbLoginWithoutOTP(_username, password);
+      if (isSuccess) {
+        if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
+          setErrorModal(true);
+        } else {
+          onLoginSuccess();
+        }
       } else {
-        onLoginSuccess();
+        onLoginFailed();
       }
-    } else {
-      onLoginFailed();
     }
     // const profile = await login(_username, password, _country);
     // if (profile) {
@@ -129,11 +134,22 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
         <View style={styles.cameraDisableContainer}>
           <AlertCircleIcon size={72} />
           <View style={styles.gap40} />
-          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>{i18n.t('login_component.lbl_account_locked') ?? `Oops! Your account is temporarily locked`}</Text>
+          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>
+            {i18n.t('login_component.lbl_account_locked') ??
+              `Oops! Your account is temporarily locked`}
+          </Text>
           <View style={styles.gap8} />
-          <Text style={[styles.subTitle, { textAlign: 'center' }]}>{i18n.t('login_component.lbl_entered_wrong_password') ?? `You’ve entered the wrong password 3 times. Please try again after 1 hour.`}</Text>
+          <Text style={[styles.subTitle, { textAlign: 'center' }]}>
+            {i18n.t('login_component.lbl_entered_wrong_password') ??
+              `You’ve entered the wrong password 3 times. Please try again after 1 hour.`}
+          </Text>
           <View style={{ height: 32 }} />
-          <Button label={i18n.t('login_component.btn_done') ?? 'Done'} onPress={() => { setErrorModal(false) }} />
+          <Button
+            label={i18n.t('login_component.btn_done') ?? 'Done'}
+            onPress={() => {
+              setErrorModal(false);
+            }}
+          />
         </View>
       </BottomSheetModal>
     </View>
@@ -191,16 +207,16 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     paddingVertical: 24,
-    paddingHorizontal: 24
+    paddingHorizontal: 24,
   },
   gap16: {
-    height: 16
+    height: 16,
   },
   gap40: {
-    height: 40
+    height: 40,
   },
   gap8: {
-    height: 8
+    height: 8,
   },
   subTitle: {
     fontSize: 14,
