@@ -423,18 +423,33 @@ export class AuthServices {
     return response.data;
   };
 
-  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string) => {
+  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string, idType: string) => {
     const { membershipBaseUrl } = this._configs!;
     const accessToken = await authComponentStore.getAccessToken();
-    const body = {
-      fullName: fullName,
-      nickName: nickname,
-      firstName: 'firstName',
-      lastName: 'lastName',
-      kycDetails: {
-        altIdNumber: id,
-      },
-    };
+    let body = {}
+
+    if(idType === 'Passport'){
+      body = {
+        fullName: fullName,
+        nickName: nickname,
+        firstName: 'firstName',
+        lastName: 'lastName',
+        kycDetails: {
+          altIdNumber: id,
+          altIdType: idType,
+        },
+      };
+    }else{
+      body = {
+        fullName: fullName,
+        nickName: nickname,
+        firstName: 'firstName',
+        lastName: 'lastName',
+        kycDetails: {
+          altIdNumber: id,
+        },
+      };
+    }
 
     const response = await axios.patch(`${membershipBaseUrl}/users/${userId}`, body, {
       headers: {
