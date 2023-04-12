@@ -6,6 +6,7 @@ import { AuthApiClient } from '../api-client/auth-api-client';
 import { AuthComponentConfig } from '../types';
 import { authorize } from 'react-native-app-auth';
 import { Base64 } from 'js-base64';
+import { PASSPORT } from 'react-native-auth-component/src/utils';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
@@ -428,7 +429,7 @@ export class AuthServices {
     const accessToken = await authComponentStore.getAccessToken();
     let body = {}
 
-    if(idType === 'Passport'){
+    if(idType === PASSPORT){
       body = {
         fullName: fullName,
         nickName: nickname,
@@ -436,7 +437,7 @@ export class AuthServices {
         lastName: 'lastName',
         kycDetails: {
           altIdNumber: id,
-          altIdType: idType,
+          idType,
         },
       };
     }else{
