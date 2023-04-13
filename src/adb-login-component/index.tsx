@@ -51,8 +51,9 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const isConnected = await checkInternetConnection();
     if (isConnected) {
       const { username, password } = values;
-      const _username = username;
-      const isSuccess = await adbLoginWithoutOTP(_username, password);
+      const _username = username.trim();
+      const _password = password.trim();
+      const isSuccess = await adbLoginWithoutOTP(_username, _password);
       if (isSuccess) {
         if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
           setErrorModal(true);
