@@ -6,6 +6,7 @@ import { AuthApiClient } from '../api-client/auth-api-client';
 import { AuthComponentConfig } from '../types';
 import { authorize } from 'react-native-app-auth';
 import { Base64 } from 'js-base64';
+import { PASSPORT } from 'react-native-auth-component/src/utils';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
@@ -423,18 +424,33 @@ export class AuthServices {
     return response.data;
   };
 
-  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string) => {
+  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string, idType: string) => {
     const { membershipBaseUrl } = this._configs!;
     const accessToken = await authComponentStore.getAccessToken();
-    const body = {
-      fullName: fullName,
-      nickName: nickname,
-      firstName: 'firstName',
-      lastName: 'lastName',
-      kycDetails: {
-        altIdNumber: id,
-      },
-    };
+    let body = {}
+
+    if(idType === PASSPORT){
+      body = {
+        fullName: fullName,
+        nickName: nickname,
+        firstName: 'firstName',
+        lastName: 'lastName',
+        kycDetails: {
+          altIdNumber: id,
+          idType,
+        },
+      };
+    }else{
+      body = {
+        fullName: fullName,
+        nickName: nickname,
+        firstName: 'firstName',
+        lastName: 'lastName',
+        kycDetails: {
+          altIdNumber: id,
+        },
+      };
+    }
 
     const response = await axios.patch(`${membershipBaseUrl}/users/${userId}`, body, {
       headers: {

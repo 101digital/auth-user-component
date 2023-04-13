@@ -73,7 +73,8 @@ export interface AuthContextData {
     userId: string,
     fullName: string,
     nickName: string,
-    id: string
+    id: string,
+    idType: string,
   ) => Promise<boolean>;
   adbLogin: (username: string, password: string) => Promise<boolean>;
   isVerifyLogin: boolean;
@@ -562,14 +563,15 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const updateUserInfo = useCallback(
-    async (userId: string, fullName: string, nickName: string, id: string) => {
+    async (userId: string, fullName: string, nickName: string, id: string, idType: string) => {
       try {
         setIsUpdatingProfile(true);
         const response = await AuthServices.instance().updateUserInfo(
           userId,
           fullName,
           nickName,
-          id
+          id,
+          idType
         );
         const { data } = response;
         setProfile(data);
