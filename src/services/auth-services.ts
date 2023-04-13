@@ -424,7 +424,7 @@ export class AuthServices {
     return response.data;
   };
 
-  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string, idType: string) => {
+  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string, idType: string, idIssuingCountry: string) => {
     const { membershipBaseUrl } = this._configs!;
     const accessToken = await authComponentStore.getAccessToken();
     let body = {}
@@ -438,6 +438,7 @@ export class AuthServices {
         kycDetails: {
           altIdNumber: id,
           idType,
+          idIssuingCountry,
         },
       };
     }else{
