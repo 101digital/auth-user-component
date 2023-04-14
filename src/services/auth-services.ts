@@ -424,28 +424,40 @@ export class AuthServices {
     return response.data;
   };
 
-  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string, idType: string) => {
+  updateUserInfo = async (
+    userId: string,
+    fullName: string,
+    nickname: string,
+    id: string,
+    idType?: string
+  ) => {
     const { membershipBaseUrl } = this._configs!;
     const accessToken = await authComponentStore.getAccessToken();
-    let body = {}
-
-    if(idType === PASSPORT){
+    let body = {};
+    let fistName = 'fistName';
+    let lastName = 'lastName';
+    const arrName = fullName.split(' ');
+    if (arrName.length > 0) {
+      lastName = arrName[arrName.length - 1];
+      fistName = arrName.slice(0, arrName.length - 1).join(' ');
+    }
+    const updateInfoPayload = {
+      fullName: fullName,
+      nickName: nickname,
+      firstName: fistName,
+      lastName: lastName,
+    };
+    if (idType === PASSPORT) {
       body = {
-        fullName: fullName,
-        nickName: nickname,
-        firstName: 'firstName',
-        lastName: 'lastName',
+        ...updateInfoPayload,
         kycDetails: {
           altIdNumber: id,
           idType,
         },
       };
-    }else{
+    } else {
       body = {
-        fullName: fullName,
-        nickName: nickname,
-        firstName: 'firstName',
-        lastName: 'lastName',
+        ...updateInfoPayload,
         kycDetails: {
           altIdNumber: id,
         },
