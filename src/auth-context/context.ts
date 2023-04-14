@@ -564,7 +564,7 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const updateUserInfo = useCallback(
-    async (userId: string, fullName: string, nickName: string, id: string, idType: string, idIssuingCountry: string) => {
+    async (userId: string, fullName: string, nickName: string, id: string, idType?: string, idIssuingCountry?: string) => {
       try {
         setIsUpdatingProfile(true);
         const response = await AuthServices.instance().updateUserInfo(
