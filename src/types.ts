@@ -103,3 +103,5 @@ export enum BiometricMethod {
   TOUCHID = 'TOUCHID',
   BIOMETRICS = 'BIOMETRICS',
 }
+
+export const PASSPORT = 'Passport';

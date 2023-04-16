@@ -74,14 +74,14 @@ export interface AuthContextData {
     fullName: string,
     nickName: string,
     id: string,
-    idType?: string
+    idType: string,
   ) => Promise<boolean>;
   adbLogin: (username: string, password: string) => Promise<boolean>;
   isVerifyLogin: boolean;
   errorVerifySignIn?: Error;
   adbLoginVerifyOtp: (otp: string) => Promise<boolean>;
   adbResendOTP: () => void;
-  adbLoginWithoutOTP: (username: string, password: string) => Promise<string | undefined>;
+  adbLoginSingleFactor: (username: string, password: string) => Promise<string | undefined>;
   flowId?: string;
   isManualLogin: boolean;
   isValidatedSubsequenceLogin: boolean;
@@ -136,7 +136,7 @@ export const authDefaultValue: AuthContextData = {
   isVerifyLogin: false,
   adbLoginVerifyOtp: async () => false,
   adbResendOTP: () => false,
-  adbLoginWithoutOTP: async () => undefined,
+  adbLoginSingleFactor: async () => undefined,
   isManualLogin: false,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
@@ -271,7 +271,7 @@ export const useAuthContextValue = (): AuthContextData => {
     } catch (error) {}
   }, []);
 
-  const adbLoginWithoutOTP = useCallback(async (username: string, password: string) => {
+  const adbLoginSingleFactor = useCallback(async (username: string, password: string) => {
     try {
       setIsSigning(true);
       const resLogin = await AuthServices.instance().adbLogin(
@@ -563,7 +563,7 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const updateUserInfo = useCallback(
-    async (userId: string, fullName: string, nickName: string, id: string, idType?: string) => {
+    async (userId: string, fullName: string, nickName: string, id: string, idType: string) => {
       try {
         setIsUpdatingProfile(true);
         const response = await AuthServices.instance().updateUserInfo(
@@ -681,7 +681,7 @@ export const useAuthContextValue = (): AuthContextData => {
       isVerifyLogin: _isVerifyLogin,
       errorVerifySignIn: _errorVerifySignIn,
       adbResendOTP,
-      adbLoginWithoutOTP,
+      adbLoginSingleFactor,
       flowId: _flowId,
       isManualLogin: _isManualLogin,
       isValidatedSubsequenceLogin: _isValidatedSubsequenceLogin,

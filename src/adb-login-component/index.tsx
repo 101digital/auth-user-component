@@ -13,12 +13,10 @@ import { fonts } from '../assets/fonts';
 import { AuthContext } from '../auth-context';
 import { Formik } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
-import { AlertCircleIcon } from 'react-native-auth-component/src/assets/icons';
-import Button from 'react-native-auth-component/src/adb-login-component/components/button';
+import { AlertCircleIcon } from '../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
-import { EyesClosedIcon, EyesIcon } from 'account-origination-component/src/assets/icons';
+import { EyesClosedIcon, EyesIcon } from '../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../utils/index';
-import { AccountOriginationContext } from 'account-origination-component';
 export class SignInData {
   constructor(readonly username: string, readonly password: string) {}
 
@@ -36,8 +34,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { onLoginSuccess, onLoginFailed } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
-  const { adbLoginWithoutOTP, isSigning, errorSignIn } = useContext(AuthContext);
-  const { checkInternetConnection } = useContext(AccountOriginationContext);
+  const { adbLoginSingleFactor, isSigning, errorSignIn } = useContext(AuthContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
 
   useEffect(() => {
@@ -48,21 +45,18 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
-    const isConnected = await checkInternetConnection();
-    if (isConnected) {
-      const { username, password } = values;
-      const _username = username.trim();
-      const _password = password.trim();
-      const isSuccess = await adbLoginWithoutOTP(_username, _password);
-      if (isSuccess) {
-        if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
-          setErrorModal(true);
-        } else {
-          onLoginSuccess();
-        }
+    const { username, password } = values;
+    const _username = username.trim();
+    const _password = password.trim();
+    const isSuccess = await adbLoginSingleFactor(_username, _password);
+    if (isSuccess) {
+      if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
+        setErrorModal(true);
       } else {
-        onLoginFailed();
+        onLoginSuccess();
       }
+    } else {
+      onLoginFailed();
     }
     // const profile = await login(_username, password, _country);
     // if (profile) {
@@ -125,7 +119,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                 isLoading={isSigning}
                 label="Login"
                 onPress={submitForm}
-                disabled={values.password.length < 8 || values.username.length === 0}
+                disabled={values.password.length === 0 || values.username.length === 0}
               />
             </>
           )}
@@ -145,7 +139,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
               `You’ve entered the wrong password 3 times. Please try again after 1 hour.`}
           </Text>
           <View style={{ height: 32 }} />
-          <Button
+          <ADBButton
             label={i18n.t('login_component.btn_done') ?? 'Done'}
             onPress={() => {
               setErrorModal(false);
