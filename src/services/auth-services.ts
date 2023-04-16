@@ -30,7 +30,6 @@ export class AuthServices {
   public adbLogin = async (
     username: string,
     password: string,
-    clientIdInit?: string,
     scope?: string,
     acr_values = 'Multi_Factor'
   ) => {
@@ -40,7 +39,7 @@ export class AuthServices {
       .get('as/authorize', {
         params: {
           response_type: responseType,
-          client_id: clientIdInit ? clientIdInit : clientId,
+          client_id: clientId,
           scope: scope ? scope : 'openid profilep',
           code_challenge:
             'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
@@ -106,9 +105,7 @@ export class AuthServices {
       code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
     });
 
-    const response = await AuthApiClient.instance()
-      .getAuthApiClient()
-      .post('as/token', body);
+    const response = await AuthApiClient.instance().getAuthApiClient().post('as/token', body);
 
     await authComponentStore.storeAccessToken(response.data.access_token);
 
@@ -216,7 +213,7 @@ export class AuthServices {
     const loginHintToken = await this.getLoginHintToken();
     const body = qs.stringify({
       response_type: 'code',
-      client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
+      client_id: this._configs?.clientId,
       scope: 'openid profile profilep',
       code_challenge: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
       response_mode: 'pi.flow',
@@ -411,28 +408,40 @@ export class AuthServices {
     return response.data;
   };
 
-  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string, idType: string) => {
+  updateUserInfo = async (
+    userId: string,
+    fullName: string,
+    nickname: string,
+    id: string,
+    idType?: string
+  ) => {
     const { membershipBaseUrl } = this._configs!;
     const accessToken = await authComponentStore.getAccessToken();
-    let body = {}
-
-    if(idType === PASSPORT){
+    let body = {};
+    let fistName = 'fistName';
+    let lastName = 'lastName';
+    const arrName = fullName.split(' ');
+    if (arrName.length > 0) {
+      lastName = arrName[arrName.length - 1];
+      fistName = arrName.slice(0, arrName.length - 1).join(' ');
+    }
+    const updateInfoPayload = {
+      fullName: fullName,
+      nickName: nickname,
+      firstName: fistName,
+      lastName: lastName,
+    };
+    if (idType === PASSPORT) {
       body = {
-        fullName: fullName,
-        nickName: nickname,
-        firstName: 'firstName',
-        lastName: 'lastName',
+        ...updateInfoPayload,
         kycDetails: {
           altIdNumber: id,
           idType,
         },
       };
-    }else{
+    } else {
       body = {
-        fullName: fullName,
-        nickName: nickname,
-        firstName: 'firstName',
-        lastName: 'lastName',
+        ...updateInfoPayload,
         kycDetails: {
           altIdNumber: id,
         },
