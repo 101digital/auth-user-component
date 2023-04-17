@@ -74,7 +74,8 @@ export interface AuthContextData {
     fullName: string,
     nickName: string,
     id: string,
-    idType: string
+    idType: string,
+    onError?: (err: Error) => void
   ) => Promise<boolean>;
   adbLogin: (username: string, password: string) => Promise<boolean>;
   isVerifyLogin: boolean;
@@ -257,7 +258,12 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const adbGetAccessToken = useCallback(async (username: string, password: string) => {
     try {
-      const resLogin = await AuthServices.instance().adbLogin(username, password, 'profilepsf');
+      const resLogin = await AuthServices.instance().adbLogin(
+        username,
+        password,
+        'profilepsf',
+        'Single_Factor'
+      );
       const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
         resAfterValidate.authorizeResponse.code,
@@ -303,7 +309,12 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsSigning(true);
       if (_username) {
-        const resLogin = await AuthServices.instance().adbLogin(_username, password, 'profilepsf');
+        const resLogin = await AuthServices.instance().adbLogin(
+          _username,
+          password,
+          'profilepsf',
+          'Single_Factor'
+        );
         if (resLogin.resumeUrl) {
           return true;
         }
@@ -321,7 +332,7 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsSigning(true);
       if (_username && _username.length > 0 && _password && _password.length > 0) {
-        const data = await AuthServices.instance().adbLogin(_username, _password);
+        const data = await AuthServices.instance().adbLogin(_username, _password, 'Single_Factor');
         if (data && data.id) {
           setFlowId(data.id);
         }
@@ -552,7 +563,14 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const updateUserInfo = useCallback(
-    async (userId: string, fullName: string, nickName: string, id: string, idType: string) => {
+    async (
+      userId: string,
+      fullName: string,
+      nickName: string,
+      id: string,
+      idType: string,
+      onError?: (err: Error) => void
+    ) => {
       try {
         setIsUpdatingProfile(true);
         const response = await AuthServices.instance().updateUserInfo(
@@ -568,6 +586,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setIsUpdatingProfile(false);
         return true;
       } catch (error) {
+        onError && onError(error as Error);
         setIsUpdatingProfile(false);
         setErrorUpdateProfile(error as Error);
         return false;

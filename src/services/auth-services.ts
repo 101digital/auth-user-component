@@ -193,7 +193,7 @@ export class AuthServices {
     try {
       const body = qs.stringify({
         response_type: 'code',
-        client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
+        client_id: this._configs?.clientId,
         scope: 'openid profile profilep',
         code_challenge:
           'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
@@ -418,17 +418,17 @@ export class AuthServices {
     const { membershipBaseUrl } = this._configs!;
     const accessToken = await authComponentStore.getAccessToken();
     let body = {};
-    let fistName = 'fistName';
+    let firstName = 'firstName';
     let lastName = 'lastName';
     const arrName = fullName.split(' ');
     if (arrName.length > 0) {
       lastName = arrName[arrName.length - 1];
-      fistName = arrName.slice(0, arrName.length - 1).join(' ');
+      firstName = arrName.slice(0, arrName.length - 1).join(' ');
     }
     const updateInfoPayload = {
       fullName: fullName,
       nickName: nickname,
-      firstName: fistName,
+      firstName: firstName?.length > 0 ? firstName : lastName,
       lastName: lastName,
     };
     if (idType === PASSPORT) {
