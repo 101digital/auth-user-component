@@ -1,6 +1,6 @@
 {
   "name": "auth-user-component",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/auth-user-component.git",
   "main": "index.ts",
@@ -32,7 +32,8 @@
     "react-native-modal": "13.0.0",
     "react-native-svg": "12.4.2",
     "lodash": "^4.17.21",
-    "react-native-theme-component": "https://github.com/101digital/react-native-theme-component.git"
+    "react-native-theme-component": "https://github.com/101digital/react-native-theme-component.git",
+    "@react-native-cookies/cookies": "^6.2.1"
   },
   "resolutions": {
     "@react-native-community/cli-platform-ios": "4.13.0"

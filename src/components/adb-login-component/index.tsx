@@ -8,15 +8,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { colors } from '../assets';
-import { fonts } from '../assets/fonts';
-import { AuthContext } from '../auth-context';
+import { colors } from '../../assets';
+import { fonts } from '../../assets/fonts';
+import { AuthContext } from '../../auth-context';
 import { Formik } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
-import { AlertCircleIcon } from '../assets/icons';
+import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
-import { EyesClosedIcon, EyesIcon } from '../assets/icons';
-import { PASSWORD_LOCKED_OUT } from '../utils/index';
+import { EyesClosedIcon, EyesIcon } from '../../assets/icons';
+import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 export class SignInData {
   constructor(readonly username: string, readonly password: string) {}
 
