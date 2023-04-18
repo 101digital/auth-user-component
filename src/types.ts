@@ -103,3 +103,15 @@ export enum BiometricMethod {
   TOUCHID = 'TOUCHID',
   BIOMETRICS = 'BIOMETRICS',
 }
+
+export const PASSPORT = 'Passport';
+
+export type DeviceType = 'MOBILE' | 'SMS' | 'EMAIL';
+
+export type Devices = {
+  id: string;
+  type: DeviceType;
+  status: string;
+  email: string;
+  phone: string;
+};

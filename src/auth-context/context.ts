@@ -4,6 +4,7 @@ import {
   CountryInformation,
   Recovery,
   VerificationMethod,
+  Devices,
 } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
@@ -75,14 +76,15 @@ export interface AuthContextData {
     nickName: string,
     id: string,
     idType: string,
-    idIssuingCountry: string
+    idIssuingCountry: string,
+    onError?: (err: Error) => void
   ) => Promise<boolean>;
   adbLogin: (username: string, password: string) => Promise<boolean>;
   isVerifyLogin: boolean;
   errorVerifySignIn?: Error;
   adbLoginVerifyOtp: (otp: string) => Promise<boolean>;
   adbResendOTP: () => void;
-  adbLoginWithoutOTP: (username: string, password: string) => Promise<string | undefined>;
+  adbLoginSingleFactor: (username: string, password: string) => Promise<string | undefined>;
   flowId?: string;
   isManualLogin: boolean;
   isValidatedSubsequenceLogin: boolean;
@@ -96,6 +98,11 @@ export interface AuthContextData {
   adbGetLoginHintToken: () => Promise<string>;
   obtainNewAccessToken: () => Promise<boolean>;
   saveResumeURL: (url: string) => void;
+
+  //rebinding
+  getListDevices: () => Promise<Devices[] | undefined>;
+  deleteDevice: (deviceId: string) => Promise<boolean>;
+  errorRebindedDevice?: Error;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -137,7 +144,7 @@ export const authDefaultValue: AuthContextData = {
   isVerifyLogin: false,
   adbLoginVerifyOtp: async () => false,
   adbResendOTP: () => false,
-  adbLoginWithoutOTP: async () => undefined,
+  adbLoginSingleFactor: async () => undefined,
   isManualLogin: false,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
@@ -150,6 +157,8 @@ export const authDefaultValue: AuthContextData = {
   adbGetLoginHintToken: async () => '',
   obtainNewAccessToken: async () => false,
   saveResumeURL: () => false,
+  getListDevices: async () => undefined,
+  deleteDevice: async () => false,
 };
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
@@ -191,6 +200,8 @@ export const useAuthContextValue = (): AuthContextData => {
     VerificationMethod.PENDING
   );
   const [_resumeURL, saveResumeURL] = useState<string>();
+  const [_errorRebindedDevice, setErrorRebindedDevice] = useState<Error | undefined>();
+  const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
 
   useEffect(() => {
     checkLogin();
@@ -251,9 +262,10 @@ export const useAuthContextValue = (): AuthContextData => {
         await authComponentStore.storeUserName(username);
       }
     } catch (error) {
-      setIsSigning(false);
       setErrorSignIn(error as Error);
       return false;
+    } finally {
+      setIsSigning(false);
     }
     return true;
   }, []);
@@ -263,8 +275,8 @@ export const useAuthContextValue = (): AuthContextData => {
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
-        '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
-        'profilepsf'
+        'profilepsf',
+        'Single_Factor'
       );
       const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
@@ -274,13 +286,12 @@ export const useAuthContextValue = (): AuthContextData => {
     } catch (error) {}
   }, []);
 
-  const adbLoginWithoutOTP = useCallback(async (username: string, password: string) => {
+  const adbLoginSingleFactor = useCallback(async (username: string, password: string) => {
     try {
       setIsSigning(true);
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
-        '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
         'profilepsf',
         'Single_Factor'
       );
@@ -316,8 +327,8 @@ export const useAuthContextValue = (): AuthContextData => {
         const resLogin = await AuthServices.instance().adbLogin(
           _username,
           password,
-          '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-          'profilepsf'
+          'profilepsf',
+          'Single_Factor'
         );
         if (resLogin.resumeUrl) {
           return true;
@@ -336,7 +347,7 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsSigning(true);
       if (_username && _username.length > 0 && _password && _password.length > 0) {
-        const data = await AuthServices.instance().adbLogin(_username, _password);
+        const data = await AuthServices.instance().adbLogin(_username, _password, 'Single_Factor');
         if (data && data.id) {
           setFlowId(data.id);
         }
@@ -353,23 +364,29 @@ export const useAuthContextValue = (): AuthContextData => {
     async (otp: string) => {
       try {
         setIsVerifyLogin(true);
+        console.log('_flowId', _flowId);
         if (_flowId && _flowId.length > 0) {
           const loginData = await AuthServices.instance().adbVerifyLogin(otp, _flowId);
+          console.log('adbLoginVerifyOtp -> loginData', loginData);
+          if (!loginData.resumeUrl) {
+            return false;
+          }
           const afterValidateData = await AuthServices.instance().resumeUrl(loginData.resumeUrl);
           await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeProfile(data);
           await authComponentStore.storeIsUserLogged(true);
           setProfile({ ...data });
-          setisManualLogin(true);
-          setIsSignedIn(true);
+          // setisManualLogin(true);
+          // setIsSignedIn(true);
           setIsVerifyLogin(false);
+          return true;
         }
       } catch (error) {
         setIsVerifyLogin(false);
         setErrorVerifySignIn(error as Error);
       }
-      return true;
+      return false;
     },
     [_flowId]
   );
@@ -576,7 +593,8 @@ export const useAuthContextValue = (): AuthContextData => {
       nickName: string,
       id: string,
       idType?: string,
-      idIssuingCountry?: string
+      idIssuingCountry?: string,
+      onError?: (err: Error) => void
     ) => {
       try {
         setIsUpdatingProfile(true);
@@ -595,6 +613,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setIsUpdatingProfile(false);
         return true;
       } catch (error) {
+        onError && onError(error as Error);
         setIsUpdatingProfile(false);
         setErrorUpdateProfile(error as Error);
         return false;
@@ -651,6 +670,31 @@ export const useAuthContextValue = (): AuthContextData => {
     } catch (error) {}
   }, []);
 
+  const getListDevices = useCallback(async () => {
+    try {
+      const response = await AuthServices.instance().getListDevices();
+      console.log('getListDevices -> response', response);
+      if (response && response.data && response.data.length > 0) {
+        return response.data;
+      }
+    } catch (error) {
+      setErrorRebindedDevice(error as Error);
+    }
+  }, []);
+
+  const deleteDevice = useCallback(async (deviceId: string) => {
+    try {
+      const response = await AuthServices.instance().deleteDevice(deviceId);
+      if (response && response.data && response.data.length > 0) {
+        console.log('deleteDevice');
+      }
+      return true;
+    } catch (error) {
+      setErrorRebindedDevice(error as Error);
+    }
+    return false;
+  }, []);
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -697,7 +741,7 @@ export const useAuthContextValue = (): AuthContextData => {
       isVerifyLogin: _isVerifyLogin,
       errorVerifySignIn: _errorVerifySignIn,
       adbResendOTP,
-      adbLoginWithoutOTP,
+      adbLoginSingleFactor,
       flowId: _flowId,
       isManualLogin: _isManualLogin,
       isValidatedSubsequenceLogin: _isValidatedSubsequenceLogin,
@@ -711,6 +755,9 @@ export const useAuthContextValue = (): AuthContextData => {
       adbGetLoginHintToken,
       obtainNewAccessToken,
       saveResumeURL,
+      errorRebindedDevice: _errorRebindedDevice,
+      deleteDevice,
+      getListDevices,
     }),
     [
       _profile,
@@ -744,6 +791,7 @@ export const useAuthContextValue = (): AuthContextData => {
       _isValidatedSubsequenceLogin,
       _verificationMethodKey,
       _resumeURL,
+      _errorRebindedDevice,
     ]
   );
 };

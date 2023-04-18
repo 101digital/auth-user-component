@@ -5,8 +5,7 @@ import axios from 'axios';
 import { AuthApiClient } from '../api-client/auth-api-client';
 import { AuthComponentConfig } from '../types';
 import { authorize } from 'react-native-app-auth';
-import { Base64 } from 'js-base64';
-import { PASSPORT } from 'react-native-auth-component/src/utils';
+import { PASSPORT } from '../types';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
@@ -31,28 +30,27 @@ export class AuthServices {
   public adbLogin = async (
     username: string,
     password: string,
-    clientIdInit?: string,
     scope?: string,
     acr_values = 'Multi_Factor'
   ) => {
-    const { clientId, redirectUrl, responseType, responseMode } = this._configs || {};
+    const { clientId, responseType, responseMode } = this._configs || {};
+
     const responseAuth = await AuthApiClient.instance()
       .getAuthApiClient()
       .get('as/authorize', {
         params: {
           response_type: responseType,
-          client_id: clientIdInit ? clientIdInit : clientId,
+          client_id: clientId,
           scope: scope ? scope : 'openid profilep',
           code_challenge:
             'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
-          redirect_uri: redirectUrl,
           response_mode: responseMode,
-          acr_values: 'Single_Factor',
+          acr_values,
         },
-        headers: {
-          Cookie:
-            'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
-        },
+        // headers: {
+        //   Cookie:
+        //     'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
+        // },
       });
 
     const flowId = responseAuth.data?.id;
@@ -99,24 +97,15 @@ export class AuthServices {
   };
 
   public obtainToken = async (authorizeCode: string) => {
-    const { redirectUrl } = this._configs || {};
+    const { authGrantType, authBaseUrl, clientId } = this._configs || {};
     const body = qs.stringify({
-      grant_type: 'authorization_code',
+      grant_type: authGrantType,
       code: authorizeCode,
-      redirect_uri: redirectUrl,
       scope: 'openid  profilep',
       code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+      client_id: clientId,
     });
-
-    const response = await AuthApiClient.instance()
-      .getAuthApiClient()
-      .post('as/token', body, {
-        headers: {
-          Authorization: `Basic ${Base64.encode(
-            `${'3de6d91d-29f9-444b-8e26-770c4a236d79'}:${'8Gafe42ZOiJipKrAqY1U-cPPZ-SAywfezFLbAmuFultDmuv9F.6WWVTvKjudC_zy'}`
-          )}`,
-        },
-      });
+    const response = await axios.post(`${authBaseUrl}/as/token`, body);
 
     await authComponentStore.storeAccessToken(response.data.access_token);
 
@@ -153,12 +142,11 @@ export class AuthServices {
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
-    const { redirectUrl, clientId, authBaseUrl } = this._configs || {};
+    const { clientId, authBaseUrl, authGrantType } = this._configs || {};
     const body = qs.stringify({
-      grant_type: 'authorization_code',
+      grant_type: authGrantType,
       code: authorizeCode,
-      redirect_uri: redirectUrl,
-      scope: scope ? scope : 'openid  profilep',
+      scope: scope ?? 'openid  profilep',
       code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
       client_id: clientId,
     });
@@ -168,7 +156,7 @@ export class AuthServices {
     await authComponentStore.storeAccessToken(response.data.access_token);
 
     return {
-      access_token: response.data.access_token,
+      access_token,
       refresh_token: '',
     };
   };
@@ -202,12 +190,10 @@ export class AuthServices {
   };
 
   public adbAuthorizeToken = async (token: string) => {
-    const { redirectUrl } = this._configs!;
     try {
       const body = qs.stringify({
         response_type: 'code',
-        client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-        redirect_uri: redirectUrl,
+        client_id: this._configs?.clientId,
         scope: 'openid profile profilep',
         code_challenge:
           'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
@@ -225,11 +211,9 @@ export class AuthServices {
 
   public adbRefreshToken = async () => {
     const loginHintToken = await this.getLoginHintToken();
-    const { redirectUrl } = this._configs!;
     const body = qs.stringify({
       response_type: 'code',
-      client_id: '0eb2b7cf-1817-48ec-a62d-eae404776cff',
-      redirect_uri: redirectUrl,
+      client_id: this._configs?.clientId,
       scope: 'openid profile profilep',
       code_challenge: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
       response_mode: 'pi.flow',
@@ -424,21 +408,28 @@ export class AuthServices {
     return response.data;
   };
 
-  updateUserInfo = async (userId: string, fullName: string, nickname: string, id: string, idType: string, idIssuingCountry: string) => {
+  updateUserInfo = async (
+    userId: string,
+    fullName: string,
+    nickname: string,
+    id: string,
+    idType?: string,
+    idIssuingCountry?: string
+  ) => {
     const { membershipBaseUrl } = this._configs!;
     const accessToken = await authComponentStore.getAccessToken();
     let body = {};
-    let fistName = 'fistName';
+    let firstName = 'firstName';
     let lastName = 'lastName';
     const arrName = fullName.split(' ');
     if (arrName.length > 0) {
       lastName = arrName[arrName.length - 1];
-      fistName = arrName.slice(0, arrName.length - 1).join(' ');
+      firstName = arrName.slice(0, arrName.length - 1).join(' ');
     }
     const updateInfoPayload = {
       fullName: fullName,
       nickName: nickname,
-      firstName: fistName,
+      firstName: firstName?.length > 0 ? firstName : lastName,
       lastName: lastName,
     };
     if (idType === PASSPORT) {
@@ -472,7 +463,7 @@ export class AuthServices {
     clientIdInit?: string,
     scope?: string
   ) => {
-    const { clientId, redirectUrl, responseType, responseMode } = this._configs || {};
+    const { clientId, responseType, responseMode } = this._configs || {};
     try {
       const responseAuth = await AuthApiClient.instance()
         .getAuthApiClient()
@@ -483,15 +474,14 @@ export class AuthServices {
             scope: scope ? scope : 'openid profilep',
             code_challenge:
               'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
-            redirect_uri: redirectUrl,
             response_mode: responseMode,
             acr_values: 'Push_Only',
             login_hint_token: loginHintToken,
           },
-          headers: {
-            Cookie:
-              'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
-          },
+          // headers: {
+          //   Cookie:
+          //     'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
+          // },
         });
       console.log('responseAuth -> response', responseAuth);
       if (responseAuth) {
@@ -501,5 +491,28 @@ export class AuthServices {
       console.log('error', error);
       return false;
     }
+  };
+
+  public getListDevices = async () => {
+    const access_token = await authComponentStore.getAccessToken();
+    const response = await axios.get(`${this._configs?.identityPingUrl}/users/devices`, {
+      headers: {
+        Authorization: `${access_token}`,
+      },
+    });
+    return response.data;
+  };
+
+  public deleteDevice = async (deviceId: string) => {
+    const access_token = await authComponentStore.getAccessToken();
+    const response = await axios.delete(
+      `${this._configs?.identityPingUrl}/users/devices/${deviceId}`,
+      {
+        headers: {
+          Authorization: `${access_token}`,
+        },
+      }
+    );
+    return response.data;
   };
 }

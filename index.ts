@@ -3,24 +3,13 @@ export { AuthComponent } from './src/index';
 export { AuthServices } from './src/services/auth-services';
 export { createAuthorizedApiClient } from './src/api-client/authorized-api-client';
 export { createAppTokenApiClient } from './src/api-client/app-token-api-client';
-export { default as LoginComponent } from './src/login-component';
-export { default as ProfileComponent } from './src/profile-component';
-export {
-  LoginComponentProps,
-  LoginComponentRef,
-  LoginComponentStyles,
-} from './src/login-component/types';
 export { AuthContext, AuthProvider } from './src/auth-context';
 export * from './src/types';
 export * from './src/assets';
 export { default as authComponentData } from './src/auth-component.json';
-export { default as ChangePassword } from './src/change-password-component';
-export { ChangePasswordRef } from './src/change-password-component/types';
-export * from './src/change-password-component/types';
-export * from './src/change-password-component/password-mask';
-export { default as InputPhoneNumberComponent } from './src/input-phone-number-component';
-export { InputPhoneNumberComponentRef } from './src/input-phone-number-component/types';
-export { default as OtpVerification } from './src/otp-verification';
-export { OtpVerificationComponentRef } from './src/otp-verification/types';
-export { PasswordMask } from './src/change-password-component/password-mask';
-export { default as ADBLoginComponent } from './src/adb-login-component';
+export { default as ADBLoginComponent } from './src/components/adb-login-component';
+export { default as ADBLoginWithPINComponent } from './src/components/adb-login-with-pin';
+export { default as ADBLoginWithPasswordComponent } from './src/components/adb-login-with-password';
+export { default as ADBInputPINVerifyComponent } from './src/components/adb-input-pin-verify';
+export { default as VerifyOTPComponent } from './src/components/verify-otp';
+export { default as ADBValidateUserNRICComponent } from './src/components/adb-validate-nric';
