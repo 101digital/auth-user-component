@@ -105,3 +105,13 @@ export enum BiometricMethod {
 }
 
 export const PASSPORT = 'Passport';
+
+export type DeviceType = 'MOBILE' | 'SMS' | 'EMAIL';
+
+export type Devices = {
+  id: string;
+  type: DeviceType;
+  status: string;
+  email: string;
+  phone: string;
+};

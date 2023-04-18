@@ -34,6 +34,7 @@ export class AuthServices {
     acr_values = 'Multi_Factor'
   ) => {
     const { clientId, responseType, responseMode } = this._configs || {};
+
     const responseAuth = await AuthApiClient.instance()
       .getAuthApiClient()
       .get('as/authorize', {
@@ -96,16 +97,15 @@ export class AuthServices {
   };
 
   public obtainToken = async (authorizeCode: string) => {
-    const { redirectUrl, authGrantType } = this._configs || {};
+    const { authGrantType, authBaseUrl, clientId } = this._configs || {};
     const body = qs.stringify({
       grant_type: authGrantType,
       code: authorizeCode,
-      redirect_uri: redirectUrl,
       scope: 'openid  profilep',
       code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+      client_id: clientId,
     });
-
-    const response = await AuthApiClient.instance().getAuthApiClient().post('as/token', body);
+    const response = await axios.post(`${authBaseUrl}/as/token`, body);
 
     await authComponentStore.storeAccessToken(response.data.access_token);
 
@@ -489,5 +489,28 @@ export class AuthServices {
       console.log('error', error);
       return false;
     }
+  };
+
+  public getListDevices = async () => {
+    const access_token = await authComponentStore.getAccessToken();
+    const response = await axios.get(`${this._configs?.identityPingUrl}/users/devices`, {
+      headers: {
+        Authorization: `${access_token}`,
+      },
+    });
+    return response.data;
+  };
+
+  public deleteDevice = async (deviceId: string) => {
+    const access_token = await authComponentStore.getAccessToken();
+    const response = await axios.delete(
+      `${this._configs?.identityPingUrl}/users/devices/${deviceId}`,
+      {
+        headers: {
+          Authorization: `${access_token}`,
+        },
+      }
+    );
+    return response.data;
   };
 }

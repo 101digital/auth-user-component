@@ -11,4 +11,5 @@ export { default as ADBLoginComponent } from './src/components/adb-login-compone
 export { default as ADBLoginWithPINComponent } from './src/components/adb-login-with-pin';
 export { default as ADBLoginWithPasswordComponent } from './src/components/adb-login-with-password';
 export { default as ADBInputPINVerifyComponent } from './src/components/adb-input-pin-verify';
-
+export { default as VerifyOTPComponent } from './src/components/verify-otp';
+export { default as ADBValidateUserNRICComponent } from './src/components/adb-validate-nric';
