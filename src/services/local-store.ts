@@ -18,6 +18,7 @@ const PIN_TOKEN = 'authcomponent.pinToken';
 const BIO_TOKEN = 'authcomponent.biometricToken';
 const QR_INBOUND_IMAGE = 'qr.inboundImage';
 const BIO_PUBLIC_KEY = 'authcomponent.bioPublicKey';
+const IS_USER_LOGGED = 'authcomponent.isUserLogged';
 
 const keySize = 256;
 const cost = 10000;
@@ -57,6 +58,12 @@ class AuthComponentStore {
     AsyncStorage.setItem(SELECTED_BIOMETRIC_METHOD, method);
 
   getSelectedBiometricMethod = () => AsyncStorage.getItem(SELECTED_BIOMETRIC_METHOD);
+
+  storeIsUserLogged = (isLogged: boolean) =>
+    AsyncStorage.setItem(IS_USER_LOGGED, JSON.stringify(isLogged));
+
+  getIsUserLogged = () => AsyncStorage.getItem(JSON.parse(IS_USER_LOGGED));
+
 
   getProfile = async () => {
     try {

@@ -75,7 +75,7 @@ export interface AuthContextData {
     nickName: string,
     id: string,
     idType: string,
-    idIssuingCountry:string,
+    idIssuingCountry: string
   ) => Promise<boolean>;
   adbLogin: (username: string, password: string) => Promise<boolean>;
   isVerifyLogin: boolean;
@@ -204,6 +204,7 @@ export const useAuthContextValue = (): AuthContextData => {
       await authComponentStore.storeRefreshToken(refreshToken);
       const { data } = await AuthServices.instance().fetchProfile();
       await authComponentStore.storeProfile(data);
+      await authComponentStore.storeIsUserLogged(true);
       setProfile({ ...data });
       setIsSignedIn(true);
       getProfilePicture(data);
@@ -224,6 +225,7 @@ export const useAuthContextValue = (): AuthContextData => {
         await AuthServices.instance().login(username, password);
         const { data } = await AuthServices.instance().fetchProfile();
         await authComponentStore.storeProfile(data);
+        await authComponentStore.storeIsUserLogged(true);
         setProfile({ ...data, country });
         setIsSignedIn(true);
         getProfilePicture(data);
@@ -291,6 +293,7 @@ export const useAuthContextValue = (): AuthContextData => {
         );
         const { data } = await AuthServices.instance().fetchProfile();
         await authComponentStore.storeProfile(data);
+        await authComponentStore.storeIsUserLogged(true);
         await authComponentStore.storeUserName(username);
         setPassword(undefined);
         setProfile({ ...data });
@@ -356,6 +359,7 @@ export const useAuthContextValue = (): AuthContextData => {
           await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeProfile(data);
+          await authComponentStore.storeIsUserLogged(true);
           setProfile({ ...data });
           setisManualLogin(true);
           setIsSignedIn(true);
@@ -407,6 +411,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setProfile(data);
         getProfilePicture(data);
         await authComponentStore.storeProfile(data);
+        await authComponentStore.storeIsUserLogged(true);
         setIsUpdatingProfile(false);
         return true;
       } catch (error) {
@@ -425,6 +430,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setProfile(data);
       getProfilePicture(data);
       await authComponentStore.storeProfile(data);
+      await authComponentStore.storeIsUserLogged(true);
       setIsUpdatingProfile(false);
       return true;
     } catch (error) {
@@ -564,7 +570,14 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const updateUserInfo = useCallback(
-    async (userId: string, fullName: string, nickName: string, id: string, idType?: string, idIssuingCountry?: string) => {
+    async (
+      userId: string,
+      fullName: string,
+      nickName: string,
+      id: string,
+      idType?: string,
+      idIssuingCountry?: string
+    ) => {
       try {
         setIsUpdatingProfile(true);
         const response = await AuthServices.instance().updateUserInfo(
@@ -578,6 +591,7 @@ export const useAuthContextValue = (): AuthContextData => {
         const { data } = response;
         setProfile(data);
         await authComponentStore.storeProfile(data);
+        await authComponentStore.storeIsUserLogged(true);
         setIsUpdatingProfile(false);
         return true;
       } catch (error) {
