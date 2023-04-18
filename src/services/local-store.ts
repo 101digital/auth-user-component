@@ -62,7 +62,14 @@ class AuthComponentStore {
   storeIsUserLogged = (isLogged: boolean) =>
     AsyncStorage.setItem(IS_USER_LOGGED, JSON.stringify(isLogged));
 
-  getIsUserLogged = () => AsyncStorage.getItem(JSON.parse(IS_USER_LOGGED));
+  getIsUserLogged = async () => {
+    try {
+      const value = await AsyncStorage.getItem(IS_USER_LOGGED);
+      return value ? JSON.parse(value) : false;
+    } catch (_) {
+      return false;
+    }
+  }
 
 
   getProfile = async () => {
