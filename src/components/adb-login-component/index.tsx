@@ -34,7 +34,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { onLoginSuccess, onLoginFailed } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
-  const { adbLogin, isSigning, errorSignIn } = useContext(AuthContext);
+  const { adbLoginSingleFactor, isSigning, errorSignIn } = useContext(AuthContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const { username, password } = values;
     const _username = username.trim();
     const _password = password.trim();
-    const isSuccess = await adbLogin(_username, _password);
+    const isSuccess = await adbLoginSingleFactor(_username, _password);
     if (isSuccess) {
       if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
         setErrorModal(true);

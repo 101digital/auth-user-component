@@ -319,7 +319,7 @@ export class AuthServices {
     newPassword: string,
     confirmNewPassword: string
   ) => {
-    const { identityBaseUrl } = this._configs!;
+    const { identityPingUrl } = this._configs!;
     const accessToken = await authComponentStore.getAccessToken();
     const body = {
       currentPassword,
@@ -327,7 +327,7 @@ export class AuthServices {
       confirmNewPassword,
     };
 
-    const response = await axios.put(`${identityBaseUrl}/users/passwords`, body, {
+    const response = await axios.put(`${identityPingUrl}/users/passwords`, body, {
       headers: {
         Authorization: `${accessToken}`,
       },

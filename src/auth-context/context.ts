@@ -40,7 +40,8 @@ export interface AuthContextData {
   changeUserPassword: (
     currentPassword: string,
     newPassword: string,
-    confirmNewPassword: string
+    confirmNewPassword: string,
+    handleResponse: (response: any) => void
   ) => void;
   isChangingPassword: boolean;
   isChangePassword: boolean;
@@ -460,25 +461,21 @@ export const useAuthContextValue = (): AuthContextData => {
   const clearUpdateProfileError = useCallback(() => {}, []);
 
   const changeUserPassword = useCallback(
-    async (currentPassword: string, newPassword: string, confirmNewPassword: string) => {
+    async (
+      currentPassword: string,
+      newPassword: string,
+      confirmNewPassword: string,
+      handleResponse: (response: any) => void
+    ) => {
       try {
-        setIsChangingPassword(true);
-        await AuthServices.instance().changeUserPassword(
+        const response = await AuthServices.instance().changeUserPassword(
           currentPassword,
           newPassword,
           confirmNewPassword
         );
-        setIsChangePassword(true);
-        setTimeout(() => {
-          setIsChangePassword(false);
-        }, 500);
-        setIsChangingPassword(false);
-
-        return true;
+        handleResponse(response);
       } catch (error) {
-        setIsChangingPassword(false);
-        setErrorChangePassword(error as Error);
-        return undefined;
+        handleResponse(error?.response?.data?.errors);
       }
     },
     []
