@@ -257,12 +257,7 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const adbGetAccessToken = useCallback(async (username: string, password: string) => {
     try {
-      const resLogin = await AuthServices.instance().adbLogin(
-        username,
-        password,
-        '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
-        'profilepsf'
-      );
+      const resLogin = await AuthServices.instance().adbLogin(username, password, 'profilepsf');
       const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
         resAfterValidate.authorizeResponse.code,
@@ -277,7 +272,6 @@ export const useAuthContextValue = (): AuthContextData => {
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
-        '4b6cea4c-88be-4ffe-b061-952b233f8b6b',
         'profilepsf',
         'Single_Factor'
       );

@@ -31,7 +31,6 @@ export class AuthServices {
   public adbLogin = async (
     username: string,
     password: string,
-    clientIdInit?: string,
     scope?: string,
     acr_values = 'Multi_Factor'
   ) => {
@@ -41,7 +40,7 @@ export class AuthServices {
       .get('as/authorize', {
         params: {
           response_type: responseType,
-          client_id: clientIdInit ? clientIdInit : clientId,
+          client_id: clientId,
           scope: scope ? scope : 'openid profilep',
           code_challenge:
             'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
