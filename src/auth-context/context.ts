@@ -204,19 +204,10 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_errorRebindedDevice, setErrorRebindedDevice] = useState<Error | undefined>();
   const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
 
-  useEffect(() => {
-    checkLogin();
-  }, []);
-
   const loginOAuth2 = useCallback(async () => {
     try {
       setIsSigning(true);
-      const { accessToken, refreshToken } = await AuthServices.instance().loginOAuth2();
-      await authComponentStore.storeAccessToken(accessToken);
-      await authComponentStore.storeRefreshToken(refreshToken);
       const { data } = await AuthServices.instance().fetchProfile();
-      await authComponentStore.storeProfile(data);
-      await authComponentStore.storeIsUserLogged(true);
       setProfile({ ...data });
       setIsSignedIn(true);
       getProfilePicture(data);
@@ -236,7 +227,6 @@ export const useAuthContextValue = (): AuthContextData => {
 
         await AuthServices.instance().login(username, password);
         const { data } = await AuthServices.instance().fetchProfile();
-        await authComponentStore.storeProfile(data);
         await authComponentStore.storeIsUserLogged(true);
         setProfile({ ...data, country });
         setIsSignedIn(true);
@@ -304,7 +294,6 @@ export const useAuthContextValue = (): AuthContextData => {
           resAfterValidate.authorizeResponse.code
         );
         const { data } = await AuthServices.instance().fetchProfile();
-        await authComponentStore.storeProfile(data);
         await authComponentStore.storeIsUserLogged(true);
         await authComponentStore.storeUserName(username);
         setPassword(undefined);
@@ -365,17 +354,14 @@ export const useAuthContextValue = (): AuthContextData => {
     async (otp: string) => {
       try {
         setIsVerifyLogin(true);
-        console.log('_flowId', _flowId);
         if (_flowId && _flowId.length > 0) {
           const loginData = await AuthServices.instance().adbVerifyLogin(otp, _flowId);
-          console.log('adbLoginVerifyOtp -> loginData', loginData);
           if (!loginData.resumeUrl) {
             return false;
           }
           const afterValidateData = await AuthServices.instance().resumeUrl(loginData.resumeUrl);
           await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
           const { data } = await AuthServices.instance().fetchProfile();
-          await authComponentStore.storeProfile(data);
           await authComponentStore.storeIsUserLogged(true);
           setProfile({ ...data });
           // setisManualLogin(true);
@@ -401,15 +387,6 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   };
 
-  const checkLogin = useCallback(async () => {
-    const profile = await authComponentStore.getProfile();
-    if (profile) {
-      setProfile(profile);
-      setIsSignedIn(true);
-      getProfilePicture(profile);
-    }
-  }, []);
-
   const clearSignInError = useCallback(() => {
     setErrorSignIn(undefined);
   }, []);
@@ -428,7 +405,6 @@ export const useAuthContextValue = (): AuthContextData => {
         const { data } = await AuthServices.instance().fetchProfile();
         setProfile(data);
         getProfilePicture(data);
-        await authComponentStore.storeProfile(data);
         await authComponentStore.storeIsUserLogged(true);
         setIsUpdatingProfile(false);
         return true;
@@ -447,7 +423,6 @@ export const useAuthContextValue = (): AuthContextData => {
       const { data } = await AuthServices.instance().fetchProfile();
       setProfile(data);
       getProfilePicture(data);
-      await authComponentStore.storeProfile(data);
       await authComponentStore.storeIsUserLogged(true);
       setIsUpdatingProfile(false);
       return true;
@@ -605,7 +580,6 @@ export const useAuthContextValue = (): AuthContextData => {
         );
         const { data } = response;
         setProfile(data);
-        await authComponentStore.storeProfile(data);
         await authComponentStore.storeIsUserLogged(true);
         setIsUpdatingProfile(false);
         return true;
