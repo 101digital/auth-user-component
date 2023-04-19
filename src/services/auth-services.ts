@@ -443,7 +443,7 @@ export class AuthServices {
     const updateInfoPayload = {
       fullName: fullName,
       nickName: nickname,
-      firstName: fistName,
+      firstName: fistName?.length > 0 ? fistName : lastName,
       lastName: lastName,
     };
     if (idType === PASSPORT) {
