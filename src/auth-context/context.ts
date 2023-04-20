@@ -11,6 +11,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
 import { AuthServices } from '../services/auth-services';
 import _ from 'lodash';
+import pkceChallenge from 'react-native-pkce-challenge';
 
 export interface AuthContextData {
   profile?: Profile;
@@ -93,7 +94,7 @@ export interface AuthContextData {
   verificationMethodKey: VerificationMethod;
   setVerificationMethodKey: (method: VerificationMethod) => void;
   verifyPassword: (password: string) => Promise<boolean>;
-  adbGetAccessToken: (username: string, password: string) => void;
+  adbGetAccessToken: (username: string, password: string) => Promise<void>;
   adbGetPairingCode: () => Promise<string>;
   adbAuthorizePushOnly: (loginHintToken: string) => Promise<boolean>;
   adbGetLoginHintToken: () => Promise<string>;
@@ -152,7 +153,7 @@ export const authDefaultValue: AuthContextData = {
   verificationMethodKey: VerificationMethod.PENDING,
   setVerificationMethodKey: () => undefined,
   verifyPassword: async () => false,
-  adbGetAccessToken: () => false,
+  adbGetAccessToken: async () => undefined,
   adbGetPairingCode: async () => '',
   adbAuthorizePushOnly: async () => false,
   adbGetLoginHintToken: async () => '',
@@ -203,10 +204,20 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_resumeURL, saveResumeURL] = useState<string>();
   const [_errorRebindedDevice, setErrorRebindedDevice] = useState<Error | undefined>();
   const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
+  const [_codeVerified, setCodeVerified] = React.useState<string>();
 
   useEffect(() => {
     checkIsLogged();
   }, []);
+
+  const generatePCKE = () => {
+    const { codeChallenge, codeVerifier } = pkceChallenge();
+    setCodeVerified(codeVerifier);
+
+    return {
+      codeChallenge,
+    };
+  };
 
   const checkIsLogged = async () => {
     const isLogged = await authComponentStore.getIsUserLogged();
@@ -254,7 +265,8 @@ export const useAuthContextValue = (): AuthContextData => {
   const adbLogin = useCallback(async (username: string, password: string) => {
     try {
       setIsSigning(true);
-      const data = await AuthServices.instance().adbLogin(username, password);
+      const { codeChallenge } = pkceChallenge();
+      const data = await AuthServices.instance().adbLogin(username, password, codeChallenge);
       if (data && data.id) {
         setFlowId(data.id);
         setUsername(username);
@@ -272,15 +284,18 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const adbGetAccessToken = useCallback(async (username: string, password: string) => {
     try {
+      const { codeChallenge, codeVerifier } = pkceChallenge();
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
+        codeChallenge,
         'profilepsf',
         'Single_Factor'
       );
       const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
         resAfterValidate.authorizeResponse.code,
+        codeVerifier,
         'profilepsf'
       );
     } catch (error) {}
@@ -289,9 +304,11 @@ export const useAuthContextValue = (): AuthContextData => {
   const adbLoginSingleFactor = useCallback(async (username: string, password: string) => {
     try {
       setIsSigning(true);
+      const { codeVerifier, codeChallenge } = pkceChallenge();
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
+        codeChallenge,
         'profilepsf',
         'Single_Factor'
       );
@@ -300,7 +317,8 @@ export const useAuthContextValue = (): AuthContextData => {
       } else {
         const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
         await AuthServices.instance().obtainTokenSingleFactor(
-          resAfterValidate.authorizeResponse.code
+          resAfterValidate.authorizeResponse.code,
+          codeVerifier
         );
         const { data } = await AuthServices.instance().fetchProfile();
         await authComponentStore.storeIsUserLogged(true);
@@ -323,9 +341,11 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsSigning(true);
       if (_username) {
+        const { codeChallenge } = pkceChallenge();
         const resLogin = await AuthServices.instance().adbLogin(
           _username,
           password,
+          codeChallenge,
           'profilepsf',
           'Single_Factor'
         );
@@ -346,7 +366,13 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsSigning(true);
       if (_username && _username.length > 0 && _password && _password.length > 0) {
-        const data = await AuthServices.instance().adbLogin(_username, _password, 'Single_Factor');
+        const { codeChallenge } = generatePCKE();
+        const data = await AuthServices.instance().adbLogin(
+          _username,
+          _password,
+          codeChallenge,
+          'Single_Factor'
+        );
         if (data && data.id) {
           setFlowId(data.id);
         }
@@ -369,7 +395,10 @@ export const useAuthContextValue = (): AuthContextData => {
             return false;
           }
           const afterValidateData = await AuthServices.instance().resumeUrl(loginData.resumeUrl);
-          await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
+          await AuthServices.instance().obtainToken(
+            afterValidateData.authorizeResponse.code,
+            _codeVerified
+          );
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeIsUserLogged(true);
           setProfile({ ...data });
@@ -384,7 +413,7 @@ export const useAuthContextValue = (): AuthContextData => {
       }
       return false;
     },
-    [_flowId]
+    [_flowId, _codeVerified]
   );
 
   const getProfilePicture = (profile: Profile) => {

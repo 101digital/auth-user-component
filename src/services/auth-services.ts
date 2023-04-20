@@ -7,6 +7,9 @@ import { AuthComponentConfig } from '../types';
 import { authorize } from 'react-native-app-auth';
 import { PASSPORT } from '../types';
 
+const defaultCodeChallenge =
+  'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ';
+
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
 
@@ -51,6 +54,7 @@ export class AuthServices {
   public adbLogin = async (
     username: string,
     password: string,
+    codeChallenge: string,
     scope?: string,
     acr_values = 'Multi_Factor'
   ) => {
@@ -63,15 +67,11 @@ export class AuthServices {
           response_type: responseType,
           client_id: clientId,
           scope: scope ? scope : 'openid profilep',
-          code_challenge:
-            'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+          code_challenge: codeChallenge ?? defaultCodeChallenge,
+          code_challenge_method: 'S256',
           response_mode: responseMode,
           acr_values,
         },
-        // headers: {
-        //   Cookie:
-        //     'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
-        // },
       });
 
     const flowId = responseAuth.data?.id;
@@ -117,13 +117,13 @@ export class AuthServices {
     return response.data;
   };
 
-  public obtainToken = async (authorizeCode: string) => {
+  public obtainToken = async (authorizeCode: string, codeVerified?: string) => {
     const { authGrantType, authBaseUrl, clientId } = this._configs || {};
     const body = qs.stringify({
       grant_type: authGrantType,
       code: authorizeCode,
       scope: 'openid  profilep',
-      code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+      code_verifier: codeVerified ?? defaultCodeChallenge,
       client_id: clientId,
     });
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
@@ -160,13 +160,17 @@ export class AuthServices {
     return responseTokenHint.data.data[0].pairingCode;
   };
 
-  public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
+  public obtainTokenSingleFactor = async (
+    authorizeCode: string,
+    codeVerify?: string,
+    scope?: string
+  ) => {
     const { clientId, authBaseUrl, authGrantType } = this._configs || {};
     const body = qs.stringify({
       grant_type: authGrantType,
       code: authorizeCode,
       scope: scope ?? 'openid  profilep',
-      code_verifier: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+      code_verifier: codeVerify ?? defaultCodeChallenge,
       client_id: clientId,
     });
 
@@ -206,42 +210,22 @@ export class AuthServices {
     return response.data;
   };
 
-  public adbAuthorizeToken = async (token: string) => {
-    try {
-      const body = qs.stringify({
-        response_type: 'code',
-        client_id: this._configs?.clientId,
-        scope: 'openid profile profilep',
-        code_challenge:
-          'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
-        response_mode: 'pi.flow',
-        login_hint_token: token,
-      });
+  // public adbRefreshToken = async () => {
+  //   const loginHintToken = await this.getLoginHintToken();
+  //   const body = qs.stringify({
+  //     response_type: 'code',
+  //     client_id: this._configs?.clientId,
+  //     scope: 'openid profile profilep',
+  //     code_challenge: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+  //     response_mode: 'pi.flow',
+  //     login_hint_token: loginHintToken,
+  //   });
+  //   const responseAuthorize = await AuthApiClient.instance()
+  //     .getAuthApiClient()
+  //     .post('as/authorize', body);
 
-      await AuthApiClient.instance().getAuthApiClient().post('as/authorize', body);
-      return true;
-    } catch (error) {
-      console.log('error', error);
-      return false;
-    }
-  };
-
-  public adbRefreshToken = async () => {
-    const loginHintToken = await this.getLoginHintToken();
-    const body = qs.stringify({
-      response_type: 'code',
-      client_id: this._configs?.clientId,
-      scope: 'openid profile profilep',
-      code_challenge: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
-      response_mode: 'pi.flow',
-      login_hint_token: loginHintToken,
-    });
-    const responseAuthorize = await AuthApiClient.instance()
-      .getAuthApiClient()
-      .post('as/authorize', body);
-
-    return await this.obtainTokenSingleFactor(responseAuthorize.data.id);
-  };
+  //   return await this.obtainTokenSingleFactor(responseAuthorize.data.id);
+  // };
 
   public fetchProfile = async () => {
     const { membershipBaseUrl, accessToken } = this._configs!;
@@ -475,16 +459,11 @@ export class AuthServices {
             response_type: responseType,
             client_id: clientIdInit ? clientIdInit : clientId,
             scope: scope ? scope : 'openid profilep',
-            code_challenge:
-              'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
+            code_challenge: defaultCodeChallenge,
             response_mode: responseMode,
             acr_values: 'Push_Only',
             login_hint_token: loginHintToken,
           },
-          // headers: {
-          //   Cookie:
-          //     'ST=8cadd807-93c8-4208-8852-ca690b2617a6; ST-NO-SS=8cadd807-93c8-4208-8852-ca690b2617a6',
-          // },
         });
       console.log('responseAuth -> response', responseAuth);
       if (responseAuth) {
