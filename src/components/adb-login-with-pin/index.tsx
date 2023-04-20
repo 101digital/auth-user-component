@@ -49,7 +49,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     } else {
       if (resp?.error) {
         setIsLoading(false);
-        if (Platform.OS !== 'android' || isSkipSMSOTP) {
+        if (isSkipSMSOTP) {
           onSuccessVerified();
         } else {
           setIsLoading(false);
