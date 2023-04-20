@@ -1,4 +1,4 @@
-import { BiometricMethod, Profile } from '../types';
+import { BiometricMethod } from '../types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AESCryptoStore from './aes-crypto';
 import SInfo from 'react-native-sensitive-info';
@@ -39,16 +39,6 @@ class AuthComponentStore {
 
   getUserName = () => AsyncStorage.getItem(USER_NAME);
 
-  storeAccessToken = (accessToken: string) => AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-
-  getAccessToken = () => AsyncStorage.getItem(ACCESS_TOKEN_KEY);
-
-  storeOrgToken = (orgToken: string) => AsyncStorage.setItem(ORG_TOKEN_KEY, orgToken);
-
-  getOrgToken = () => AsyncStorage.getItem(ORG_TOKEN_KEY);
-
-  storeProfile = (profile: Profile) => AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-
   storeIsEnableBiometric = (isEnable: boolean) =>
     AsyncStorage.setItem(IS_ENABLE_BIOMETRIC, JSON.stringify(isEnable));
 
@@ -69,16 +59,6 @@ class AuthComponentStore {
     } catch (_) {
       return false;
     }
-  }
-
-
-  getProfile = async () => {
-    try {
-      const value = await AsyncStorage.getItem(PROFILE_KEY);
-      return value ? JSON.parse(value) : undefined;
-    } catch (_) {
-      return undefined;
-    }
   };
 
   clearAuths = async () => {
@@ -89,6 +69,7 @@ class AuthComponentStore {
       PROFILE_KEY,
       LOGIN_TOKEN_HINT,
       QR_INBOUND_IMAGE,
+      IS_USER_LOGGED,
     ]);
   };
 

@@ -88,6 +88,7 @@ export type AuthComponentConfig = {
   identityPingUrl?: string;
   responseType?: string;
   responseMode?: string;
+  accessToken?: string;
 };
 
 export enum VerificationMethod {

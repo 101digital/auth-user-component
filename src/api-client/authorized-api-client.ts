@@ -55,23 +55,6 @@ const refreshTokens = async () => {
   });
 };
 
-const refreshLoginHint = async () => {
-  return new Promise<TokenData>((resolve, reject) => {
-    AuthServices.instance()
-      .adbRefreshToken()
-      .then(async ({ refresh_token, access_token }) => {
-        return [refresh_token, access_token];
-      })
-      .then(([refresh_token, access_token]) => {
-        resolve({
-          accessToken: access_token,
-          refreshToken: refresh_token,
-        });
-      })
-      .catch((err) => reject(err));
-  });
-};
-
 const forceLogout = async () => {
   DeviceEventEmitter.emit('authcomponent.session.expired');
 };
@@ -79,7 +62,7 @@ const forceLogout = async () => {
 export const createAuthorizedApiClient = (baseURL: string) => {
   const options = {
     attachTokenToRequest,
-    refreshLoginHint,
+    refreshTokens,
     shouldIntercept,
     forceLogout,
   };
@@ -100,7 +83,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
   };
 
   const onRequest = async (request: AxiosRequestConfig) => {
-    const authBearer = await authComponentStore.getAccessToken();
+    const authBearer = AuthServices.instance().getAccessToken();
     if (authBearer) {
       request.headers.Authorization = `${authBearer}`;
     }
@@ -141,7 +124,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     originalRequest.retry = true;
     return new Promise((resolve, reject) => {
       options
-        .refreshLoginHint()
+        .refreshTokens()
         .then((data) => {
           options.attachTokenToRequest(
             originalRequest,

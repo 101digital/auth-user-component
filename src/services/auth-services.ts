@@ -27,6 +27,27 @@ export class AuthServices {
     this._configs = configs;
   }
 
+  private storeAccessToken(token: string) {
+    if (this._configs) {
+      this._configs.accessToken = token;
+    }
+  }
+
+  public getAccessToken() {
+    if (this._configs) {
+      return this._configs.accessToken;
+    }
+  }
+
+  public fetchAppAccessToken = async () => {
+    const body = qs.stringify({
+      grant_type: this._configs?.appGrantType ?? 'client_credentials',
+      scope: this._configs?.appScope ?? 'PRODUCTION',
+    });
+    const response = await AuthApiClient.instance().getAuthApiClient().post('as/token', body);
+    return response.data.access_token;
+  };
+
   public adbLogin = async (
     username: string,
     password: string,
@@ -107,7 +128,7 @@ export class AuthServices {
     });
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
 
-    await authComponentStore.storeAccessToken(response.data.access_token);
+    this.storeAccessToken(response.data.access_token);
 
     return {
       access_token: response.data.access_token,
@@ -116,12 +137,11 @@ export class AuthServices {
   };
 
   public getLoginHintToken = async () => {
-    const { identityPingUrl } = this._configs || {};
+    const { identityPingUrl, accessToken } = this._configs || {};
 
-    const access_token = await authComponentStore.getAccessToken();
     const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
       headers: {
-        Authorization: `${access_token}`,
+        Authorization: `${accessToken}`,
       },
     });
 
@@ -129,12 +149,11 @@ export class AuthServices {
   };
 
   public getPairingCode = async () => {
-    const { identityPingUrl } = this._configs || {};
+    const { identityPingUrl, accessToken } = this._configs || {};
 
-    const access_token = await authComponentStore.getAccessToken();
     const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
       headers: {
-        Authorization: `${access_token}`,
+        Authorization: `${accessToken}`,
       },
     });
 
@@ -153,7 +172,7 @@ export class AuthServices {
 
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
     const access_token = response.data.access_token;
-    await authComponentStore.storeAccessToken(response.data.access_token);
+    this.storeAccessToken(access_token);
 
     return {
       access_token,
@@ -174,18 +193,16 @@ export class AuthServices {
           scope: scope ?? this._configs?.authScope ?? 'openid',
         },
       });
-    const { access_token, refresh_token } = response.data;
-    await authComponentStore.storeAccessToken(access_token);
-    await authComponentStore.storeRefreshToken(refresh_token);
+    const { access_token } = response.data;
+    this.storeAccessToken(access_token);
     return response.data;
   };
 
   public refreshToken = async (refreshToken: string, grant_type = 'refresh_token') => {
     const body = qs.stringify({ grant_type, refresh_token: refreshToken });
     const response = await AuthApiClient.instance().getAuthApiClient().post('', body);
-    const { access_token, refresh_token } = response.data;
-    await authComponentStore.storeAccessToken(access_token);
-    await authComponentStore.storeRefreshToken(refresh_token);
+    const { access_token } = response.data;
+    this.storeAccessToken(access_token);
     return response.data;
   };
 
@@ -227,8 +244,8 @@ export class AuthServices {
   };
 
   public fetchProfile = async () => {
-    const { membershipBaseUrl } = this._configs!;
-    const accessToken = await authComponentStore.getAccessToken();
+    const { membershipBaseUrl, accessToken } = this._configs!;
+    console.log('fetchProfile -> accessToken', accessToken);
     const response = await axios.get(`${membershipBaseUrl}/users/me`, {
       headers: {
         Authorization: `${accessToken}`,
@@ -237,21 +254,11 @@ export class AuthServices {
     const { data } = response.data;
     const organisationUser = data?.memberships?.filter((el: any) => el.organisationName);
     const memberShip = organisationUser?.length > 0 ? organisationUser[0] : data?.memberships[0];
-    await authComponentStore.storeOrgToken(memberShip?.token ?? '');
     return { orgToken: memberShip?.token ?? undefined, data };
   };
 
   logout = async () => {
     await authComponentStore.clearAuths();
-  };
-
-  fetchAppAccessToken = async () => {
-    const body = qs.stringify({
-      grant_type: this._configs?.appGrantType ?? 'client_credentials',
-      scope: this._configs?.appScope ?? 'PRODUCTION',
-    });
-    const response = await AuthApiClient.instance().getAuthApiClient().post('as/token', body);
-    return response.data.access_token;
   };
 
   updateProfile = async (
@@ -260,8 +267,7 @@ export class AuthServices {
     lastName: string,
     profilePicture?: string
   ) => {
-    const { membershipBaseUrl } = this._configs!;
-    const accessToken = await authComponentStore.getAccessToken();
+    const { membershipBaseUrl, accessToken } = this._configs!;
     const body = {
       firstName: firstName,
       lastName: lastName,
@@ -319,8 +325,7 @@ export class AuthServices {
     newPassword: string,
     confirmNewPassword: string
   ) => {
-    const { identityPingUrl } = this._configs!;
-    const accessToken = await authComponentStore.getAccessToken();
+    const { identityPingUrl, accessToken } = this._configs!;
     const body = {
       currentPassword,
       newPassword,
@@ -337,10 +342,10 @@ export class AuthServices {
 
   recoveryUserPassword = async (mobileNumber: string) => {
     const { identityBaseUrl } = this._configs!;
-    const accessToken = await this.fetchAppAccessToken();
+    const appAccessToken = await this.fetchAppAccessToken();
     const response = await axios.get(`${identityBaseUrl}/users/${mobileNumber}/recovery-options`, {
       headers: {
-        Authorization: `${accessToken}`,
+        Authorization: `${appAccessToken}`,
       },
     });
     return response.data;
@@ -390,8 +395,7 @@ export class AuthServices {
     appId: string,
     entityId: string
   ) => {
-    const { notificationBaseUrl } = this._configs!;
-    const accessToken = await authComponentStore.getAccessToken();
+    const { notificationBaseUrl, accessToken } = this._configs!;
     const body = {
       entityId,
       appId,
@@ -416,8 +420,7 @@ export class AuthServices {
     idType?: string,
     idIssuingCountry?: string
   ) => {
-    const { membershipBaseUrl } = this._configs!;
-    const accessToken = await authComponentStore.getAccessToken();
+    const { membershipBaseUrl, accessToken } = this._configs!;
     let body = {};
     let firstName = 'firstName';
     let lastName = 'lastName';
@@ -494,22 +497,22 @@ export class AuthServices {
   };
 
   public getListDevices = async () => {
-    const access_token = await authComponentStore.getAccessToken();
+    const { accessToken } = this._configs || {};
     const response = await axios.get(`${this._configs?.identityPingUrl}/users/devices`, {
       headers: {
-        Authorization: `${access_token}`,
+        Authorization: `${accessToken}`,
       },
     });
     return response.data;
   };
 
   public deleteDevice = async (deviceId: string) => {
-    const access_token = await authComponentStore.getAccessToken();
+    const { accessToken } = this._configs || {};
     const response = await axios.delete(
       `${this._configs?.identityPingUrl}/users/devices/${deviceId}`,
       {
         headers: {
-          Authorization: `${access_token}`,
+          Authorization: `${accessToken}`,
         },
       }
     );

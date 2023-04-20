@@ -204,6 +204,15 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_errorRebindedDevice, setErrorRebindedDevice] = useState<Error | undefined>();
   const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
 
+  useEffect(() => {
+    checkIsLogged();
+  }, []);
+
+  const checkIsLogged = async () => {
+    const isLogged = await authComponentStore.getIsUserLogged();
+    setIsSignedIn(isLogged);
+  };
+
   const loginOAuth2 = useCallback(async () => {
     try {
       setIsSigning(true);
