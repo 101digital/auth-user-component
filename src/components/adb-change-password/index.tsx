@@ -47,11 +47,11 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
   };
 
   const checkAtLeast1upperandLower = (text: string) => {
-    return /[A-Z][a-z]/.test(text);
+    return /(?=.*[A-Z])(?=.*[a-z])/.test(text);
   };
 
   const checkSpecialCharacter = (text: string) => {
-    return /[#?!@$%^&*-]/.test(text);
+    return /[#`~()+={}|:;"'<>[,.?!@$%^_&*-]/.test(text);
   };
 
   const validationCheck = (val: string) => {
