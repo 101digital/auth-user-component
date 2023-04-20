@@ -120,6 +120,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                 label="Login"
                 onPress={submitForm}
                 disabled={values.password.length < 8 || values.username.length === 0}
+                containerStyles={{marginBottom: 15}}
               />
             </>
           )}
