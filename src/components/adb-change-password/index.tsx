@@ -39,19 +39,19 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
   );
   const [loading, setLoading] = useState(false);
   const checkIs8Character = (text: string) => {
-    return /^.{8,}$/.test(text);
+    return /^.{8,}$/.test(text.trim());
   };
 
   const checkAtLeast1digit = (text: string) => {
-    return /\d/.test(text);
+    return /(?=.*\d)/.test(text.trim());
   };
 
   const checkAtLeast1upperandLower = (text: string) => {
-    return /[A-Z][a-z]/.test(text);
+    return /(?=.*[A-Z])(?=.*[a-z])/.test(text.trim());
   };
 
   const checkSpecialCharacter = (text: string) => {
-    return /[#?!@$%^&*-]/.test(text);
+    return /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(text.trim());
   };
 
   const validationCheck = (val: string) => {
