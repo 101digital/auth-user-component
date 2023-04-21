@@ -86,7 +86,11 @@ export interface AuthContextData {
   errorVerifySignIn?: Error;
   adbLoginVerifyOtp: (otp: string) => Promise<boolean>;
   adbResendOTP: () => void;
-  adbLoginSingleFactor: (username: string, password: string) => Promise<string | undefined>;
+  adbLoginSingleFactor: (
+    username: string,
+    password: string,
+    isSkipLogged?: boolean
+  ) => Promise<string | undefined>;
   flowId?: string;
   isManualLogin: boolean;
   isValidatedSubsequenceLogin: boolean;
@@ -104,7 +108,10 @@ export interface AuthContextData {
   //rebinding
   getListDevices: () => Promise<Devices[] | undefined>;
   deleteDevice: (deviceId: string) => Promise<boolean>;
+  updateUserStatus: (status: string) => Promise<boolean>;
+  isUpdatingUserStatus: boolean;
   errorRebindedDevice?: Error;
+  setIsSignedIn: (isLogged: boolean) => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -161,7 +168,11 @@ export const authDefaultValue: AuthContextData = {
   saveResumeURL: () => false,
   getListDevices: async () => undefined,
   deleteDevice: async () => false,
+  updateUserStatus: async () => false,
+  setIsSignedIn: () => undefined,
+  isUpdatingUserStatus: false,
 };
+
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
 export const useAuthContextValue = (): AuthContextData => {
@@ -205,6 +216,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_errorRebindedDevice, setErrorRebindedDevice] = useState<Error | undefined>();
   const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
   const [_codeVerified, setCodeVerified] = React.useState<string>();
+  const [_isUpdatingUserStatus, setIsUpdatingUserStatus] = useState<boolean>(false);
 
   useEffect(() => {
     checkIsLogged();
@@ -301,41 +313,46 @@ export const useAuthContextValue = (): AuthContextData => {
     } catch (error) {}
   }, []);
 
-  const adbLoginSingleFactor = useCallback(async (username: string, password: string) => {
-    try {
-      setIsSigning(true);
-      const { codeVerifier, codeChallenge } = pkceChallenge();
-      const resLogin = await AuthServices.instance().adbLogin(
-        username,
-        password,
-        codeChallenge,
-        'profilepsf',
-        'Single_Factor'
-      );
-      if (resLogin.error) {
-        return resLogin;
-      } else {
-        const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
-        await AuthServices.instance().obtainTokenSingleFactor(
-          resAfterValidate.authorizeResponse.code,
-          codeVerifier
+  const adbLoginSingleFactor = useCallback(
+    async (username: string, password: string, isSkipLogged?: boolean) => {
+      try {
+        setIsSigning(true);
+        const { codeVerifier, codeChallenge } = pkceChallenge();
+        const resLogin = await AuthServices.instance().adbLogin(
+          username,
+          password,
+          codeChallenge,
+          'profilepsf',
+          'Single_Factor'
         );
-        const { data } = await AuthServices.instance().fetchProfile();
-        await authComponentStore.storeIsUserLogged(true);
-        await authComponentStore.storeUserName(username);
-        setPassword(undefined);
-        setProfile({ ...data });
-        setIsSignedIn(true);
-        setisManualLogin(true);
-        return resLogin._embedded.user.id;
+        if (resLogin.error) {
+          return resLogin;
+        } else {
+          const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
+          await AuthServices.instance().obtainTokenSingleFactor(
+            resAfterValidate.authorizeResponse.code,
+            codeVerifier
+          );
+          const { data } = await AuthServices.instance().fetchProfile();
+          await authComponentStore.storeIsUserLogged(true);
+          await authComponentStore.storeUserName(username);
+          setPassword(undefined);
+          setProfile({ ...data });
+          if (!isSkipLogged) {
+            setIsSignedIn(true);
+          }
+          setisManualLogin(true);
+          return resLogin._embedded.user.id;
+        }
+      } catch (error) {
+        setErrorSignIn(error as Error);
+        throw error;
+      } finally {
+        setIsSigning(false);
       }
-    } catch (error) {
-      setErrorSignIn(error as Error);
-      throw error;
-    } finally {
-      setIsSigning(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   const verifyPassword = useCallback(async (password: string) => {
     try {
@@ -704,6 +721,24 @@ export const useAuthContextValue = (): AuthContextData => {
     return false;
   }, []);
 
+  const updateUserStatus = useCallback(
+    async (status: string) => {
+      if (_profile?.userId) {
+        setIsUpdatingUserStatus(true);
+        try {
+          await AuthServices.instance().updateUserStatus(_profile?.userId, status);
+          return true;
+        } catch (error) {
+          setErrorRebindedDevice(error as Error);
+        } finally {
+          setIsUpdatingUserStatus(false);
+        }
+      }
+      return false;
+    },
+    [_profile]
+  );
+
   return useMemo(
     () => ({
       profile: _profile,
@@ -767,6 +802,9 @@ export const useAuthContextValue = (): AuthContextData => {
       errorRebindedDevice: _errorRebindedDevice,
       deleteDevice,
       getListDevices,
+      updateUserStatus,
+      setIsSignedIn,
+      isUpdatingUserStatus: _isUpdatingUserStatus,
     }),
     [
       _profile,
@@ -801,6 +839,7 @@ export const useAuthContextValue = (): AuthContextData => {
       _verificationMethodKey,
       _resumeURL,
       _errorRebindedDevice,
+      _isUpdatingUserStatus,
     ]
   );
 };

@@ -497,4 +497,21 @@ export class AuthServices {
     );
     return response.data;
   };
+
+  public updateUserStatus = async (userId: string, status: string) => {
+    const { accessToken } = this._configs || {};
+    try {
+      await axios.patch(
+        `${this._configs?.membershipBaseUrl}/users/${userId}`,
+        { status },
+        {
+          headers: {
+            Authorization: `${accessToken}`,
+          },
+        }
+      );
+      return true;
+    } catch (err) {}
+    return false;
+  };
 }
