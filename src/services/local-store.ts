@@ -95,14 +95,24 @@ class AuthComponentStore {
     await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
   };
 
-  setBiometric = async (keyBio: string) => {
-    const loginHintToken = await AuthServices.instance().getLoginHintToken();
-    const salt = await this.getSalt();
-    const key = await AESCryptoStore.generateKey(keyBio, salt, cost, keySize); //cost 10000
-    const encryptedData = await AESCryptoStore.encryptData(loginHintToken, key);
+  setBiometric = async () => {
+    const hasAnySensors = await SInfo.isSensorAvailable();
+    if (hasAnySensors) {
+      try {
+        const loginHintToken = await AuthServices.instance().getLoginHintToken();
 
-    await SInfo.setItem(BIO_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
-    await SInfo.setItem(BIO_PUBLIC_KEY, keyBio, sensitiveInfoOptions);
+        await SInfo.setItem(BIO_TOKEN, loginHintToken, {
+          ...sensitiveInfoOptions,
+          touchID: true, //add this key
+          showModal: true, //add this key
+          kSecAccessControl: 'kSecAccessControlBiometryAny', // optional - Add support for FaceID
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    return false;
   };
 
   validatePin = async (pinNumber: string) => {
@@ -121,17 +131,23 @@ class AuthComponentStore {
 
   validateBiometric = async () => {
     try {
-      const bioPublicKey = await SInfo.getItem(BIO_PUBLIC_KEY, sensitiveInfoOptions);
-      const dataEncrypted = await SInfo.getItem(BIO_TOKEN, sensitiveInfoOptions);
-      const salt = await this.getSalt();
-      const key = await AESCryptoStore.generateKey(bioPublicKey, salt, cost, keySize); //cost = 10000
-      const loginHintToken = await AESCryptoStore.decryptData(JSON.parse(dataEncrypted), key);
+      const hasAnySensors = await SInfo.isSensorAvailable();
+      if (hasAnySensors) {
+        const loginHintToken = await SInfo.getItem(BIO_TOKEN, {
+          ...sensitiveInfoOptions,
+          touchID: true,
+          showModal: true, //required (Android) - Will prompt user's fingerprint on Android
+          // required (iOS) -  A fallback string for iOS
+          kSecUseOperationPrompt: 'Biometric login for ADB App',
+        });
 
-      return await AuthServices.instance().authorizePushOnly(loginHintToken);
+        return await AuthServices.instance().authorizePushOnly(loginHintToken);
+      }
     } catch (error) {
       console.log('error', error);
       return false;
     }
+    return false;
   };
 }
 
