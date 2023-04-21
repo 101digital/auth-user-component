@@ -12,7 +12,7 @@ type ADBInputPINVerifyProps = {
 const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
   const { onContinue, onFailed } = props;
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-  const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
+  const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
   const otpRef = useRef<OTPFieldRef>();
   const [isLoadingStoringPIN, setIsLoadingStoringPIN] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');

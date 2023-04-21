@@ -35,7 +35,9 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const { adbLoginSingleFactor, isSigning, errorSignIn } = useContext(AuthContext);
+  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
+  const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
 
   useEffect(() => {
     if (errorSignIn) {
@@ -58,13 +60,23 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     } else {
       onLoginFailed();
     }
-    // const profile = await login(_username, password, _country);
-    // if (profile) {
-    //   onLoginSuccess();
-    // } else {
-    //   onLoginFailed();
-    // }
   };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+      console.log('event', e);
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   const onToggleVisiblePassword = () => {
     setIsVisiblePassword(!isVisiblePassword);
@@ -72,59 +84,60 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-      >
-        <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
-          {({ submitForm, values }) => (
-            <>
-              <View style={styles.content}>
-                <View style={styles.rowInput}>
-                  <ADBInputField
-                    name="username"
-                    returnKeyType="done"
-                    placeholder={'Email'}
-                    autoCapitalize="none"
-                  />
-                </View>
-                <View style={styles.rowInput}>
-                  <ADBInputField
-                    name="password"
-                    returnKeyType="done"
-                    secureTextEntry={!isVisiblePassword}
-                    placeholder={'Password'}
-                    autoCapitalize="none"
-                    suffixIcon={
-                      <TouchableOpacity onPress={onToggleVisiblePassword} style={styles.iconBtn}>
-                        {isVisiblePassword ? <EyesClosedIcon size={25} /> : <EyesIcon size={25} />}
-                      </TouchableOpacity>
-                    }
-                  />
-                </View>
-                <View style={styles.rowBetween}>
-                  <TouchableOpacity style={styles.flex}>
-                    <Text style={styles.forgotPasswordTitle}>{`${
-                      i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                    }?`}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={styles.helpTitle}>{`${
-                      i18n.t('login_component.lbl_help') ?? 'Help'
-                    }?`}</Text>
-                  </TouchableOpacity>
-                </View>
+      <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
+        {({ submitForm, values }) => (
+          <>
+            <View style={styles.content}>
+              <View style={styles.rowInput}>
+                <ADBInputField
+                  name="username"
+                  returnKeyType="done"
+                  placeholder={'Email'}
+                  autoCapitalize="none"
+                />
               </View>
+              <View style={styles.rowInput}>
+                <ADBInputField
+                  name="password"
+                  returnKeyType="done"
+                  secureTextEntry={!isVisiblePassword}
+                  placeholder={'Password'}
+                  autoCapitalize="none"
+                  suffixIcon={
+                    <TouchableOpacity onPress={onToggleVisiblePassword} style={styles.iconBtn}>
+                      {isVisiblePassword ? <EyesClosedIcon size={25} /> : <EyesIcon size={25} />}
+                    </TouchableOpacity>
+                  }
+                />
+              </View>
+              <View style={styles.rowBetween}>
+                <TouchableOpacity style={styles.flex}>
+                  <Text style={styles.forgotPasswordTitle}>{`${
+                    i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
+                  }?`}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <Text style={styles.helpTitle}>{`${
+                    i18n.t('login_component.lbl_help') ?? 'Help'
+                  }?`}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View
+              style={{
+                marginBottom: marginKeyboard,
+              }}
+            >
               <ADBButton
                 isLoading={isSigning}
-                label="Login"
+                label={i18n.t('common.lbl_continue') ?? 'Continue'}
                 onPress={submitForm}
                 disabled={values.password.length < 8 || values.username.length === 0}
               />
-            </>
-          )}
-        </Formik>
-      </KeyboardAvoidingView>
+            </View>
+          </>
+        )}
+      </Formik>
       <BottomSheetModal isVisible={errorModal}>
         <View style={styles.cameraDisableContainer}>
           <AlertCircleIcon size={72} />
@@ -157,8 +170,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-    paddingHorizontal: 12,
-    paddingTop: 7,
+    marginHorizontal: 25,
+    paddingTop: 20,
   },
   rowInput: {
     marginTop: 15,
@@ -168,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
   },
   input: {
     borderBottomWidth: 1,
