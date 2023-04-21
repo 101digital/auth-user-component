@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import {
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
@@ -36,12 +35,37 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const [errorModal, setErrorModal] = useState(false);
   const { adbLoginSingleFactor, isSigning, errorSignIn } = useContext(AuthContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+  const marginKeyboard =
+    keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
 
   useEffect(() => {
     if (errorSignIn) {
       onLoginFailed();
     }
   }, [errorSignIn]);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      (e) => {
+        console.log('event', e);
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
@@ -72,10 +96,6 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
 
   return (
     <View style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-      >
         <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
           {({ submitForm, values }) => (
             <>
@@ -115,17 +135,17 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              <ADBButton
-                isLoading={isSigning}
-                label="Login"
-                onPress={submitForm}
-                disabled={values.password.length < 8 || values.username.length === 0}
-                containerStyles={{marginBottom: 15}}
-              />
+              <View style={{ marginBottom: marginKeyboard }}>
+                <ADBButton
+                  isLoading={isSigning}
+                  label="Login"
+                  onPress={submitForm}
+                  disabled={values.password.length < 8 || values.username.length === 0}
+                />
+              </View>
             </>
           )}
         </Formik>
-      </KeyboardAvoidingView>
       <BottomSheetModal isVisible={errorModal}>
         <View style={styles.cameraDisableContainer}>
           <AlertCircleIcon size={72} />
