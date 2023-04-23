@@ -63,16 +63,21 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
         onSubmit={(values) => validateIdNumber(values.userId)}
       >
         {({ submitForm, setFieldValue, values }) => {
-          if (
-            (values.userId.length === 7 || values.userId.length === 10) &&
-            values.userId[values.userId.length - 1] !== '-'
-          ) {
-            setFieldValue(
-              'userId',
-              `${values.userId.slice(0, values.userId.length - 1)}-${values.userId.slice(
-                values.userId.length - 1
-              )}`
-            );
+          let formattedId = values.userId.replace(/[-]+/g, '');
+          if (formattedId.length > 8) {
+            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(
+              6,
+              8
+            )}-${formattedId.slice(8)}`;
+          } else if (formattedId.length > 6) {
+            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(6)}`;
+          }
+
+          if (formattedId !== values.userId) {
+            if (formattedId[formattedId.length - 1] === '-') {
+              formattedId = formattedId.slice(0, formattedId.length - 2);
+            }
+            setFieldValue('userId', formattedId);
           }
 
           return (

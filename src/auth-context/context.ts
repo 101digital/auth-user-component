@@ -277,7 +277,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const adbLogin = useCallback(async (username: string, password: string) => {
     try {
       setIsSigning(true);
-      const { codeChallenge } = pkceChallenge();
+      const { codeChallenge } = generatePCKE();
       const data = await AuthServices.instance().adbLogin(username, password, codeChallenge);
       if (data && data.id) {
         setFlowId(data.id);
