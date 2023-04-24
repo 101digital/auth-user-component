@@ -93,6 +93,7 @@ export interface AuthContextData {
   ) => Promise<string | undefined>;
   flowId?: string;
   isManualLogin: boolean;
+  setIsManualLogin: (isManual: boolean) => void;
   isValidatedSubsequenceLogin: boolean;
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
   verificationMethodKey: VerificationMethod;
@@ -155,6 +156,7 @@ export const authDefaultValue: AuthContextData = {
   adbResendOTP: () => false,
   adbLoginSingleFactor: async () => undefined,
   isManualLogin: false,
+  setIsManualLogin: () => undefined,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
   verificationMethodKey: VerificationMethod.PENDING,
@@ -207,7 +209,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_errorVerifySignIn, setErrorVerifySignIn] = useState<Error | undefined>();
   const [_username, setUsername] = useState<string>();
   const [_password, setPassword] = useState<string>();
-  const [_isManualLogin, setisManualLogin] = useState<boolean>(false);
+  const [_isManualLogin, setIsManualLogin] = useState<boolean>(false);
   const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
   const [_verificationMethodKey, setVerificationMethodKey] = useState<VerificationMethod>(
     VerificationMethod.PENDING
@@ -341,7 +343,7 @@ export const useAuthContextValue = (): AuthContextData => {
           if (!isSkipLogged) {
             setIsSignedIn(true);
           }
-          setisManualLogin(true);
+          setIsManualLogin(true);
           return resLogin._embedded.user.id;
         }
       } catch (error) {
@@ -788,6 +790,7 @@ export const useAuthContextValue = (): AuthContextData => {
       adbLoginSingleFactor,
       flowId: _flowId,
       isManualLogin: _isManualLogin,
+      setIsManualLogin,
       isValidatedSubsequenceLogin: _isValidatedSubsequenceLogin,
       setIsValidatedSubsequenceLogin,
       verificationMethodKey: _verificationMethodKey,
