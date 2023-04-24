@@ -8,21 +8,20 @@ import { AuthContext } from '../../auth-context';
 type ADBInputIdProps = {
   onVerifyNRICSuccess: () => void;
   onError: () => void;
+  isLoading: boolean;
 };
 
 const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
   const { i18n } = useContext(ThemeContext);
   const { profile } = useContext(AuthContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-  const [isLoadingVerifyUserId, setIsLoadingVerifyUserId] = useState<boolean>(false);
   const formikRef = useRef<FormikProps<InputIdData>>(null);
   const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
 
   console.log('profile?.kycDetails', profile?.kycDetails);
-  const { onVerifyNRICSuccess, onError } = prop;
+  const { onVerifyNRICSuccess, onError, isLoading } = prop;
 
   const validateIdNumber = async (id: string) => {
-    setIsLoadingVerifyUserId(true);
     const formatedId = id.replace(/[-]+/g, '');
     if (
       profile?.kycDetails?.idNumber === formatedId ||
@@ -34,7 +33,6 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
     }
 
     console.log('profile', profile?.kycDetails);
-    setIsLoadingVerifyUserId(false);
   };
 
   useEffect(() => {
@@ -86,13 +84,14 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                 <ADBInputField
                   name={'userId'}
                   placeholder={i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'}
+                  maxLength={14}
                 />
               </View>
               <View style={{ marginBottom: marginKeyboard }}>
                 <ADBButton
                   label={'Continue'}
                   onPress={submitForm}
-                  isLoading={isLoadingVerifyUserId}
+                  isLoading={isLoading}
                   disabled={values.userId.length === 0}
                 />
               </View>

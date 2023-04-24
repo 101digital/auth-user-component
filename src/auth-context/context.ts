@@ -77,8 +77,8 @@ export interface AuthContextData {
     fullName: string,
     nickName: string,
     id: string,
-    idType: string,
-    idIssuingCountry: string,
+    idType?: string,
+    idIssuingCountry?: string,
     onError?: (err: Error) => void
   ) => Promise<boolean>;
   adbLogin: (username: string, password: string) => Promise<boolean>;
@@ -417,7 +417,6 @@ export const useAuthContextValue = (): AuthContextData => {
             _codeVerified
           );
           const { data } = await AuthServices.instance().fetchProfile();
-          await authComponentStore.storeIsUserLogged(true);
           setProfile({ ...data });
           // setisManualLogin(true);
           // setIsSignedIn(true);
@@ -447,9 +446,10 @@ export const useAuthContextValue = (): AuthContextData => {
   }, []);
 
   const logout = useCallback(async () => {
-    await authComponentStore.clearAuths();
-    setIsSignedIn(false);
+    // await authComponentStore.clearAuths();
+    // setIsSignedIn(false);
     setProfile(undefined);
+    setIsValidatedSubsequenceLogin(false);
   }, []);
 
   const updateProfile = useCallback(
