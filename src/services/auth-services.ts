@@ -3,17 +3,16 @@ import qs from 'qs';
 import authComponentStore from './local-store';
 import axios from 'axios';
 import { AuthApiClient } from '../api-client/auth-api-client';
-import { AuthComponentConfig } from '../types';
+import { AuthComponentConfig, PKCE } from '../types';
 import { authorize } from 'react-native-app-auth';
 import { PASSPORT } from '../types';
-
-const defaultCodeChallenge =
-  'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ';
+import pkceChallenge from 'react-native-pkce-challenge';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
 
   private _configs?: AuthComponentConfig;
+  private _pkce: PKCE = pkceChallenge();
 
   constructor() {
     if (AuthServices._instance) {
@@ -42,6 +41,11 @@ export class AuthServices {
     }
   }
 
+  private refreshPKCEChallenge() {
+    this._pkce = pkceChallenge();
+    return this._pkce;
+  }
+
   public fetchAppAccessToken = async () => {
     const body = qs.stringify({
       grant_type: this._configs?.appGrantType ?? 'client_credentials',
@@ -54,12 +58,11 @@ export class AuthServices {
   public adbLogin = async (
     username: string,
     password: string,
-    codeChallenge: string,
     scope?: string,
     acr_values = 'Multi_Factor'
   ) => {
     const { clientId, responseType, responseMode } = this._configs || {};
-
+    const { codeChallenge } = this.refreshPKCEChallenge();
     const responseAuth = await AuthApiClient.instance()
       .getAuthApiClient()
       .get('as/authorize', {
@@ -67,7 +70,7 @@ export class AuthServices {
           response_type: responseType,
           client_id: clientId,
           scope: scope ? scope : 'openid profilep',
-          code_challenge: codeChallenge ?? defaultCodeChallenge,
+          code_challenge: codeChallenge,
           code_challenge_method: 'S256',
           response_mode: responseMode,
           acr_values,
@@ -117,13 +120,14 @@ export class AuthServices {
     return response.data;
   };
 
-  public obtainToken = async (authorizeCode: string, codeVerified?: string) => {
+  public obtainToken = async (authorizeCode: string) => {
     const { authGrantType, authBaseUrl, clientId } = this._configs || {};
+    const { codeVerifier } = this._pkce;
     const body = qs.stringify({
       grant_type: authGrantType,
       code: authorizeCode,
       scope: 'openid  profilep',
-      code_verifier: codeVerified ?? defaultCodeChallenge,
+      code_verifier: codeVerifier,
       client_id: clientId,
     });
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
@@ -160,17 +164,14 @@ export class AuthServices {
     return responseTokenHint.data.data[0].pairingCode;
   };
 
-  public obtainTokenSingleFactor = async (
-    authorizeCode: string,
-    codeVerify?: string,
-    scope?: string
-  ) => {
+  public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
     const { clientId, authBaseUrl, authGrantType } = this._configs || {};
+    const { codeVerifier } = this._pkce;
     const body = qs.stringify({
       grant_type: authGrantType,
       code: authorizeCode,
       scope: scope ?? 'openid  profilep',
-      code_verifier: codeVerify ?? defaultCodeChallenge,
+      code_verifier: codeVerifier,
       client_id: clientId,
     });
 
@@ -452,6 +453,7 @@ export class AuthServices {
   ) => {
     const { clientId, responseType, responseMode } = this._configs || {};
     try {
+      const { codeChallenge } = this.refreshPKCEChallenge();
       const responseAuth = await AuthApiClient.instance()
         .getAuthApiClient()
         .get('as/authorize', {
@@ -459,7 +461,7 @@ export class AuthServices {
             response_type: responseType,
             client_id: clientIdInit ? clientIdInit : clientId,
             scope: scope ? scope : 'openid profilep',
-            code_challenge: defaultCodeChallenge,
+            code_challenge: codeChallenge,
             response_mode: responseMode,
             acr_values: 'Push_Only',
             login_hint_token: loginHintToken,

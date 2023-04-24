@@ -116,3 +116,8 @@ export type Devices = {
   email: string;
   phone: string;
 };
+
+export type PKCE = {
+  codeChallenge: string;
+  codeVerifier: string;
+};
