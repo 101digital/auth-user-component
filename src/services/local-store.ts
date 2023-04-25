@@ -17,7 +17,6 @@ const LOGIN_TOKEN_HINT = 'authcomponent.loginTokenHint';
 const PIN_TOKEN = 'authcomponent.pinToken';
 const BIO_TOKEN = 'authcomponent.biometricToken';
 const QR_INBOUND_IMAGE = 'qr.inboundImage';
-const BIO_PUBLIC_KEY = 'authcomponent.bioPublicKey';
 const IS_USER_LOGGED = 'authcomponent.isUserLogged';
 
 const keySize = 256;
@@ -95,14 +94,21 @@ class AuthComponentStore {
     await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
   };
 
-  setBiometric = async (keyBio: string) => {
+  setBiometric = async () => {
     const loginHintToken = await AuthServices.instance().getLoginHintToken();
-    const salt = await this.getSalt();
-    const key = await AESCryptoStore.generateKey(keyBio, salt, cost, keySize); //cost 10000
-    const encryptedData = await AESCryptoStore.encryptData(loginHintToken, key);
 
-    await SInfo.setItem(BIO_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
-    await SInfo.setItem(BIO_PUBLIC_KEY, keyBio, sensitiveInfoOptions);
+      await SInfo.setItem(BIO_TOKEN, loginHintToken, {
+        ...sensitiveInfoOptions,
+        touchID: true, //add this key
+        showModal: true, //add this key
+        kSecAccessControl: 'kSecAccessControlBiometryAny', // optional - Add support for FaceID
+      });
+
+      return true;
+    } catch (error) {
+      console.log('error', error);
+      return false;
+    }
   };
 
   validatePin = async (pinNumber: string) => {
@@ -114,19 +120,24 @@ class AuthComponentStore {
 
       return await AuthServices.instance().authorizePushOnly(loginHintToken);
     } catch (error) {
-      console.log('error', error);
+      console.log('react native log -> error', error);
       return false;
     }
   };
 
   validateBiometric = async () => {
     try {
-      const bioPublicKey = await SInfo.getItem(BIO_PUBLIC_KEY, sensitiveInfoOptions);
-      const dataEncrypted = await SInfo.getItem(BIO_TOKEN, sensitiveInfoOptions);
-      const salt = await this.getSalt();
-      const key = await AESCryptoStore.generateKey(bioPublicKey, salt, cost, keySize); //cost = 10000
-      const loginHintToken = await AESCryptoStore.decryptData(JSON.parse(dataEncrypted), key);
-
+      const loginHintToken = await SInfo.getItem(BIO_TOKEN, {
+        ...sensitiveInfoOptions,
+        touchID: true,
+        showModal: true,
+        strings: {
+          description: 'Do you want to allow {ADB} to use Finger Print ID?',
+          header:
+            '{ADB} uses Finger Print ID to restrict unauthorized users from accessing the app.',
+        },
+        kSecUseOperationPrompt: 'We need your permission to retrieve encrypted data',
+      });
       return await AuthServices.instance().authorizePushOnly(loginHintToken);
     } catch (error) {
       console.log('error', error);
