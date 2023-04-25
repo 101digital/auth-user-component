@@ -421,6 +421,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const logout = useCallback(async () => {
     // await authComponentStore.clearAuths();
     // setIsSignedIn(false);
+    setVerificationMethodKey(VerificationMethod.PIN);
     setProfile(undefined);
     setIsValidatedSubsequenceLogin(false);
   }, []);
