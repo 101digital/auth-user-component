@@ -462,6 +462,7 @@ export class AuthServices {
             client_id: clientIdInit ? clientIdInit : clientId,
             scope: scope ? scope : 'openid profilep',
             code_challenge: codeChallenge,
+            code_challenge_method: 'S256',
             response_mode: responseMode,
             acr_values: 'Push_Only',
             login_hint_token: loginHintToken,
