@@ -96,7 +96,7 @@ class AuthComponentStore {
 
   setBiometric = async () => {
     const loginHintToken = await AuthServices.instance().getLoginHintToken();
-
+    try{
       await SInfo.setItem(BIO_TOKEN, loginHintToken, {
         ...sensitiveInfoOptions,
         touchID: true, //add this key
@@ -105,7 +105,7 @@ class AuthComponentStore {
       });
 
       return true;
-    } catch (error) {
+    } catch(error) {
       console.log('error', error);
       return false;
     }
