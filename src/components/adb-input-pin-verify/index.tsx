@@ -3,6 +3,7 @@ import { StyleSheet, View, Keyboard, Platform, KeyboardAvoidingView } from 'reac
 import { ADBButton, OTPField } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
+import { isIphone8 } from 'react-native-theme-component/src/utils/device-utils';
 
 type ADBInputPINVerifyProps = {
   onContinue: () => void;
@@ -12,7 +13,7 @@ type ADBInputPINVerifyProps = {
 const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
   const { onContinue, onFailed } = props;
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-  const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
+  const marginKeyboard = keyboardHeight ? keyboardHeight - (isIphone8() ? 0 : 20)  : Platform.OS === 'ios' ? (isIphone8() ? 10 : 0) : 20;
   const otpRef = useRef<OTPFieldRef>();
   const [isLoadingStoringPIN, setIsLoadingStoringPIN] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
