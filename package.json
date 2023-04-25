@@ -1,6 +1,6 @@
 {
   "name": "auth-user-component",
-  "version": "1.1.32",
+  "version": "1.1.34",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/auth-user-component.git",
   "main": "index.ts",
@@ -21,9 +21,6 @@
     "react": "16.13.1",
     "react-native": "0.63.2",
     "typescript": "^4.0.2"
-  },
-  "dependencies": {
-    "react-native-sensitive-info": "6.0.0-alpha.9"
   },
   "peerDependencies": {
     "@react-native-community/eslint-config": "^2.0.0",
