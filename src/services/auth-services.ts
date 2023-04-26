@@ -407,19 +407,14 @@ export class AuthServices {
   ) => {
     const { membershipBaseUrl, accessToken } = this._configs!;
     let body = {};
-    let firstName = 'firstName';
-    let lastName = 'lastName';
-    const arrName = fullName.split(' ');
-    if (arrName.length > 0) {
-      lastName = arrName[arrName.length - 1];
-      firstName = arrName.slice(0, arrName.length - 1).join(' ');
-    }
+    
     const updateInfoPayload = {
       fullName: fullName,
       nickName: nickname,
-      firstName: firstName?.length > 0 ? firstName : lastName,
-      lastName: lastName,
+      firstName: fullName,
+      lastName: fullName,
     };
+    
     if (idType === PASSPORT) {
       body = {
         ...updateInfoPayload,
