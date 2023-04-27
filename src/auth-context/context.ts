@@ -11,7 +11,6 @@ import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
 import { AuthServices } from '../services/auth-services';
 import _ from 'lodash';
-import pkceChallenge from 'react-native-pkce-challenge';
 
 export interface AuthContextData {
   profile?: Profile;
@@ -113,6 +112,7 @@ export interface AuthContextData {
   isUpdatingUserStatus: boolean;
   errorRebindedDevice?: Error;
   setIsSignedIn: (isLogged: boolean) => void;
+  userMobileNumberHint?: string;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -218,6 +218,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_errorRebindedDevice, setErrorRebindedDevice] = useState<Error | undefined>();
   const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
   const [_isUpdatingUserStatus, setIsUpdatingUserStatus] = useState<boolean>(false);
+  const [_userMobileNumberHint, setUserMobileNumberHint] = useState<string>();
 
   useEffect(() => {
     checkIsLogged();
@@ -272,6 +273,14 @@ export const useAuthContextValue = (): AuthContextData => {
       const data = await AuthServices.instance().adbLogin(username, password);
       if (data && data.id) {
         setFlowId(data.id);
+        if (data._embedded.devices?.length > 0) {
+          const smsDevice = data._embedded.devices.find(
+            (dvc: Devices) => dvc.type === 'SMS' && dvc.status === 'ACTIVE'
+          );
+          if (smsDevice) {
+            setUserMobileNumberHint(smsDevice.phone);
+          }
+        }
         setUsername(username);
         setPassword(undefined);
       }
@@ -780,6 +789,7 @@ export const useAuthContextValue = (): AuthContextData => {
       updateUserStatus,
       setIsSignedIn,
       isUpdatingUserStatus: _isUpdatingUserStatus,
+      userMobileNumberHint: _userMobileNumberHint,
     }),
     [
       _profile,
@@ -815,6 +825,7 @@ export const useAuthContextValue = (): AuthContextData => {
       _resumeURL,
       _errorRebindedDevice,
       _isUpdatingUserStatus,
+      _userMobileNumberHint,
     ]
   );
 };
