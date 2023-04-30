@@ -22,7 +22,7 @@ type ADBLoginWithPINProps = {
 };
 
 const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
-  const { onFailedVerified, onSuccessVerified, isSkipSMSOTP = false, onError } = prop;
+  const { onFailedVerified, onSuccessVerified, onError } = prop;
   const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
@@ -35,8 +35,8 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
 
   const validatePINNumber = async () => {
     setIsLoading(true);
-    const authResponse = await authComponentStore.validatePin(value);
-    if (!authResponse) {
+    const authorizeResponse = await authComponentStore.validatePin(value);
+    if (!authorizeResponse) {
       setIsLoading(false);
       if (retryCount + 1 < 3) {
         setIsNotMatched(true);
@@ -47,30 +47,27 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         onFailedVerified();
       }
     } else {
-      if (authResponse?.error) {
+      if (authorizeResponse?.status === 'FAILED') {
         setIsLoading(false);
-        if (isSkipSMSOTP) {
-          onSuccessVerified();
-        } else {
-          setIsLoading(false);
-          onError && onError(authResponse.error);
-          setIsNotMatched(false);
-          setRetryCount(0);
-        }
+        setIsSignedIn(false);
+        authComponentStore.storeIsUserLogged(false);
+        onError && onError(authorizeResponse.error);
+        setIsNotMatched(false);
+        setRetryCount(0);
       } else if (
-        authResponse.authSession &&
-        authResponse?.resumeUrl &&
-        authResponse.selectedDevice?.id
+        authorizeResponse.authSession &&
+        authorizeResponse?.resumeUrl &&
+        authorizeResponse.selectedDevice?.id
       ) {
         const deviceId = await authComponentStore.getDeviceId();
-        const selectedDeviceId = authResponse.selectedDevice?.id;
+        const selectedDeviceId = authorizeResponse.selectedDevice?.id;
 
         if (deviceId !== selectedDeviceId) {
           setIsSignedIn(false);
           authComponentStore.storeIsUserLogged(false);
         } else {
-          PingOnesdkModule.setCurrentSessionId(authResponse.authSession.id);
-          saveResumeURL(authResponse?.resumeUrl);
+          PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
+          saveResumeURL(authorizeResponse?.resumeUrl);
           onSuccessVerified();
         }
       }
