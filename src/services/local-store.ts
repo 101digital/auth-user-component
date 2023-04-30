@@ -18,6 +18,7 @@ const PIN_TOKEN = 'authcomponent.pinToken';
 const BIO_TOKEN = 'authcomponent.biometricToken';
 const QR_INBOUND_IMAGE = 'qr.inboundImage';
 const IS_USER_LOGGED = 'authcomponent.isUserLogged';
+const DEVICE_ID = 'authcomponent.deviceId';
 
 const keySize = 256;
 const cost = 10000;
@@ -60,6 +61,10 @@ class AuthComponentStore {
     }
   };
 
+  storeDeviceId = (id: string) => AsyncStorage.setItem(DEVICE_ID, id);
+
+  getDeviceId = () => AsyncStorage.getItem(DEVICE_ID);
+
   clearAuths = async () => {
     await AsyncStorage.multiRemove([
       REFRESH_TOKEN_KEY,
@@ -96,7 +101,7 @@ class AuthComponentStore {
 
   setBiometric = async () => {
     const loginHintToken = await AuthServices.instance().getLoginHintToken();
-    try{
+    try {
       await SInfo.setItem(BIO_TOKEN, loginHintToken, {
         ...sensitiveInfoOptions,
         touchID: true, //add this key
@@ -105,7 +110,7 @@ class AuthComponentStore {
       });
 
       return true;
-    } catch(error) {
+    } catch (error) {
       console.log('error', error);
       return false;
     }

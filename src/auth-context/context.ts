@@ -11,6 +11,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
 import { AuthServices } from '../services/auth-services';
 import _ from 'lodash';
+import { NativeModules } from 'react-native';
 
 export interface AuthContextData {
   profile?: Profile;
@@ -95,12 +96,10 @@ export interface AuthContextData {
   setIsManualLogin: (isManual: boolean) => void;
   isValidatedSubsequenceLogin: boolean;
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
-  verificationMethodKey: VerificationMethod;
-  setVerificationMethodKey: (method: VerificationMethod) => void;
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => Promise<void>;
   adbGetPairingCode: () => Promise<string>;
-  adbAuthorizePushOnly: (loginHintToken: string) => Promise<boolean>;
+  adbAuthorizePushOnly: (loginHintToken?: string) => Promise<boolean>;
   adbGetLoginHintToken: () => Promise<string>;
   obtainNewAccessToken: () => Promise<boolean>;
   saveResumeURL: (url: string) => void;
@@ -159,8 +158,6 @@ export const authDefaultValue: AuthContextData = {
   setIsManualLogin: () => undefined,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
-  verificationMethodKey: VerificationMethod.PENDING,
-  setVerificationMethodKey: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: async () => undefined,
   adbGetPairingCode: async () => '',
@@ -211,14 +208,12 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_password, setPassword] = useState<string>();
   const [_isManualLogin, setIsManualLogin] = useState<boolean>(false);
   const [_isValidatedSubsequenceLogin, setIsValidatedSubsequenceLogin] = useState<boolean>(false);
-  const [_verificationMethodKey, setVerificationMethodKey] = useState<VerificationMethod>(
-    VerificationMethod.PENDING
-  );
   const [_resumeURL, saveResumeURL] = useState<string>();
   const [_errorRebindedDevice, setErrorRebindedDevice] = useState<Error | undefined>();
   const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
   const [_isUpdatingUserStatus, setIsUpdatingUserStatus] = useState<boolean>(false);
   const [_userMobileNumberHint, setUserMobileNumberHint] = useState<string>();
+  const { PingOnesdkModule } = NativeModules;
 
   useEffect(() => {
     checkIsLogged();
@@ -430,7 +425,6 @@ export const useAuthContextValue = (): AuthContextData => {
   const logout = useCallback(async () => {
     // await authComponentStore.clearAuths();
     // setIsSignedIn(false);
-    setVerificationMethodKey(VerificationMethod.PIN);
     setProfile(undefined);
     setIsValidatedSubsequenceLogin(false);
   }, []);
@@ -643,22 +637,32 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   }, []);
 
-  const adbAuthorizePushOnly = useCallback(async (loginHintToken: string) => {
+  const adbAuthorizePushOnly = useCallback(async (loginHintToken?: string) => {
     try {
-      const data = await AuthServices.instance().resumeUrl(loginHintToken);
-      if (data) {
-        saveResumeURL(data.resumeUrl);
+      let token = loginHintToken;
+      if (!token) {
+        token = await AuthServices.instance().getLoginHintToken();
       }
-      return true;
+      if (token) {
+        const response = await AuthServices.instance().authorizePushOnly(token);
+        if (response && response.selectedDevice?.id && response.authSession && response.resumeUrl) {
+          authComponentStore.storeDeviceId(response.selectedDevice?.id);
+          PingOnesdkModule.setCurrentSessionId(response.authSession.id);
+          saveResumeURL(response.resumeUrl);
+          return true;
+        }
+      }
     } catch (error) {
       return false;
     }
+    return false;
   }, []);
 
   const obtainNewAccessToken = useCallback(async () => {
     try {
       if (_resumeURL) {
         const authResponse = await AuthServices.instance().resumeUrl(_resumeURL);
+
         if (authResponse && authResponse.authorizeResponse?.code) {
           await AuthServices.instance().obtainTokenSingleFactor(
             authResponse.authorizeResponse.code
@@ -774,8 +778,6 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsManualLogin,
       isValidatedSubsequenceLogin: _isValidatedSubsequenceLogin,
       setIsValidatedSubsequenceLogin,
-      verificationMethodKey: _verificationMethodKey,
-      setVerificationMethodKey,
       verifyPassword,
       adbGetAccessToken,
       adbGetPairingCode,
@@ -821,7 +823,6 @@ export const useAuthContextValue = (): AuthContextData => {
       _password,
       _isManualLogin,
       _isValidatedSubsequenceLogin,
-      _verificationMethodKey,
       _resumeURL,
       _errorRebindedDevice,
       _isUpdatingUserStatus,

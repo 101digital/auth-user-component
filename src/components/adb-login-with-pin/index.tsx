@@ -23,7 +23,7 @@ type ADBLoginWithPINProps = {
 
 const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const { onFailedVerified, onSuccessVerified, isSkipSMSOTP = false, onError } = prop;
-  const { saveResumeURL } = useContext(AuthContext);
+  const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
   const otpRef = useRef<OTPFieldRef>();
@@ -35,8 +35,8 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
 
   const validatePINNumber = async () => {
     setIsLoading(true);
-    const resp = await authComponentStore.validatePin(value);
-    if (!resp) {
+    const authResponse = await authComponentStore.validatePin(value);
+    if (!authResponse) {
       setIsLoading(false);
       if (retryCount + 1 < 3) {
         setIsNotMatched(true);
@@ -47,21 +47,32 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         onFailedVerified();
       }
     } else {
-      if (resp?.error) {
+      if (authResponse?.error) {
         setIsLoading(false);
         if (isSkipSMSOTP) {
           onSuccessVerified();
         } else {
           setIsLoading(false);
-          onError && onError(resp.error);
+          onError && onError(authResponse.error);
           setIsNotMatched(false);
           setRetryCount(0);
         }
-      } else if (resp.authSession) {
-        console.log('setCurrentSessionId => id', resp.authSession.id);
-        PingOnesdkModule.setCurrentSessionId(resp.authSession.id);
-        saveResumeURL(resp?.resumeUrl);
-        onSuccessVerified();
+      } else if (
+        authResponse.authSession &&
+        authResponse?.resumeUrl &&
+        authResponse.selectedDevice?.id
+      ) {
+        const deviceId = await authComponentStore.getDeviceId();
+        const selectedDeviceId = authResponse.selectedDevice?.id;
+
+        if (deviceId !== selectedDeviceId) {
+          setIsSignedIn(false);
+          authComponentStore.storeIsUserLogged(false);
+        } else {
+          PingOnesdkModule.setCurrentSessionId(authResponse.authSession.id);
+          saveResumeURL(authResponse?.resumeUrl);
+          onSuccessVerified();
+        }
       }
     }
   };
