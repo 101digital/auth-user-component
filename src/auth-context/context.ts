@@ -98,8 +98,8 @@ export interface AuthContextData {
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => Promise<void>;
-  adbGetPairingCode: () => Promise<string>;
-  adbAuthorizePushOnly: (loginHintToken?: string) => Promise<boolean>;
+  pairingDevice: () => Promise<string>;
+  adbAuthorizePushOnly: () => Promise<boolean>;
   adbGetLoginHintToken: () => Promise<string>;
   obtainNewAccessToken: () => Promise<boolean>;
   saveResumeURL: (url: string) => void;
@@ -160,7 +160,7 @@ export const authDefaultValue: AuthContextData = {
   setIsValidatedSubsequenceLogin: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: async () => undefined,
-  adbGetPairingCode: async () => '',
+  pairingDevice: async () => '',
   adbAuthorizePushOnly: async () => false,
   adbGetLoginHintToken: async () => '',
   obtainNewAccessToken: async () => false,
@@ -213,6 +213,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
   const [_isUpdatingUserStatus, setIsUpdatingUserStatus] = useState<boolean>(false);
   const [_userMobileNumberHint, setUserMobileNumberHint] = useState<string>();
+  const [loginHintToken, setLoginHintToken] = useState<string>();
   const { PingOnesdkModule } = NativeModules;
 
   useEffect(() => {
@@ -637,7 +638,15 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   }, []);
 
-  const adbAuthorizePushOnly = useCallback(async (loginHintToken?: string) => {
+  const pairingDevice = useCallback(async () => {
+    try {
+      const response = await AuthServices.instance().getPairingCode();
+      setLoginHintToken(response.token);
+      PingOnesdkModule.pairDevice(response.pairingCode);
+    } catch (error) {}
+  }, []);
+
+  const adbAuthorizePushOnly = useCallback(async () => {
     try {
       let token = loginHintToken;
       if (!token) {
@@ -656,7 +665,7 @@ export const useAuthContextValue = (): AuthContextData => {
       return false;
     }
     return false;
-  }, []);
+  }, [loginHintToken]);
 
   const obtainNewAccessToken = useCallback(async () => {
     try {
@@ -675,13 +684,6 @@ export const useAuthContextValue = (): AuthContextData => {
       return false;
     }
   }, [_resumeURL]);
-
-  const adbGetPairingCode = useCallback(async () => {
-    try {
-      const response = await AuthServices.instance().getPairingCode();
-      return response;
-    } catch (error) {}
-  }, []);
 
   const getListDevices = useCallback(async () => {
     try {
@@ -780,7 +782,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsValidatedSubsequenceLogin,
       verifyPassword,
       adbGetAccessToken,
-      adbGetPairingCode,
+      pairingDevice,
       adbAuthorizePushOnly,
       adbGetLoginHintToken,
       obtainNewAccessToken,

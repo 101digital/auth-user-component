@@ -161,7 +161,7 @@ export class AuthServices {
       },
     });
 
-    return responseTokenHint.data.data[0].pairingCode;
+    return responseTokenHint.data.data[0];
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {

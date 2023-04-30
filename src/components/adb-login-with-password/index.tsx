@@ -23,16 +23,17 @@ import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 type ADBLoginWithPasswordProps = {
   onSuccessVerified: () => void;
   onFailedVerified: () => void;
+  onInvalidPassword: () => void;
 };
 const ADBLoginWithPasswordComponent = ({
   onSuccessVerified,
   onFailedVerified,
+  onInvalidPassword,
 }: ADBLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
   const { adbLoginSingleFactor, errorSignIn, isSigning } = useContext(AuthContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-  const [errorPassword, setErrorPassword] = useState<boolean>(false);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
   const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
   const formikRef = useRef(null);
@@ -41,7 +42,7 @@ const ADBLoginWithPasswordComponent = ({
 
   useEffect(() => {
     if (errorSignIn) {
-      setErrorPassword(true);
+      onInvalidPassword();
       onFailedVerified();
     }
   }, [errorSignIn]);
@@ -51,7 +52,6 @@ const ADBLoginWithPasswordComponent = ({
     if (userName && formikRef.current?.values.password) {
       try {
         const response = await adbLoginSingleFactor(userName, formikRef.current?.values.password);
-        console.log('response', response);
         if (response) {
           if (response?.error?.code === PASSWORD_LOCKED_OUT) {
             setErrorModal(true);
@@ -62,17 +62,16 @@ const ADBLoginWithPasswordComponent = ({
           } else {
             onSuccessVerified();
           }
-          setErrorPassword(false);
         } else {
-          setErrorPassword(true);
+          onInvalidPassword();
           onFailedVerified();
         }
       } catch {
-        setErrorPassword(true);
+        onInvalidPassword();
         onFailedVerified();
       }
     } else {
-      setErrorPassword(true);
+      onInvalidPassword();
       onFailedVerified();
     }
   };
@@ -129,11 +128,6 @@ const ADBLoginWithPasswordComponent = ({
                     </TouchableOpacity>
                   }
                 />
-                {errorPassword && (
-                  <View style={styles.errorSection}>
-                    <Text>Incorrect Password</Text>
-                  </View>
-                )}
                 {passwordLock !== '' && (
                   <View style={styles.errorSection}>
                     <Text>{passwordLock}</Text>
