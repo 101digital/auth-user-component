@@ -98,7 +98,7 @@ export interface AuthContextData {
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => Promise<void>;
-  pairingDevice: () => Promise<string>;
+  pairingDevice: () => Promise<void>;
   adbAuthorizePushOnly: () => Promise<boolean>;
   adbGetLoginHintToken: () => Promise<string>;
   obtainNewAccessToken: () => Promise<boolean>;
@@ -160,7 +160,7 @@ export const authDefaultValue: AuthContextData = {
   setIsValidatedSubsequenceLogin: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: async () => undefined,
-  pairingDevice: async () => '',
+  pairingDevice: async () => undefined,
   adbAuthorizePushOnly: async () => false,
   adbGetLoginHintToken: async () => '',
   obtainNewAccessToken: async () => false,
