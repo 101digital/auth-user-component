@@ -1,11 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
 import {
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { colors } from '../../assets';
@@ -15,24 +13,21 @@ import { Formik } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
-import { EyesClosedIcon, EyesIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
-export class SignInData {
-  constructor(readonly username: string, readonly password: string) {}
+export class ForgotPasswordData {
+  constructor(readonly email: string, readonly nric: string) {}
 
-  static empty(): SignInData {
-    return new SignInData('', '');
+  static empty(): ForgotPasswordData {
+    return new ForgotPasswordData('', '');
   }
 }
 
 export interface ILogin {
-  onLoginSuccess: () => void;
-  onLoginFailed: () => void;
-  onForgotPassword: () => void;
+  onValidationSuccess: () => void;
 }
 
-const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onLoginSuccess, onLoginFailed, onForgotPassword } = props;
+const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
+  const { onValidationSuccess, } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const { adbLogin, isSigning, errorSignIn } = useContext(AuthContext);
@@ -40,26 +35,20 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
   const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
 
-  useEffect(() => {
-    if (errorSignIn) {
-      onLoginFailed();
-    }
-  }, [errorSignIn]);
-
-  const handleOnSignIn = async (values: SignInData) => {
+  const handleOnValidation = async (values: ForgotPasswordData) => {
     Keyboard.dismiss();
-    const { username, password } = values;
-    const _username = username.trim();
-    const _password = password.trim();
-    const isSuccess = await adbLogin(_username, _password);
+    const { email, nric } = values;
+    const _email = email.trim();
+    const _nric = nric.trim();
+    const isSuccess = await adbLogin(_email, _nric);
     if (isSuccess) {
       if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
         setErrorModal(true);
       } else {
-        onLoginSuccess();
+        onValidationSuccess();
       }
     } else {
-      onLoginFailed();
+      setErrorModal(true);
     }
   };
 
@@ -79,13 +68,9 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     };
   }, []);
 
-  const onToggleVisiblePassword = () => {
-    setIsVisiblePassword(!isVisiblePassword);
-  };
-
   return (
     <View style={styles.container}>
-      <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
+      <Formik initialValues={ForgotPasswordData.empty()} onSubmit={handleOnValidation}>
         {({ submitForm, values }) => (
           <>
             <View style={styles.content}>
@@ -99,29 +84,10 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
               </View>
               <View style={styles.rowInput}>
                 <ADBInputField
-                  name="password"
-                  returnKeyType="done"
-                  secureTextEntry={!isVisiblePassword}
-                  placeholder={'Password'}
-                  autoCapitalize="none"
-                  suffixIcon={
-                    <TouchableOpacity onPress={onToggleVisiblePassword} style={styles.iconBtn}>
-                      {isVisiblePassword ? <EyesClosedIcon size={25} /> : <EyesIcon size={25} />}
-                    </TouchableOpacity>
-                  }
+                  name={'userId'}
+                  placeholder={i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'}
+                  maxLength={14}
                 />
-              </View>
-              <View style={styles.rowBetween}>
-                <TouchableOpacity onPress={onForgotPassword} style={styles.flex}>
-                  <Text style={styles.forgotPasswordTitle}>{`${
-                    i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                  }?`}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Text style={styles.helpTitle}>{`${
-                    i18n.t('login_component.lbl_help') ?? 'Help'
-                  }?`}</Text>
-                </TouchableOpacity>
               </View>
             </View>
             <View
@@ -133,7 +99,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                 isLoading={isSigning}
                 label={i18n.t('common.lbl_continue') ?? 'Continue'}
                 onPress={submitForm}
-                disabled={values.password.length < 8 || values.username.length === 0}
+                disabled={values.nric.length < 14 || values.email.length === 0}
               />
             </View>
           </>
@@ -165,7 +131,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   );
 };
 
-export default ADBLoginComponent;
+export default ADBForgotPasswordComponent;
 
 const styles = StyleSheet.create({
   container: {
