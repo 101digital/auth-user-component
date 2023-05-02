@@ -161,6 +161,7 @@ Provide functions to make authentication
 | fetchAppAccessToken | Function                                                   | Promise function return app access token base on basic token                                                                                                                                                                                                              |
 | changeUserPassword  | Function (currentPassword, newPassword,confirmNewPassword) | Promise function using currentPassword, newPassword and confirmNewPassword to change account password.                                                                                                                                                                    |
 | registerDevice      | Function (fcmToken, platform, userId, appId, entityId)     | Function to register user deivce to get notification                                                                                                                                                                                                                      |
+| validateUserForgotPassword  | Function (email, nric) | Promise function using email, nric to validate and start forgot password flow.     
 
 ```javascript
 import { AuthServices } from 'auth-user-component';

@@ -15,3 +15,5 @@ export { default as VerifyOTPComponent } from './src/components/verify-otp';
 export { default as ADBValidateUserNRICComponent } from './src/components/adb-validate-nric';
 export { default as ADBChangePasswordComponent } from './src/components/adb-change-password';
 export { default as ADBForgotPasswordComponent } from './src/components/adb-forgot-password';
+export { default as ADVerifyRecoveryCodeComponent } from './src/components/adb-verify-recovery';
+export { default as ADBForgotPasswordCreateNewComponent } from './src/components/adb-forgot-password-create-new';

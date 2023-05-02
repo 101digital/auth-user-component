@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import {
   Keyboard,
   Platform,
@@ -9,52 +9,87 @@ import {
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
 import { AuthContext } from '../../auth-context';
-import { Formik } from 'formik';
+import { Formik, FormikProps, isObject } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
-import { PASSWORD_LOCKED_OUT } from '../../utils/index';
-export class ForgotPasswordData {
-  constructor(readonly email: string, readonly nric: string) {}
-
-  static empty(): ForgotPasswordData {
-    return new ForgotPasswordData('', '');
-  }
-}
+import { InputIdData, InputIdSchema } from './model';
+import moment from 'moment';
 
 export interface ILogin {
-  onValidationSuccess: () => void;
+  onValidationSuccess: (flowId: string) => void;
+  onErrorValidateID: (msg: string) => void;
 }
 
 const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onValidationSuccess, } = props;
+  const { onValidationSuccess, onErrorValidateID } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
-  const { adbLogin, isSigning, errorSignIn } = useContext(AuthContext);
+  const { validateUserForgotPassword, isRecoveringUserPassword } = useContext(AuthContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-  const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
+  const formikRef = useRef<FormikProps<InputIdData>>(null);
   const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
 
-  const handleOnValidation = async (values: ForgotPasswordData) => {
+  const onShowInvalidIDNumber = () => {
+    onErrorValidateID(
+      i18n.t('id_number.error_invalid_id') ?? 'Invalid NRIC number.'
+    );
+  };
+
+  const onShowInvalidAge = () => {
+    onErrorValidateID(
+      i18n.t('id_number.error_invalid_age_id') ??
+        'You must be 18 years old and above.'
+    );
+  };
+
+  const handleOnValidation = async (values: InputIdData) => {
     Keyboard.dismiss();
     const { email, nric } = values;
     const _email = email.trim();
     const _nric = nric.trim();
-    const isSuccess = await adbLogin(_email, _nric);
-    if (isSuccess) {
-      if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
-        setErrorModal(true);
-      } else {
-        onValidationSuccess();
+    try {
+      const yearDOB = parseInt(_nric.slice(0, 2));
+      const monthOB = parseInt(_nric.slice(2, 4));
+      const dayOB = parseInt(_nric.slice(4, 6));
+
+      if (
+        _nric.length !== 14 ||
+        yearDOB <= 0 ||
+        monthOB <= 0 ||
+        monthOB > 12 ||
+        dayOB <= 0 ||
+        dayOB > 31
+      ) {
+        onShowInvalidIDNumber();
+        return;
       }
-    } else {
-      setErrorModal(true);
+    } catch {
+      onShowInvalidIDNumber();
+      return;
     }
+
+    const currentYear = parseInt(moment().format('YY'));
+    const idYOB = parseInt(_nric.slice(0, 2));
+    const currentAge =
+      currentYear < idYOB ? currentYear + 100 - idYOB : currentYear - idYOB;
+    if (currentAge < 18) {
+      onShowInvalidAge();
+      return;
+    }
+    const _finalNric = _nric.replace(/-/gm,'');
+    validateUserForgotPassword(_email, _finalNric, (resp: any) => {
+      if(resp && isObject(resp) && resp.resendCode) {
+        onValidationSuccess(resp.resendCode);
+      }
+      else {
+        setErrorModal(true);
+      }
+    });
   };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      console.log('event', e);
       setKeyboardHeight(e.endCoordinates.height);
     });
 
@@ -70,53 +105,80 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
 
   return (
     <View style={styles.container}>
-      <Formik initialValues={ForgotPasswordData.empty()} onSubmit={handleOnValidation}>
-        {({ submitForm, values }) => (
-          <>
-            <View style={styles.content}>
-              <View style={styles.rowInput}>
-                <ADBInputField
-                  name="username"
-                  returnKeyType="done"
-                  placeholder={'Email'}
-                  autoCapitalize="none"
+      <Formik
+        innerRef={formikRef}
+        enableReinitialize={true}
+        initialValues={InputIdData.empty()} 
+        onSubmit={handleOnValidation}
+        validationSchema={InputIdSchema}
+      >
+        {({ submitForm, setFieldValue, values }) => {
+          let formattedId = values.nric.replace(/[-]+/g, '');
+          if (formattedId.length > 8) {
+            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(
+              6,
+              8
+            )}-${formattedId.slice(8)}`;
+          } else if (formattedId.length > 6) {
+            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(6)}`;
+          }
+
+          if (formattedId !== values.nric) {
+            if (formattedId[formattedId.length - 1] === '-') {
+              formattedId = formattedId.slice(0, formattedId.length - 2);
+            }
+            setFieldValue('nric', formattedId);
+          }
+          return (
+            <>
+              <View style={styles.content}>
+                <View style={styles.rowInput}>
+                  <ADBInputField
+                    name="email"
+                    returnKeyType="done"
+                    placeholder={'Email'}
+                    autoCapitalize="none"
+                    keyboardType={"email-address"}
+                  />
+                </View>
+                <View style={styles.rowInput}>
+                  <ADBInputField
+                    name={'nric'}
+                    placeholder={i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'}
+                    maxLength={14}
+                    returnKeyType="done"
+                    keyboardType={"number-pad"}
+                  />
+                </View>
+              </View>
+              <View
+                style={{
+                  marginBottom: marginKeyboard,
+                }}
+              >
+                <ADBButton
+                  isLoading={isRecoveringUserPassword}
+                  label={i18n.t('common.lbl_continue') ?? 'Continue'}
+                  onPress={submitForm}
+                  disabled={values.nric.length < 14 || values.email.length === 0}
                 />
               </View>
-              <View style={styles.rowInput}>
-                <ADBInputField
-                  name={'userId'}
-                  placeholder={i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'}
-                  maxLength={14}
-                />
-              </View>
-            </View>
-            <View
-              style={{
-                marginBottom: marginKeyboard,
-              }}
-            >
-              <ADBButton
-                isLoading={isSigning}
-                label={i18n.t('common.lbl_continue') ?? 'Continue'}
-                onPress={submitForm}
-                disabled={values.nric.length < 14 || values.email.length === 0}
-              />
-            </View>
-          </>
-        )}
+            </>
+          );
+        }}
       </Formik>
       <BottomSheetModal isVisible={errorModal}>
         <View style={styles.cameraDisableContainer}>
           <AlertCircleIcon size={72} />
           <View style={styles.gap40} />
           <Text style={[styles.loginTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.lbl_account_locked') ??
-              `Oops! Your account is temporarily locked`}
+            {i18n.t('login_component.invalid_creds') ??
+              `Invalid credentials!`}
           </Text>
           <View style={styles.gap8} />
           <Text style={[styles.subTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.lbl_entered_wrong_password') ??
-              `You’ve entered the wrong password 3 times. Please try again after 1 hour.`}
+            {i18n.t('login_component.please_try_again') ??
+              `Please try again.`}
           </Text>
           <View style={{ height: 32 }} />
           <ADBButton

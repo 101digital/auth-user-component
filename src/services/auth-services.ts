@@ -373,6 +373,49 @@ export class AuthServices {
     return response.data;
   };
 
+  validateUserForgotPassword = async (email: string, nric: string) => {
+    const { identityBaseUrl } = this._configs!;
+    const publicAppToken = await this.fetchAppAccessToken();
+    const body = {
+      email:email,
+      idType: "IdNumber",
+      idNumber: nric
+    };
+    const response = await axios.post(
+      `${identityBaseUrl}/users/passwords/validate-reset-request`,
+      body,
+      {
+        headers: {
+          Authorization: `${publicAppToken}`,
+        },
+      }
+    );
+
+    return response.data;
+  };
+
+  changeUserPasswordUsingRecoveryCode = async (
+    recoveryCode: string,
+    newPassword: string,
+    flowId: string
+  ) => {
+    const { authBaseUrl } = this._configs!;
+    const body = {
+      recoveryCode:recoveryCode,
+      newPassword:newPassword,
+    };
+    const response = await axios.post(
+      `${authBaseUrl}/flows/${flowId}`,
+        body,
+        {
+          headers: {
+            'Content-Type': 'application/vnd.pingidentity.password.forgot+json',
+          },
+        }
+      );
+    return response.data;
+  };
+
   registerDevice = async (
     token: string,
     platform: 'IOS' | 'Android',
