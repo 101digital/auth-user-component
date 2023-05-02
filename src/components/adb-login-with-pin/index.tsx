@@ -54,22 +54,18 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         onError && onError(authorizeResponse.error);
         setIsNotMatched(false);
         setRetryCount(0);
-      } else if (
-        authorizeResponse.authSession &&
-        authorizeResponse?.resumeUrl &&
-        authorizeResponse.selectedDevice?.id
-      ) {
-        const deviceId = await authComponentStore.getDeviceId();
-        const selectedDeviceId = authorizeResponse.selectedDevice?.id;
+      } else if (authorizeResponse.authSession && authorizeResponse?.resumeUrl) {
+        // const deviceId = await authComponentStore.getDeviceId();
+        // const selectedDeviceId = authorizeResponse.selectedDevice?.id;
 
-        if (deviceId !== selectedDeviceId) {
-          setIsSignedIn(false);
-          authComponentStore.storeIsUserLogged(false);
-        } else {
-          PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
-          saveResumeURL(authorizeResponse?.resumeUrl);
-          onSuccessVerified();
-        }
+        // if (deviceId !== selectedDeviceId) {
+        //   setIsSignedIn(false);
+        //   authComponentStore.storeIsUserLogged(false);
+        // } else {
+        PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
+        saveResumeURL(authorizeResponse?.resumeUrl);
+        onSuccessVerified();
+        // }
       }
     }
   };
