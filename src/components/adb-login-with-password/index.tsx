@@ -107,7 +107,6 @@ const ADBLoginWithPasswordComponent = ({
       keyboardDidShowListener.remove();
     };
   }, []);
-  console.log('values', formikRef?.current);
 
   return (
     <View style={styles.container}>
@@ -137,7 +136,11 @@ const ADBLoginWithPasswordComponent = ({
                 )}
               </ScrollView>
               <View style={{ marginBottom: marginKeyboard }}>
-                <ADBButton isLoading={isSigning} label={'Login'} onPress={onSubmit} />
+                <ADBButton
+                  isLoading={isSigning}
+                  label={isEdit ? 'Continue' : 'Login'}
+                  onPress={onSubmit}
+                />
               </View>
             </>
           );
@@ -158,7 +161,7 @@ const ADBLoginWithPasswordComponent = ({
           </Text>
           <View style={{ height: 32 }} />
           <ADBButton
-            label={isEdit ? 'Continue' : i18n.t('login_component.btn_done') ?? 'Done'}
+            label={i18n.t('login_component.btn_done') ?? 'Done'}
             onPress={() => {
               setErrorModal(false);
             }}
