@@ -28,10 +28,11 @@ export class SignInData {
 export interface ILogin {
   onLoginSuccess: () => void;
   onLoginFailed: () => void;
+  onForgotPassword: () => void;
 }
 
 const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onLoginSuccess, onLoginFailed } = props;
+  const { onLoginSuccess, onLoginFailed, onForgotPassword } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const { adbLogin, isSigning, errorSignIn } = useContext(AuthContext);
@@ -111,7 +112,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                 />
               </View>
               <View style={styles.rowBetween}>
-                <TouchableOpacity style={styles.flex}>
+                <TouchableOpacity onPress={onForgotPassword} style={styles.flex}>
                   <Text style={styles.forgotPasswordTitle}>{`${
                     i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
                   }?`}</Text>

@@ -44,6 +44,21 @@ export interface AuthContextData {
     confirmNewPassword: string,
     handleResponse: (response: any) => void
   ) => void;
+  validateUserForgotPassword: (
+    email: string,
+    nric: string,
+    handleResponse: (response: any) => void
+  ) => void;
+  changeUserPasswordUsingRecoveryCode: (
+    recoveryCode: string,
+    newPassword: string,
+    flowId: string,
+    handleResponse: (response: any) => void
+  ) => void;
+  adbForgotPasswordVerifyOtp: (
+    otp: string,
+    flowId: string
+  ) => Promise<boolean>;
   isChangingPassword: boolean;
   isChangePassword: boolean;
   errorChangePassword?: Error;
@@ -126,6 +141,9 @@ export const authDefaultValue: AuthContextData = {
   fetchProfile: async () => false,
   clearUpdateProfileError: () => null,
   changeUserPassword: async () => false,
+  validateUserForgotPassword: async () => false,
+  changeUserPasswordUsingRecoveryCode: async () => false,
+  adbForgotPasswordVerifyOtp: async () => false,
   requestResetUserPassword: async () => false,
   isChangingPassword: false,
   isChangePassword: false,
@@ -490,6 +508,71 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
+  const validateUserForgotPassword = useCallback(
+    async (
+      email: string,
+      nric: string,
+      handleResponse: (response: any) => void
+    ) => {
+      try {
+        setIsRecoveringUserPassword(true);
+        const response = await AuthServices.instance().validateUserForgotPassword(
+          email,
+          nric
+        );
+        handleResponse(response);
+        setIsRecoveringUserPassword(false);
+      } catch (error) {
+        handleResponse(error?.response?.data?.errors);
+        setIsRecoveringUserPassword(false);
+      }
+    },
+    []
+  );
+
+  const changeUserPasswordUsingRecoveryCode = useCallback(
+    async (
+      recoveryCode: string,
+      newPassword: string,
+      flowId: string,
+      handleResponse: (response: any) => void
+    ) => {
+      try {
+        setIsRecoveringUserPassword(true);
+        const response = await AuthServices.instance().changeUserPasswordUsingRecoveryCode(
+          recoveryCode,
+          newPassword,
+          flowId
+        );
+        handleResponse(response);
+        setIsRecoveringUserPassword(false);
+      } catch (error) {
+        handleResponse(error?.response?.data?.errors);
+        setIsRecoveringUserPassword(false);
+      }
+    },
+    []
+  );
+
+  const adbForgotPasswordVerifyOtp = useCallback(
+    async (otp: string, flowId: string) => {
+      try {
+        setIsVerifyLogin(true);
+        if (flowId && flowId.length > 0) {
+          const loginData = await AuthServices.instance().adbVerifyLogin(otp, flowId);
+          setIsVerifyLogin(false);
+          if(loginData.status === 'COMPLETED') {
+            return true;  
+          }
+        }
+      } catch (error) {
+        setIsVerifyLogin(false);
+      }
+      return false;
+    },
+    []
+  );
+
   const saveUserPhoneNumber = useCallback(async (mobileNumber: string) => {
     setUserMobileNumber(mobileNumber);
   }, []);
@@ -741,6 +824,9 @@ export const useAuthContextValue = (): AuthContextData => {
       updateProfile,
       fetchProfile,
       changeUserPassword,
+      validateUserForgotPassword,
+      changeUserPasswordUsingRecoveryCode,
+      adbForgotPasswordVerifyOtp,
       profilePicture: _profilePicture,
       errorSignIn: _errorSignIn,
       errorUpdateProfile: _errorUpdateProfile,
