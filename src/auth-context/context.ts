@@ -516,8 +516,6 @@ export const useAuthContextValue = (): AuthContextData => {
     ) => {
       try {
         setIsRecoveringUserPassword(true);
-        console.log('validateUserForgotPassword','email:'+email);
-        console.log('validateUserForgotPassword','nric:'+nric);
         const response = await AuthServices.instance().validateUserForgotPassword(
           email,
           nric
@@ -541,19 +539,14 @@ export const useAuthContextValue = (): AuthContextData => {
     ) => {
       try {
         setIsRecoveringUserPassword(true);
-        console.log('changeUserPasswordUsingRecoveryCode','recoveryCode:'+recoveryCode);
-        console.log('changeUserPasswordUsingRecoveryCode','flowId:'+flowId);
-        console.log('changeUserPasswordUsingRecoveryCode','newPassword:'+newPassword);
         const response = await AuthServices.instance().changeUserPasswordUsingRecoveryCode(
           recoveryCode,
           newPassword,
           flowId
         );
-        console.log('changeUserPasswordUsingRecoveryCode','response:'+response);
         handleResponse(response);
         setIsRecoveringUserPassword(false);
       } catch (error) {
-        console.log('changeUserPasswordUsingRecoveryCode','error:'+error);
         handleResponse(error?.response?.data?.errors);
         setIsRecoveringUserPassword(false);
       }
