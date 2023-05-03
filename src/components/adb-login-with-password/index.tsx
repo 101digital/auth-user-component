@@ -24,11 +24,13 @@ type ADBLoginWithPasswordProps = {
   onSuccessVerified: () => void;
   onFailedVerified: () => void;
   onInvalidPassword: () => void;
+  isEdit: boolean;
 };
 const ADBLoginWithPasswordComponent = ({
   onSuccessVerified,
   onFailedVerified,
   onInvalidPassword,
+  isEdit = false,
 }: ADBLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
@@ -156,7 +158,7 @@ const ADBLoginWithPasswordComponent = ({
           </Text>
           <View style={{ height: 32 }} />
           <ADBButton
-            label={i18n.t('login_component.btn_done') ?? 'Done'}
+            label={isEdit ? 'Continue' : i18n.t('login_component.btn_done') ?? 'Done'}
             onPress={() => {
               setErrorModal(false);
             }}

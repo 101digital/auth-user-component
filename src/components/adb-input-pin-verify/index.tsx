@@ -13,7 +13,13 @@ type ADBInputPINVerifyProps = {
 const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
   const { onContinue, onFailed } = props;
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-  const marginKeyboard = keyboardHeight ? keyboardHeight - (isIphone8() ? 0 : 20)  : Platform.OS === 'ios' ? (isIphone8() ? 10 : 0) : 20;
+  const marginKeyboard = keyboardHeight
+    ? keyboardHeight - (isIphone8() ? 0 : 20)
+    : Platform.OS === 'ios'
+    ? isIphone8()
+      ? 10
+      : 0
+    : 20;
   const otpRef = useRef<OTPFieldRef>();
   const [isLoadingStoringPIN, setIsLoadingStoringPIN] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
@@ -51,6 +57,7 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
       <View style={styles.content}>
         <OTPField
           ref={otpRef}
+          isUnMasked={false}
           cellCount={6}
           onChanged={setValue}
           style={{
