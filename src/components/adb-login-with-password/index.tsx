@@ -24,11 +24,13 @@ type ADBLoginWithPasswordProps = {
   onSuccessVerified: () => void;
   onFailedVerified: () => void;
   onInvalidPassword: () => void;
+  isEdit: boolean;
 };
 const ADBLoginWithPasswordComponent = ({
   onSuccessVerified,
   onFailedVerified,
   onInvalidPassword,
+  isEdit = false,
 }: ADBLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
@@ -105,7 +107,6 @@ const ADBLoginWithPasswordComponent = ({
       keyboardDidShowListener.remove();
     };
   }, []);
-  console.log('values', formikRef?.current);
 
   return (
     <View style={styles.container}>
@@ -135,7 +136,11 @@ const ADBLoginWithPasswordComponent = ({
                 )}
               </ScrollView>
               <View style={{ marginBottom: marginKeyboard }}>
-                <ADBButton isLoading={isSigning} label={'Login'} onPress={onSubmit} />
+                <ADBButton
+                  isLoading={isSigning}
+                  label={isEdit ? 'Continue' : 'Login'}
+                  onPress={onSubmit}
+                />
               </View>
             </>
           );

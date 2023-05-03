@@ -295,6 +295,7 @@ export const useAuthContextValue = (): AuthContextData => {
             setUserMobileNumberHint(smsDevice.phone);
           }
         }
+        authComponentStore.storeUserName(username);
         setUsername(username);
         setPassword(undefined);
       }
