@@ -78,14 +78,13 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
       return;
     }
     const _finalNric = _nric.replace(/-/gm,'');
-    validateUserForgotPassword(_email, _finalNric, (resp: any) => {
-      if(resp && isObject(resp) && resp.resendCode) {
-        onValidationSuccess(resp.resendCode);
-      }
-      else {
-        setErrorModal(true);
-      }
-    });
+    const response = await validateUserForgotPassword(_email, _finalNric);
+    if(response && isObject(response) && response.resendCode) {
+      onValidationSuccess(response.resendCode);
+    }
+    else {
+      setErrorModal(true);
+    }
   };
 
   useEffect(() => {

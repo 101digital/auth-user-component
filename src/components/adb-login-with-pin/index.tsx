@@ -8,11 +8,15 @@ import {
   KeyboardAvoidingView,
   NativeModules,
 } from 'react-native';
-import { ADBButton, OTPField, TriangelDangerIcon, ImageIcon } from 'react-native-theme-component';
+import { ADBButton, OTPField, TriangelDangerIcon, ImageIcon, ThemeContext } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
 import { fonts } from '../../assets';
 import { AuthContext } from '../../auth-context/context';
+import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
+import { AlertCircleIcon } from '../../assets/icons';
+import { PASSWORD_LOCKED_OUT } from '../../utils/index';
+import { colors } from '../../assets';
 
 type ADBLoginWithPINProps = {
   onFailedVerified: () => void;
@@ -24,6 +28,7 @@ type ADBLoginWithPINProps = {
 const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const { onFailedVerified, onSuccessVerified, onError } = prop;
   const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
+  const { i18n } = useContext(ThemeContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
   const otpRef = useRef<OTPFieldRef>();
@@ -32,6 +37,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const [isNotMatched, setIsNotMatched] = useState<boolean>(false);
   const [retryCount, setRetryCount] = useState<number>(0);
   const { PingOnesdkModule } = NativeModules;
+  const [errorModal, setErrorModal] = useState(false);
 
   const validatePINNumber = async () => {
     setIsLoading(true);
@@ -49,11 +55,17 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     } else {
       if (authorizeResponse?.status === 'FAILED') {
         setIsLoading(false);
-        setIsSignedIn(false);
         authComponentStore.storeIsUserLogged(false);
-        onError && onError(authorizeResponse.error);
         setIsNotMatched(false);
         setRetryCount(0);
+        if (authorizeResponse.error?.code === PASSWORD_LOCKED_OUT) {
+          setErrorModal(true);
+          return;
+        }
+        else {
+          onError && onError(authorizeResponse.error);
+          setIsSignedIn(false);
+        } 
       } else if (authorizeResponse.authSession && authorizeResponse?.resumeUrl) {
         // const deviceId = await authComponentStore.getDeviceId();
         // const selectedDeviceId = authorizeResponse.selectedDevice?.id;
@@ -79,7 +91,6 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   useEffect(() => {
     otpRef.current?.focus();
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      console.log('event', e);
       setKeyboardHeight(e.endCoordinates.height);
     });
 
@@ -134,6 +145,28 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           isLoading={isLoading}
         />
       </View>
+      <BottomSheetModal isVisible={errorModal}>
+        <View style={styles.cameraDisableContainer}>
+          <AlertCircleIcon size={72} />
+          <View style={styles.gap40} />
+          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>
+            {i18n.t('login_component.lbl_account_locked') ??
+              `Oops! Your account is temporarily locked`}
+          </Text>
+          <View style={styles.gap8} />
+          <Text style={[styles.subTitle, { textAlign: 'center' }]}>
+            {i18n.t('login_component.lbl_entered_wrong_password') ??
+              `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
+          </Text>
+          <View style={{ height: 32 }} />
+          <ADBButton
+            label={i18n.t('login_component.btn_done') ?? 'Done'}
+            onPress={() => {
+              setErrorModal(false);
+            }}
+          />
+        </View>
+      </BottomSheetModal>
     </KeyboardAvoidingView>
   );
 };
@@ -217,6 +250,32 @@ const styles = StyleSheet.create({
   pinTitle: {
     color: '#858585',
     fontSize: 12,
+  },
+  cameraDisableContainer: {
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 24,
+  },
+  gap16: {
+    height: 16,
+  },
+  gap40: {
+    height: 40,
+  },
+  gap8: {
+    height: 8,
+  },
+  subTitle: {
+    fontSize: 14,
+    color: colors.primaryBlack,
+    fontFamily: fonts.regular,
+    marginTop: 8,
+  },
+  loginTitle: {
+    fontSize: 24,
+    color: colors.primaryBlack,
+    fontFamily: fonts.semiBold,
   },
 });
 

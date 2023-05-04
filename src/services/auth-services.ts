@@ -76,7 +76,6 @@ export class AuthServices {
           acr_values,
         },
       });
-
     const flowId = responseAuth.data?.id;
 
     if (flowId?.length > 0) {
@@ -390,7 +389,6 @@ export class AuthServices {
         },
       }
     );
-
     return response.data;
   };
 
@@ -409,7 +407,8 @@ export class AuthServices {
         body,
         {
           headers: {
-            'Content-Type': 'application/vnd.pingidentity.password.forgot+json',
+            'access-control-allow-origin': '*',
+            'Content-Type': 'application/vnd.pingidentity.password.recover+json',
           },
         }
       );

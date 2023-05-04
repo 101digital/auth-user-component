@@ -75,24 +75,23 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
       : colors.primaryBlack;
   };
 
-  const changePassword = (val: any) => {
+  const changePassword = async (val: any) => {
     setLoading(true);
-      changeUserPasswordUsingRecoveryCode(forgotPasswordObj.recoveryCode, val.createNew, forgotPasswordObj.flowId, (resp: any) => {
-        setLoading(false);
-        if ( resp ) {
-          if(resp.status && resp.status === 'OTP_REQUIRED') {
-            onPressContinue(val.createNew);
-            return;
-          } else if (
-            resp.details && `${resp.details[0].message}`.includes('New password did not satisfy password policy requirements')
-          ) {
-            onPasswordSameHistory();
-            return;
-          } 
-        } 
-        setErrorModal(true);
-        setErrorTitle(i18n.t('change_password.lbl_sorry_there_was_problem') ?? 'Sorry, there was a problem');
-      });
+    const response = await changeUserPasswordUsingRecoveryCode(forgotPasswordObj.recoveryCode, val.createNew, forgotPasswordObj.flowId);
+    setLoading(false);
+    if ( response ) {
+      if(response.status && response.status === 'OTP_REQUIRED') {
+        onPressContinue(val.createNew);
+        return;
+      } else if (
+        response.details && `${response.details[0].message}`.includes('New password did not satisfy password policy requirements')
+      ) {
+        onPasswordSameHistory();
+        return;
+      } 
+    }
+    setErrorModal(true);
+    setErrorTitle(i18n.t('change_password.lbl_sorry_there_was_problem') ?? 'Sorry, there was a problem');
   };
   return (
     <>

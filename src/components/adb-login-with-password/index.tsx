@@ -34,7 +34,7 @@ const ADBLoginWithPasswordComponent = ({
 }: ADBLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
-  const { adbLoginSingleFactor, errorSignIn, isSigning } = useContext(AuthContext);
+  const { adbLoginSingleFactor, errorSignIn, isSigning, setIsSignedIn } = useContext(AuthContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
   const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
@@ -157,7 +157,7 @@ const ADBLoginWithPasswordComponent = ({
           <View style={styles.gap8} />
           <Text style={[styles.modalsubTitle, { textAlign: 'center' }]}>
             {i18n.t('login_component.lbl_entered_wrong_password') ??
-              `You’ve entered the wrong password 3 times. Please try again after 1 hour.`}
+              `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
           </Text>
           <View style={{ height: 32 }} />
           <ADBButton

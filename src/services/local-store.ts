@@ -125,8 +125,8 @@ class AuthComponentStore {
 
       return await AuthServices.instance().authorizePushOnly(loginHintToken);
     } catch (error) {
-      console.log('react native log -> error', error);
-      return false;
+      console.log('react native log -> error', JSON.stringify(error));
+      return error?.response?.data;
     }
   };
 
