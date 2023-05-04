@@ -146,7 +146,7 @@ class AuthComponentStore {
       return await AuthServices.instance().authorizePushOnly(loginHintToken);
     } catch (error) {
       console.log('error', error);
-      return false;
+      return error?.response?.data;
     }
   };
 }
