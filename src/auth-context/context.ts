@@ -525,6 +525,16 @@ export const useAuthContextValue = (): AuthContextData => {
           flowId
         );
         setIsRecoveringUserPassword(false);
+        if (response && response.id) {
+          if (response._embedded.devices?.length > 0) {
+            const smsDevice = response._embedded.devices.find(
+              (dvc: Devices) => dvc.type === 'SMS' && dvc.status === 'ACTIVE'
+            );
+            if (smsDevice) {
+              setUserMobileNumberHint(smsDevice.phone);
+            }
+          }
+        }
         return response;
       } catch (error) {
         setIsRecoveringUserPassword(false);
