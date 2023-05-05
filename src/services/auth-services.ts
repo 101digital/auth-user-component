@@ -3,7 +3,7 @@ import qs from 'qs';
 import authComponentStore from './local-store';
 import axios from 'axios';
 import { AuthApiClient } from '../api-client/auth-api-client';
-import { AuthComponentConfig, PKCE } from '../types';
+import { AuthComponentConfig, PKCE, Profile } from '../types';
 import { authorize } from 'react-native-app-auth';
 import { PASSPORT } from '../types';
 import pkceChallenge from 'react-native-pkce-challenge';
@@ -245,24 +245,9 @@ export class AuthServices {
     await authComponentStore.clearAuths();
   };
 
-  updateProfile = async (
-    userId: string,
-    firstName: string,
-    lastName: string,
-    profilePicture?: string
-  ) => {
+  updateProfile = async (userId: string, data: any) => {
     const { membershipBaseUrl, accessToken } = this._configs!;
-    const body = {
-      firstName: firstName,
-      lastName: lastName,
-      listCustomFields: [
-        {
-          customKey: 'logo',
-          customValue: profilePicture,
-        },
-      ],
-    };
-    const response = await axios.put(`${membershipBaseUrl}/users/${userId}`, body, {
+    const response = await axios.patch(`${membershipBaseUrl}/users/${userId}`, data, {
       headers: {
         Authorization: `${accessToken}`,
       },
@@ -376,9 +361,9 @@ export class AuthServices {
     const { identityBaseUrl } = this._configs!;
     const publicAppToken = await this.fetchAppAccessToken();
     const body = {
-      email:email,
-      idType: "IdNumber",
-      idNumber: nric
+      email: email,
+      idType: 'IdNumber',
+      idNumber: nric,
     };
     const response = await axios.post(
       `${identityBaseUrl}/users/passwords/validate-reset-request`,
@@ -399,8 +384,8 @@ export class AuthServices {
   ) => {
     const { authBaseUrl } = this._configs!;
     const body = {
-      recoveryCode:recoveryCode,
-      newPassword:newPassword,
+      recoveryCode: recoveryCode,
+      newPassword: newPassword,
     };
     const response = await axios.post(
       `${authBaseUrl}/flows/${flowId}`,
@@ -449,14 +434,14 @@ export class AuthServices {
   ) => {
     const { membershipBaseUrl, accessToken } = this._configs!;
     let body = {};
-    
+
     const updateInfoPayload = {
       fullName: fullName,
       nickName: nickname,
       firstName: fullName,
       lastName: fullName,
     };
-    
+
     if (idType === PASSPORT) {
       body = {
         ...updateInfoPayload,

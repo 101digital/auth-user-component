@@ -1,3 +1,45 @@
+export interface Address {
+  id: string;
+  addressType?: string;
+  line1?: string;
+  line2?: string;
+  line3?: string;
+  city?: string;
+  state?: string;
+  postcode?: string;
+  country?: string;
+  accountEmploymentId?: string;
+}
+
+export interface ContactDetails {
+  id: string;
+  accountEmploymentId?: string;
+  contactType?: string;
+}
+
+export interface CreditDetails {
+  accountId: string;
+  creditType?: string;
+  sourceOfFund?: string;
+  accountPurpose?: string;
+  numberCreditCard?: number;
+  numberLoan?: number;
+  annualIncome?: number;
+}
+
+export interface EmploymentDetails {
+  id: string;
+  accountId?: string;
+  companyName?: string;
+  companyType?: string;
+  employmentType?: string;
+  occupation?: string;
+  sector?: string;
+  startDate?: string;
+  addresses?: Address[];
+  contactDetails?: ContactDetails[];
+}
+
 export interface Profile {
   userId: string;
   userName: string;
@@ -13,6 +55,11 @@ export interface Profile {
   createdAt: string;
   passwordExpired: boolean;
   country?: CountryInformation;
+  religion: string;
+  maritalStatus: string;
+  addresses: Address[];
+  employmentDetails: EmploymentDetails[];
+  creditDetails: CreditDetails[];
 }
 
 export interface Recovery {
