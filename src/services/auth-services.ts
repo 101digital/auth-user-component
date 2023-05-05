@@ -229,7 +229,6 @@ export class AuthServices {
 
   public fetchProfile = async () => {
     const { membershipBaseUrl, accessToken } = this._configs!;
-    console.log('fetchProfile -> accessToken', accessToken);
     const response = await axios.get(`${membershipBaseUrl}/users/me`, {
       headers: {
         Authorization: `${accessToken}`,
@@ -239,10 +238,6 @@ export class AuthServices {
     const organisationUser = data?.memberships?.filter((el: any) => el.organisationName);
     const memberShip = organisationUser?.length > 0 ? organisationUser[0] : data?.memberships[0];
     return { orgToken: memberShip?.token ?? undefined, data };
-  };
-
-  logout = async () => {
-    await authComponentStore.clearAuths();
   };
 
   updateProfile = async (userId: string, data: any) => {
@@ -387,16 +382,12 @@ export class AuthServices {
       recoveryCode: recoveryCode,
       newPassword: newPassword,
     };
-    const response = await axios.post(
-      `${authBaseUrl}/flows/${flowId}`,
-        body,
-        {
-          headers: {
-            'access-control-allow-origin': '*',
-            'Content-Type': 'application/vnd.pingidentity.password.recover+json',
-          },
-        }
-      );
+    const response = await axios.post(`${authBaseUrl}/flows/${flowId}`, body, {
+      headers: {
+        'access-control-allow-origin': '*',
+        'Content-Type': 'application/vnd.pingidentity.password.recover+json',
+      },
+    });
     return response.data;
   };
 

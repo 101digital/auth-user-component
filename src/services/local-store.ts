@@ -1,4 +1,5 @@
 import { BiometricMethod } from '../types';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AESCryptoStore from './aes-crypto';
 import SInfo from 'react-native-sensitive-info';
@@ -6,19 +7,12 @@ import base64 from 'react-native-base64';
 import { AuthServices } from '../services/auth-services';
 import { generateSecureRandom } from 'react-native-securerandom';
 
-const REFRESH_TOKEN_KEY = 'authcomponent.refreshToken';
 const USER_NAME = 'authcomponent.userName';
-const ACCESS_TOKEN_KEY = 'authcomponent.accessToken';
-const ORG_TOKEN_KEY = 'authcomponent.orgToken';
 const IS_ENABLE_BIOMETRIC = 'authcomponent.enableBio';
 const SELECTED_BIOMETRIC_METHOD = 'authcomponent.selectedBioMethod';
-const PROFILE_KEY = 'authcomponent.profile';
-const LOGIN_TOKEN_HINT = 'authcomponent.loginTokenHint';
 const PIN_TOKEN = 'authcomponent.pinToken';
 const BIO_TOKEN = 'authcomponent.biometricToken';
-const QR_INBOUND_IMAGE = 'qr.inboundImage';
 const IS_USER_LOGGED = 'authcomponent.isUserLogged';
-const DEVICE_ID = 'authcomponent.deviceId';
 
 const keySize = 256;
 const cost = 10000;
@@ -29,12 +23,13 @@ const sensitiveInfoOptions = {
   keychainService: 'myKeychain',
 };
 
+const biometricChangeErrorCode = {
+  error: {
+    code: 'BIOMETRIC_CHANGE',
+  },
+};
+
 class AuthComponentStore {
-  storeRefreshToken = (refreshToken: string) =>
-    AsyncStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-
-  getRefreshToken = () => AsyncStorage.getItem(REFRESH_TOKEN_KEY);
-
   storeUserName = (userName: string) => AsyncStorage.setItem(USER_NAME, userName);
 
   getUserName = () => AsyncStorage.getItem(USER_NAME);
@@ -59,22 +54,6 @@ class AuthComponentStore {
     } catch (_) {
       return false;
     }
-  };
-
-  storeDeviceId = (id: string) => AsyncStorage.setItem(DEVICE_ID, id);
-
-  getDeviceId = () => AsyncStorage.getItem(DEVICE_ID);
-
-  clearAuths = async () => {
-    await AsyncStorage.multiRemove([
-      REFRESH_TOKEN_KEY,
-      ACCESS_TOKEN_KEY,
-      ORG_TOKEN_KEY,
-      PROFILE_KEY,
-      LOGIN_TOKEN_HINT,
-      QR_INBOUND_IMAGE,
-      IS_USER_LOGGED,
-    ]);
   };
 
   getSalt = async () => {
@@ -106,12 +85,11 @@ class AuthComponentStore {
         ...sensitiveInfoOptions,
         touchID: true, //add this key
         showModal: true, //add this key
-        kSecAccessControl: 'kSecAccessControlBiometryAny', // optional - Add support for FaceID
+        kSecAccessControl: 'kSecAccessControlBiometryCurrentSet', // optional - Add support for FaceID
       });
 
       return true;
     } catch (error) {
-      console.log('error', error);
       return false;
     }
   };
@@ -125,7 +103,6 @@ class AuthComponentStore {
 
       return await AuthServices.instance().authorizePushOnly(loginHintToken);
     } catch (error) {
-      console.log('react native log -> error', JSON.stringify(error));
       return error?.response?.data;
     }
   };
@@ -143,9 +120,14 @@ class AuthComponentStore {
         },
         kSecUseOperationPrompt: 'We need your permission to retrieve encrypted data',
       });
+      if (!loginHintToken) {
+        return biometricChangeErrorCode;
+      }
       return await AuthServices.instance().authorizePushOnly(loginHintToken);
     } catch (error) {
-      console.log('error', error);
+      if (error.message === 'Key permanently invalidated') {
+        return biometricChangeErrorCode;
+      }
       return error?.response?.data;
     }
   };

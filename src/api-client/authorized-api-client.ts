@@ -36,23 +36,23 @@ const attachTokenToRequest = (
 };
 
 const refreshTokens = async () => {
-  const refreshToken = await authComponentStore.getRefreshToken();
-  return new Promise<TokenData>((resolve, reject) => {
-    AuthServices.instance()
-      .refreshToken(refreshToken ?? '')
-      .then(async ({ refresh_token, access_token }) => {
-        const { orgToken } = await AuthServices.instance().fetchProfile();
-        return [refresh_token, access_token, orgToken];
-      })
-      .then(([refresh_token, access_token, orgToken]) => {
-        resolve({
-          accessToken: access_token,
-          refreshToken: refresh_token,
-          orgToken,
-        });
-      })
-      .catch((err) => reject(err));
-  });
+  // const refreshToken = await authComponentStore.getRefreshToken();
+  // return new Promise<TokenData>((resolve, reject) => {
+  //   AuthServices.instance()
+  //     .refreshToken(refreshToken ?? '')
+  //     .then(async ({ refresh_token, access_token }) => {
+  //       const { orgToken } = await AuthServices.instance().fetchProfile();
+  //       return [refresh_token, access_token, orgToken];
+  //     })
+  //     .then(([refresh_token, access_token, orgToken]) => {
+  //       resolve({
+  //         accessToken: access_token,
+  //         refreshToken: refresh_token,
+  //         orgToken,
+  //       });
+  //     })
+  //     .catch((err) => reject(err));
+  // });
 };
 
 const forceLogout = async () => {
@@ -93,58 +93,49 @@ export const createAuthorizedApiClient = (baseURL: string) => {
   const onResponseSuccess = (response: AxiosResponse) => response;
 
   const onResponseError = async (axiosError: AxiosError) => {
-    if (!options.shouldIntercept(axiosError)) {
-      return Promise.reject(axiosError);
-    }
-    const originalRequest: OriginalRequest = { ...axiosError.config };
-
-    if (originalRequest.retry || originalRequest.queued) {
-      return Promise.reject(axiosError);
-    }
-
-    if (isRefreshing) {
-      return new Promise<TokenData>(function (resolve, reject) {
-        failedQueue.push({ resolve, reject });
-      })
-        .then((data) => {
-          if (isRefreshed) {
-            originalRequest.queued = true;
-            options.attachTokenToRequest(
-              originalRequest,
-              data.accessToken
-            );
-            return axios.request(originalRequest);
-          }
-        })
-        .catch((_) => {
-          return Promise.reject(axiosError);
-        });
-    }
-    isRefreshing = true;
-    originalRequest.retry = true;
-    return new Promise((resolve, reject) => {
-      options
-        .refreshTokens()
-        .then((data) => {
-          options.attachTokenToRequest(
-            originalRequest,
-            data.accessToken,
-            data.orgToken
-          );
-          isRefreshed = true;
-          processQueue(null, data.accessToken, data.orgToken);
-          resolve(axios.request(originalRequest));
-        })
-        .catch(async (_) => {
-          await options.forceLogout();
-          processQueue(axiosError);
-          reject(axiosError);
-        })
-        .finally(() => {
-          isRefreshing = false;
-          isRefreshed = false;
-        });
-    });
+    // if (!options.shouldIntercept(axiosError)) {
+    //   return Promise.reject(axiosError);
+    // }
+    // const originalRequest: OriginalRequest = { ...axiosError.config };
+    // if (originalRequest.retry || originalRequest.queued) {
+    //   return Promise.reject(axiosError);
+    // }
+    // if (isRefreshing) {
+    //   return new Promise<TokenData>(function (resolve, reject) {
+    //     failedQueue.push({ resolve, reject });
+    //   })
+    //     .then((data) => {
+    //       if (isRefreshed) {
+    //         originalRequest.queued = true;
+    //         options.attachTokenToRequest(originalRequest, data.accessToken);
+    //         return axios.request(originalRequest);
+    //       }
+    //     })
+    //     .catch((_) => {
+    //       return Promise.reject(axiosError);
+    //     });
+    // }
+    // isRefreshing = true;
+    // originalRequest.retry = true;
+    // return new Promise((resolve, reject) => {
+    //   options
+    //     .refreshTokens()
+    //     .then((data) => {
+    //       options.attachTokenToRequest(originalRequest, data.accessToken, data.orgToken);
+    //       isRefreshed = true;
+    //       processQueue(null, data.accessToken, data.orgToken);
+    //       resolve(axios.request(originalRequest));
+    //     })
+    //     .catch(async (_) => {
+    //       await options.forceLogout();
+    //       processQueue(axiosError);
+    //       reject(axiosError);
+    //     })
+    //     .finally(() => {
+    //       isRefreshing = false;
+    //       isRefreshed = false;
+    //     });
+    // });
   };
 
   instance.interceptors.request.use(onRequest);
