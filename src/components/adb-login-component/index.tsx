@@ -16,7 +16,8 @@ import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { EyesClosedIcon, EyesIcon } from '../../assets/icons';
-import { PASSWORD_LOCKED_OUT } from '../../utils/index';
+import { OTP_REQUIRED, PASSWORD_LOCKED_OUT } from '../../utils/index';
+
 export class SignInData {
   constructor(readonly username: string, readonly password: string) {}
 
@@ -51,16 +52,19 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const { username, password } = values;
     const _username = username.trim();
     const _password = password.trim();
-    const isSuccess = await adbLogin(_username, _password);
-    if (isSuccess) {
-      if (isSuccess?.error?.code === PASSWORD_LOCKED_OUT) {
-        setErrorModal(true);
-      } else {
+    const response = await adbLogin(_username, _password);
+    console.log('handleOnSignIn','response:'+response);
+    if (response) {
+      if(response.status && response.status === OTP_REQUIRED) {
         onLoginSuccess();
+        return;
       }
-    } else {
-      onLoginFailed();
+      else if (response.error?.code === PASSWORD_LOCKED_OUT) {
+        setErrorModal(true);
+        return;
+      } 
     }
+    onLoginFailed();
   };
 
   useEffect(() => {
@@ -150,7 +154,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
           <View style={styles.gap8} />
           <Text style={[styles.subTitle, { textAlign: 'center' }]}>
             {i18n.t('login_component.lbl_entered_wrong_password') ??
-              `You’ve entered the wrong password 3 times. Please try again after 1 hour.`}
+              `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
           </Text>
           <View style={{ height: 32 }} />
           <ADBButton

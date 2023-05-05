@@ -1,1 +1,3 @@
 export const PASSWORD_LOCKED_OUT = 'PASSWORD_LOCKED_OUT';
+export const OTP_REQUIRED = 'OTP_REQUIRED';
+export const FAILED = 'FAILED';

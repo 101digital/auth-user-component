@@ -76,7 +76,6 @@ export class AuthServices {
           acr_values,
         },
       });
-
     const flowId = responseAuth.data?.id;
 
     if (flowId?.length > 0) {
@@ -375,7 +374,6 @@ export class AuthServices {
         },
       }
     );
-
     return response.data;
   };
 
@@ -389,11 +387,16 @@ export class AuthServices {
       recoveryCode: recoveryCode,
       newPassword: newPassword,
     };
-    const response = await axios.post(`${authBaseUrl}/flows/${flowId}`, body, {
-      headers: {
-        'Content-Type': 'application/vnd.pingidentity.password.forgot+json',
-      },
-    });
+    const response = await axios.post(
+      `${authBaseUrl}/flows/${flowId}`,
+        body,
+        {
+          headers: {
+            'access-control-allow-origin': '*',
+            'Content-Type': 'application/vnd.pingidentity.password.recover+json',
+          },
+        }
+      );
     return response.data;
   };
 

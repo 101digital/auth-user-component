@@ -41,16 +41,17 @@ export interface AuthContextData {
   ) => void;
   validateUserForgotPassword: (
     email: string,
-    nric: string,
-    handleResponse: (response: any) => void
-  ) => void;
+    nric: string
+  ) => Promise<boolean>;
   changeUserPasswordUsingRecoveryCode: (
     recoveryCode: string,
     newPassword: string,
-    flowId: string,
-    handleResponse: (response: any) => void
-  ) => void;
-  adbForgotPasswordVerifyOtp: (otp: string, flowId: string) => Promise<boolean>;
+    flowId: string
+  ) => Promise<boolean>;
+  adbForgotPasswordVerifyOtp: (
+    otp: string,
+    flowId: string
+  ) => Promise<boolean>;
   isChangingPassword: boolean;
   isChangePassword: boolean;
   errorChangePassword?: Error;
@@ -290,14 +291,15 @@ export const useAuthContextValue = (): AuthContextData => {
         authComponentStore.storeUserName(username);
         setUsername(username);
         setPassword(undefined);
+        setIsSigning(false);
+        return data;
       }
     } catch (error) {
+      setIsSigning(false);
       setErrorSignIn(error as Error);
       return false;
-    } finally {
-      setIsSigning(false);
-    }
-    return true;
+    } 
+    return false;
   }, []);
 
   const adbLoginVerifyOtp = useCallback(
@@ -496,27 +498,25 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const validateUserForgotPassword = useCallback(
-    async (email: string, nric: string, handleResponse: (response: any) => void) => {
+    async (email: string, nric: string) => {
       try {
         setIsRecoveringUserPassword(true);
-        const response = await AuthServices.instance().validateUserForgotPassword(email, nric);
-        handleResponse(response);
+        const response = await AuthServices.instance().validateUserForgotPassword(
+          email,
+          nric
+        );
         setIsRecoveringUserPassword(false);
+        return response;
       } catch (error) {
-        handleResponse(error?.response?.data?.errors);
         setIsRecoveringUserPassword(false);
+        return error?.response?.data?.errors;
       }
     },
     []
   );
 
   const changeUserPasswordUsingRecoveryCode = useCallback(
-    async (
-      recoveryCode: string,
-      newPassword: string,
-      flowId: string,
-      handleResponse: (response: any) => void
-    ) => {
+    async (recoveryCode: string, newPassword: string, flowId: string) => {
       try {
         setIsRecoveringUserPassword(true);
         const response = await AuthServices.instance().changeUserPasswordUsingRecoveryCode(
@@ -524,11 +524,11 @@ export const useAuthContextValue = (): AuthContextData => {
           newPassword,
           flowId
         );
-        handleResponse(response);
         setIsRecoveringUserPassword(false);
+        return response;
       } catch (error) {
-        handleResponse(error?.response?.data?.errors);
         setIsRecoveringUserPassword(false);
+        return error?.response?.data;
       }
     },
     []
