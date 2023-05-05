@@ -39,19 +39,13 @@ export interface AuthContextData {
     confirmNewPassword: string,
     handleResponse: (response: any) => void
   ) => void;
-  validateUserForgotPassword: (
-    email: string,
-    nric: string
-  ) => Promise<boolean>;
+  validateUserForgotPassword: (email: string, nric: string) => Promise<boolean>;
   changeUserPasswordUsingRecoveryCode: (
     recoveryCode: string,
     newPassword: string,
     flowId: string
   ) => Promise<boolean>;
-  adbForgotPasswordVerifyOtp: (
-    otp: string,
-    flowId: string
-  ) => Promise<boolean>;
+  adbForgotPasswordVerifyOtp: (otp: string, flowId: string) => Promise<boolean>;
   isChangingPassword: boolean;
   isChangePassword: boolean;
   errorChangePassword?: Error;
@@ -120,6 +114,8 @@ export interface AuthContextData {
   errorRebindedDevice?: Error;
   setIsSignedIn: (isLogged: boolean) => void;
   userMobileNumberHint?: string;
+  currentVerificationMethod: VerificationMethod;
+  setCurrentVerificationMethod: (method: VerificationMethod) => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -181,6 +177,8 @@ export const authDefaultValue: AuthContextData = {
   updateUserStatus: async () => false,
   setIsSignedIn: () => undefined,
   isUpdatingUserStatus: false,
+  currentVerificationMethod: VerificationMethod.PENDING,
+  setCurrentVerificationMethod: () => false,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -225,6 +223,10 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isUpdatingUserStatus, setIsUpdatingUserStatus] = useState<boolean>(false);
   const [_userMobileNumberHint, setUserMobileNumberHint] = useState<string>();
   const [loginHintToken, setLoginHintToken] = useState<string>();
+  const [_currentVerificationMethod, setCurrentVerificationMethod] = useState<VerificationMethod>(
+    VerificationMethod.PENDING
+  );
+
   const { PingOnesdkModule } = NativeModules;
 
   useEffect(() => {
@@ -298,7 +300,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsSigning(false);
       setErrorSignIn(error as Error);
       return false;
-    } 
+    }
     return false;
   }, []);
 
@@ -437,8 +439,7 @@ export const useAuthContextValue = (): AuthContextData => {
   }, []);
 
   const logout = useCallback(async () => {
-    // await authComponentStore.clearAuths();
-    // setIsSignedIn(false);
+    setCurrentVerificationMethod(VerificationMethod.PIN);
     setProfile(undefined);
     setIsValidatedSubsequenceLogin(false);
   }, []);
@@ -447,7 +448,6 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsUpdatingProfile(true);
       const response = await AuthServices.instance().updateProfile(userId, profile);
-      console.log('updateProfile -> data', response.data);
       setProfile(response.data);
       return true;
     } catch (error) {
@@ -497,23 +497,17 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const validateUserForgotPassword = useCallback(
-    async (email: string, nric: string) => {
-      try {
-        setIsRecoveringUserPassword(true);
-        const response = await AuthServices.instance().validateUserForgotPassword(
-          email,
-          nric
-        );
-        setIsRecoveringUserPassword(false);
-        return response;
-      } catch (error) {
-        setIsRecoveringUserPassword(false);
-        return error?.response?.data?.errors;
-      }
-    },
-    []
-  );
+  const validateUserForgotPassword = useCallback(async (email: string, nric: string) => {
+    try {
+      setIsRecoveringUserPassword(true);
+      const response = await AuthServices.instance().validateUserForgotPassword(email, nric);
+      setIsRecoveringUserPassword(false);
+      return response;
+    } catch (error) {
+      setIsRecoveringUserPassword(false);
+      return error?.response?.data?.errors;
+    }
+  }, []);
 
   const changeUserPasswordUsingRecoveryCode = useCallback(
     async (recoveryCode: string, newPassword: string, flowId: string) => {
@@ -759,7 +753,6 @@ export const useAuthContextValue = (): AuthContextData => {
   const getListDevices = useCallback(async () => {
     try {
       const response = await AuthServices.instance().getListDevices();
-      console.log('getListDevices -> response', response);
       if (response && response.data && response.data.length > 0) {
         return response.data;
       }
@@ -772,7 +765,6 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       const response = await AuthServices.instance().deleteDevice(deviceId);
       if (response && response.data && response.data.length > 0) {
-        console.log('deleteDevice');
       }
       return true;
     } catch (error) {
@@ -868,6 +860,8 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsSignedIn,
       isUpdatingUserStatus: _isUpdatingUserStatus,
       userMobileNumberHint: _userMobileNumberHint,
+      currentVerificationMethod: _currentVerificationMethod,
+      setCurrentVerificationMethod,
     }),
     [
       _profile,
@@ -903,6 +897,7 @@ export const useAuthContextValue = (): AuthContextData => {
       _errorRebindedDevice,
       _isUpdatingUserStatus,
       _userMobileNumberHint,
+      _currentVerificationMethod,
     ]
   );
 };
