@@ -28,12 +28,7 @@ export interface AuthContextData {
   loginOAuth2: () => Promise<Profile | undefined>;
   logout: () => void;
   clearSignInError: () => void;
-  updateProfile: (
-    userId: string,
-    firstName: string,
-    lastName: string,
-    profilePicture?: string
-  ) => Promise<boolean>;
+  updateProfile: (userId: string, data: any) => Promise<boolean>;
   fetchProfile: () => void;
   isUpdatingProfile?: boolean;
   errorUpdateProfile?: Error;
@@ -55,10 +50,7 @@ export interface AuthContextData {
     flowId: string,
     handleResponse: (response: any) => void
   ) => void;
-  adbForgotPasswordVerifyOtp: (
-    otp: string,
-    flowId: string
-  ) => Promise<boolean>;
+  adbForgotPasswordVerifyOtp: (otp: string, flowId: string) => Promise<boolean>;
   isChangingPassword: boolean;
   isChangePassword: boolean;
   errorChangePassword?: Error;
@@ -449,25 +441,20 @@ export const useAuthContextValue = (): AuthContextData => {
     setIsValidatedSubsequenceLogin(false);
   }, []);
 
-  const updateProfile = useCallback(
-    async (userId: string, firstName: string, lastName: string, profilePicture?: string) => {
-      try {
-        setIsUpdatingProfile(true);
-        await AuthServices.instance().updateProfile(userId, firstName, lastName, profilePicture);
-        const { data } = await AuthServices.instance().fetchProfile();
-        setProfile(data);
-        getProfilePicture(data);
-        await authComponentStore.storeIsUserLogged(true);
-        setIsUpdatingProfile(false);
-        return true;
-      } catch (error) {
-        setIsUpdatingProfile(false);
-        setErrorUpdateProfile(error as Error);
-        return false;
-      }
-    },
-    []
-  );
+  const updateProfile = useCallback(async (userId: string, profile: Profile) => {
+    try {
+      setIsUpdatingProfile(true);
+      const response = await AuthServices.instance().updateProfile(userId, profile);
+      console.log('updateProfile -> data', response.data);
+      setProfile(response.data);
+      return true;
+    } catch (error) {
+      setErrorUpdateProfile(error as Error);
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+    return false;
+  }, []);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -509,17 +496,10 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const validateUserForgotPassword = useCallback(
-    async (
-      email: string,
-      nric: string,
-      handleResponse: (response: any) => void
-    ) => {
+    async (email: string, nric: string, handleResponse: (response: any) => void) => {
       try {
         setIsRecoveringUserPassword(true);
-        const response = await AuthServices.instance().validateUserForgotPassword(
-          email,
-          nric
-        );
+        const response = await AuthServices.instance().validateUserForgotPassword(email, nric);
         handleResponse(response);
         setIsRecoveringUserPassword(false);
       } catch (error) {
@@ -554,24 +534,21 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const adbForgotPasswordVerifyOtp = useCallback(
-    async (otp: string, flowId: string) => {
-      try {
-        setIsVerifyLogin(true);
-        if (flowId && flowId.length > 0) {
-          const loginData = await AuthServices.instance().adbVerifyLogin(otp, flowId);
-          setIsVerifyLogin(false);
-          if(loginData.status === 'COMPLETED') {
-            return true;  
-          }
-        }
-      } catch (error) {
+  const adbForgotPasswordVerifyOtp = useCallback(async (otp: string, flowId: string) => {
+    try {
+      setIsVerifyLogin(true);
+      if (flowId && flowId.length > 0) {
+        const loginData = await AuthServices.instance().adbVerifyLogin(otp, flowId);
         setIsVerifyLogin(false);
+        if (loginData.status === 'COMPLETED') {
+          return true;
+        }
       }
-      return false;
-    },
-    []
-  );
+    } catch (error) {
+      setIsVerifyLogin(false);
+    }
+    return false;
+  }, []);
 
   const saveUserPhoneNumber = useCallback(async (mobileNumber: string) => {
     setUserMobileNumber(mobileNumber);
