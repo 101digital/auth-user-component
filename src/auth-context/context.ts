@@ -12,6 +12,7 @@ import { useMemo, useState } from 'react';
 import { AuthServices } from '../services/auth-services';
 import _ from 'lodash';
 import { NativeModules } from 'react-native';
+import { SINGLE_FACTOR_ACR_VALUE, SINGLE_FACTOR_SCOPE } from '../utils';
 
 export interface AuthContextData {
   profile?: Profile;
@@ -336,13 +337,13 @@ export const useAuthContextValue = (): AuthContextData => {
       const resLogin = await AuthServices.instance().adbLogin(
         username,
         password,
-        'profilepsf',
-        'Single_Factor'
+        SINGLE_FACTOR_SCOPE,
+        SINGLE_FACTOR_ACR_VALUE
       );
       const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
       await AuthServices.instance().obtainTokenSingleFactor(
         resAfterValidate.authorizeResponse.code,
-        'profilepsf'
+        SINGLE_FACTOR_SCOPE
       );
     } catch (error) {}
   }, []);
@@ -354,8 +355,8 @@ export const useAuthContextValue = (): AuthContextData => {
         const resLogin = await AuthServices.instance().adbLogin(
           username,
           password,
-          'profilepsf',
-          'Single_Factor'
+          SINGLE_FACTOR_SCOPE,
+          SINGLE_FACTOR_ACR_VALUE
         );
         if (resLogin.error) {
           return resLogin;
@@ -392,8 +393,8 @@ export const useAuthContextValue = (): AuthContextData => {
         const resLogin = await AuthServices.instance().adbLogin(
           _username,
           password,
-          'profilepsf',
-          'Single_Factor'
+          SINGLE_FACTOR_SCOPE,
+          SINGLE_FACTOR_ACR_VALUE
         );
         if (resLogin.resumeUrl) {
           return true;
@@ -412,7 +413,11 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsSigning(true);
       if (_username && _username.length > 0 && _password && _password.length > 0) {
-        const data = await AuthServices.instance().adbLogin(_username, _password, 'Single_Factor');
+        const data = await AuthServices.instance().adbLogin(
+          _username,
+          _password,
+          SINGLE_FACTOR_ACR_VALUE
+        );
         if (data && data.id) {
           setFlowId(data.id);
         }

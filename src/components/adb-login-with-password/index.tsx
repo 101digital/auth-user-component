@@ -78,12 +78,11 @@ const ADBLoginWithPasswordComponent = ({
     }
   };
 
-  const checkUserName = async () => {
-    const userName = await authComponentStore.getUserName();
-    if (!userName || userName.length === 0) {
-      console.log('checkUserName');
-    }
-  };
+  // const checkUserName = async () => {
+  //   const userName = await authComponentStore.getUserName();
+  //   if (!userName || userName.length === 0) {
+  //   }
+  // };
 
   useEffect(() => {
     if (isFocused) {
@@ -92,9 +91,8 @@ const ADBLoginWithPasswordComponent = ({
   }, [isFocused]);
 
   useEffect(() => {
-    checkUserName();
+    // checkUserName();
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      console.log('event', e);
       setKeyboardHeight(e.endCoordinates.height);
     });
 
@@ -111,8 +109,7 @@ const ADBLoginWithPasswordComponent = ({
   return (
     <View style={styles.container}>
       <Formik innerRef={formikRef} initialValues={{}} onSubmit={() => {}}>
-        {({ submitForm, values, errors }) => {
-          console.log('errorsss', errors);
+        {() => {
           return (
             <>
               <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>

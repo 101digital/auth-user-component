@@ -481,12 +481,10 @@ export class AuthServices {
             login_hint_token: loginHintToken,
           },
         });
-      console.log('responseAuth -> response', responseAuth);
       if (responseAuth) {
         return responseAuth.data;
       }
     } catch (error) {
-      console.log('error', error);
       return false;
     }
   };

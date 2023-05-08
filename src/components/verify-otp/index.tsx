@@ -2,12 +2,18 @@ import { VerifyOTPComponentProps } from './types';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Text, View, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import useMergeStyles from './styles';
-import { ADBButton, OTPField, TriangelDangerIcon } from 'react-native-theme-component';
+import {
+  ADBButton,
+  OTPField,
+  TriangelDangerIcon,
+  ThemeContext,
+} from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import CountdownTimer, {
   CountDownTimerRef,
 } from 'react-native-theme-component/src/countdown-timer';
 import { AuthContext } from '../../auth-context/context';
+import { ResponseStatus } from '../../types';
 
 const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
   const styles = useMergeStyles(style);
@@ -24,6 +30,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
     clearError,
   } = props || {};
   const { errorVerifySignIn, isVerifyLogin } = useContext(AuthContext);
+  const { i18n } = useContext(ThemeContext);
   const [value, setValue] = useState<string>('');
   const [isValid, setIsValid] = useState<boolean>(false);
   const [attemptCount, setAttemptCount] = useState<number>(0);
@@ -36,7 +43,6 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
       generateOTP();
     }
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      console.log('event', e);
       setKeyboardHeight(e.endCoordinates.height);
     });
 
@@ -66,7 +72,6 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
     if (isSuccess) {
       otpRef.current?.clearInput();
       otpRef.current?.setValue('');
-      console.log('>??????');
       onVerifySuccess && onVerifySuccess();
     } else {
       setAttemptCount(attemptCount + 1);
@@ -92,13 +97,13 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
   const getErrorMessage = () => {
     const errorCode = errorVerifySignIn?.response?.status;
     switch (errorCode.toString()) {
-      case '400':
-      case '401':
-        return 'Your OTP does not match.';
-      case '000.01.429.00':
-        return 'Too many request.';
+      case ResponseStatus.BAD_REQUEST:
+      case ResponseStatus.UNAUTHORIZED:
+        return i18n.t('errors.login.otp_not_matched') ?? 'Your OTP does not match.';
+      case ResponseStatus.TOO_MANY_REQUEST:
+        return i18n.t('errors.login.too_many_request') ?? 'Too many request.';
       default:
-        return 'Internal Server Error';
+        return i18n.t('errors.common.server') ?? 'Internal Server Error';
     }
   };
 
@@ -119,8 +124,6 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
     ret += '' + secs;
     return ret;
   };
-
-  console.log('mockVerifyOTP', isVerifyLogin);
 
   return (
     <KeyboardAvoidingView style={styles.container}>

@@ -16,6 +16,10 @@ import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { SuccessIcon } from 'react-native-theme-component/src/assets/success.icon';
 import { colors } from '../../assets';
 import { AuthContext } from '../../auth-context/context';
+import {
+  DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY,
+  OTP_REQUIRED,
+} from '../../utils';
 
 export interface IADBForgotPasswordCreateNewComponent {
   forgotPasswordObj: object;
@@ -77,21 +81,30 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
 
   const changePassword = async (val: any) => {
     setLoading(true);
-    const response = await changeUserPasswordUsingRecoveryCode(forgotPasswordObj.recoveryCode, val.createNew, forgotPasswordObj.flowId);
+    const response = await changeUserPasswordUsingRecoveryCode(
+      forgotPasswordObj.recoveryCode,
+      val.createNew,
+      forgotPasswordObj.flowId
+    );
     setLoading(false);
-    if ( response ) {
-      if(response.status && response.status === 'OTP_REQUIRED') {
+    if (response) {
+      if (response.status && response.status === OTP_REQUIRED) {
         onPressContinue(val.createNew);
         return;
       } else if (
-        response.details && `${response.details[0].message}`.includes('New password did not satisfy password policy requirements')
+        response.details &&
+        `${response.details[0].message}`.includes(
+          DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY
+        )
       ) {
         onPasswordSameHistory();
         return;
-      } 
+      }
     }
     setErrorModal(true);
-    setErrorTitle(i18n.t('change_password.lbl_sorry_there_was_problem') ?? 'Sorry, there was a problem');
+    setErrorTitle(
+      i18n.t('change_password.lbl_sorry_there_was_problem') ?? 'Sorry, there was a problem'
+    );
   };
   return (
     <>
@@ -99,7 +112,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
         innerRef={formikRef}
         enableReinitialize={true}
         initialValues={ADBChangePasswordData.empty()}
-        validationSchema={ADBChangePasswordSchema}
+        validationSchema={ADBChangePasswordSchema(i18n)}
         onSubmit={(values) => {}}
       >
         {({ setFieldTouched, errors, values }) => {
@@ -224,7 +237,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
           </Text>
           <View style={styles.height32} />
           <ADBButton
-            label={i18n.t('change_password.btn_done') ?? 'Done'}
+            label={i18n.t('common.lbl_done') ?? 'Done'}
             onPress={() => {
               setErrorModal(false);
             }}

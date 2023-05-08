@@ -16,6 +16,10 @@ import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { SuccessIcon } from 'react-native-theme-component/src/assets/success.icon';
 import { colors } from '../../assets';
 import { AuthContext } from '../../auth-context/context';
+import {
+  DEFAULT_ERROR_MESSAGE_INVALID_PROVIDED_PASSWORD,
+  DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY,
+} from '../../utils';
 
 export interface IADBChangePasswordComponent {
   onPressContinue: () => void;
@@ -85,13 +89,13 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
         setSuccessModal(true);
         setLoading(false);
       } else if (
-        `${resp[0].message}`.includes('New password did not satisfy password policy requirements')
+        `${resp[0].message}`.includes(
+          DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY
+        )
       ) {
         onPasswordSameHistory();
         setLoading(false);
-      } else if (
-        `${resp[0].message}`.includes('The current password provided for the user is invalid')
-      ) {
+      } else if (`${resp[0].message}`.includes(DEFAULT_ERROR_MESSAGE_INVALID_PROVIDED_PASSWORD)) {
         setInvalidCredModal(true);
         setLoading(false);
       } else {
@@ -111,7 +115,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
         innerRef={formikRef}
         enableReinitialize={true}
         initialValues={ADBChangePasswordData.empty()}
-        validationSchema={ADBChangePasswordSchema}
+        validationSchema={ADBChangePasswordSchema(i18n)}
         onSubmit={(values) => {}}
       >
         {({ setFieldTouched, errors, values }) => {
@@ -264,7 +268,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
           </Text>
           <View style={styles.height32} />
           <ADBButton
-            label={i18n.t('change_password.btn_done') ?? 'Done'}
+            label={i18n.t('common.lbl_done') ?? 'Done'}
             onPress={() => {
               setErrorModal(false);
             }}
@@ -281,7 +285,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
           </Text>
           <View style={styles.height8} />
           <ADBButton
-            label={i18n.t('change_password.btn_done') ?? 'Done'}
+            label={i18n.t('common.lbl_done') ?? 'Done'}
             onPress={() => {
               setSuccessModal(false), onPressContinue();
             }}
@@ -302,7 +306,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
           </Text>
           <View style={styles.height32} />
           <ADBButton
-            label={i18n.t('change_password.btn_done') ?? 'Done'}
+            label={i18n.t('common.lbl_done') ?? 'Done'}
             onPress={() => {
               setInvalidCredModal(false);
             }}

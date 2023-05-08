@@ -1,11 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import {
-  Keyboard,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
 import { AuthContext } from '../../auth-context';
@@ -31,15 +25,12 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
   const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
 
   const onShowInvalidIDNumber = () => {
-    onErrorValidateID(
-      i18n.t('id_number.error_invalid_id') ?? 'Invalid NRIC number.'
-    );
+    onErrorValidateID(i18n.t('id_number.error_invalid_id') ?? 'Invalid NRIC number.');
   };
 
   const onShowInvalidAge = () => {
     onErrorValidateID(
-      i18n.t('id_number.error_invalid_age_id') ??
-        'You must be 18 years old and above.'
+      i18n.t('id_number.error_invalid_age_id') ?? 'You must be 18 years old and above.'
     );
   };
 
@@ -71,18 +62,16 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
 
     const currentYear = parseInt(moment().format('YY'));
     const idYOB = parseInt(_nric.slice(0, 2));
-    const currentAge =
-      currentYear < idYOB ? currentYear + 100 - idYOB : currentYear - idYOB;
+    const currentAge = currentYear < idYOB ? currentYear + 100 - idYOB : currentYear - idYOB;
     if (currentAge < 18) {
       onShowInvalidAge();
       return;
     }
-    const _finalNric = _nric.replace(/-/gm,'');
+    const _finalNric = _nric.replace(/-/gm, '');
     const response = await validateUserForgotPassword(_email, _finalNric);
-    if(response && isObject(response) && response.resendCode) {
+    if (response && isObject(response) && response.resendCode) {
       onValidationSuccess(response.resendCode);
-    }
-    else {
+    } else {
       setErrorModal(true);
     }
   };
@@ -107,9 +96,9 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
       <Formik
         innerRef={formikRef}
         enableReinitialize={true}
-        initialValues={InputIdData.empty()} 
+        initialValues={InputIdData.empty()}
         onSubmit={handleOnValidation}
-        validationSchema={InputIdSchema}
+        validationSchema={InputIdSchema(i18n)}
       >
         {({ submitForm, setFieldValue, values }) => {
           let formattedId = values.nric.replace(/[-]+/g, '');
@@ -137,16 +126,18 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
                     returnKeyType="done"
                     placeholder={'Email'}
                     autoCapitalize="none"
-                    keyboardType={"email-address"}
+                    keyboardType={'email-address'}
                   />
                 </View>
                 <View style={styles.rowInput}>
                   <ADBInputField
                     name={'nric'}
-                    placeholder={i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'}
+                    placeholder={
+                      i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'
+                    }
                     maxLength={14}
                     returnKeyType="done"
-                    keyboardType={"number-pad"}
+                    keyboardType={'number-pad'}
                   />
                 </View>
               </View>
@@ -171,17 +162,15 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
           <AlertCircleIcon size={72} />
           <View style={styles.gap40} />
           <Text style={[styles.loginTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.invalid_creds') ??
-              `Invalid credentials!`}
+            {i18n.t('login_component.invalid_creds') ?? `Invalid credentials!`}
           </Text>
           <View style={styles.gap8} />
           <Text style={[styles.subTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.please_try_again') ??
-              `Please try again.`}
+            {i18n.t('login_component.please_try_again') ?? `Please try again.`}
           </Text>
           <View style={{ height: 32 }} />
           <ADBButton
-            label={i18n.t('login_component.btn_done') ?? 'Done'}
+            label={i18n.t('common.lbl_done') ?? 'Done'}
             onPress={() => {
               setErrorModal(false);
             }}

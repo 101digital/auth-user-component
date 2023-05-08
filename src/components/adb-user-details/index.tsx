@@ -86,7 +86,6 @@ const ADBUserDetailsScreenComponent = ({
         setIsLoadingValues(false);
       })
       .catch((e) => {
-        console.log('errow', e);
         setIsLoadingValues(false);
       });
     setIsShowBottomSheet(true);
@@ -178,7 +177,6 @@ const ADBUserDetailsScreenComponent = ({
   };
 
   const onPressImploymentType = () => {
-    console.log('onPressImploymentType');
     getMetaData('employmentType');
   };
 
@@ -196,10 +194,9 @@ const ADBUserDetailsScreenComponent = ({
     <View style={styles.container}>
       <Formik
         innerRef={formikRef}
-        validationSchema={UserDetailsSchema}
+        validationSchema={UserDetailsSchema(i18n)}
         initialValues={UserDetailsData.empty(profile)}
         onSubmit={async (values) => {
-          console.log('submit form', values);
           const inputedValue = {
             nickName: values.nickName,
             religion: values.religion,

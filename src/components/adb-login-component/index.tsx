@@ -53,23 +53,20 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const _username = username.trim();
     const _password = password.trim();
     const response = await adbLogin(_username, _password);
-    console.log('handleOnSignIn','response:'+response);
     if (response) {
-      if(response.status && response.status === OTP_REQUIRED) {
+      if (response.status && response.status === OTP_REQUIRED) {
         onLoginSuccess();
         return;
-      }
-      else if (response.error?.code === PASSWORD_LOCKED_OUT) {
+      } else if (response.error?.code === PASSWORD_LOCKED_OUT) {
         setErrorModal(true);
         return;
-      } 
+      }
     }
     onLoginFailed();
   };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      console.log('event', e);
       setKeyboardHeight(e.endCoordinates.height);
     });
 
@@ -158,7 +155,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
           </Text>
           <View style={{ height: 32 }} />
           <ADBButton
-            label={i18n.t('login_component.btn_done') ?? 'Done'}
+            label={i18n.t('common.lbl_done') ?? 'Done'}
             onPress={() => {
               setErrorModal(false);
             }}

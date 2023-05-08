@@ -7,6 +7,9 @@ export class InputIdData {
     return new InputIdData('');
   }
 }
-export const InputIdSchema = Yup.object().shape({
-  userId: Yup.string().trim().required('Please input your id number'),
-});
+export const InputIdSchema = (i18n: any) =>
+  Yup.object().shape({
+    userId: Yup.string()
+      .trim()
+      .required(i18n.t('errors.forgot_password.nric_required') ?? 'Please input your id number'),
+  });

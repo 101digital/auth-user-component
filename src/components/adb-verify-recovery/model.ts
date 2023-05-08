@@ -7,6 +7,11 @@ export class InputIdData {
     return new InputIdData('');
   }
 }
-export const InputIdSchema = Yup.object().shape({
-  recoveryCode: Yup.string().trim().required('Please input recovery code'),
-});
+export const InputIdSchema = (i18n: any) =>
+  Yup.object().shape({
+    recoveryCode: Yup.string()
+      .trim()
+      .required(
+        i18n.t('login_component.please_input_recovery_code') ?? 'Please input recovery code'
+      ),
+  });

@@ -1,11 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import {
-  Keyboard,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
 import { Formik, FormikProps } from 'formik';
@@ -19,7 +13,7 @@ export interface ILogin {
 }
 
 const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onContinue, } = props;
+  const { onContinue } = props;
   const { i18n } = useContext(ThemeContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const formikRef = useRef<FormikProps<InputIdData>>(null);
@@ -27,7 +21,7 @@ const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
 
   const handleOnContinue = async (values: InputIdData) => {
     Keyboard.dismiss();
-    const { recoveryCode} = values;
+    const { recoveryCode } = values;
     const _recoveryCode = recoveryCode.trim();
     onContinue(_recoveryCode);
   };
@@ -52,9 +46,9 @@ const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
       <Formik
         innerRef={formikRef}
         enableReinitialize={true}
-        initialValues={InputIdData.empty()} 
+        initialValues={InputIdData.empty()}
         onSubmit={handleOnContinue}
-        validationSchema={InputIdSchema}
+        validationSchema={InputIdSchema(i18n)}
       >
         {({ submitForm, values }) => {
           return (
@@ -65,9 +59,9 @@ const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
                     name="recoveryCode"
                     maxLength={8}
                     returnKeyType="done"
-                    placeholder={'Recovery code'}
+                    placeholder={i18n.t('login_component.recovery_code') ?? 'Recovery code'}
                     autoCapitalize="none"
-                    keyboardType={"default"}
+                    keyboardType={'default'}
                   />
                 </View>
               </View>
@@ -79,7 +73,7 @@ const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
                 <ADBButton
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}
                   onPress={submitForm}
-                  disabled={values.recoveryCode.length !=8}
+                  disabled={values.recoveryCode.length != 8}
                 />
               </View>
             </>

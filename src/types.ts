@@ -168,3 +168,9 @@ export type PKCE = {
   codeChallenge: string;
   codeVerifier: string;
 };
+
+export enum ResponseStatus {
+  BAD_REQUEST = '400',
+  UNAUTHORIZED = '401',
+  TOO_MANY_REQUEST = '000.01.429.00',
+}

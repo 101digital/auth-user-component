@@ -18,7 +18,6 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
   const formikRef = useRef<FormikProps<InputIdData>>(null);
   const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
 
-  console.log('profile?.kycDetails', profile?.kycDetails);
   const { onVerifyNRICSuccess, onError, isLoading } = prop;
 
   const validateIdNumber = async (id: string) => {
@@ -31,13 +30,10 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
     } else {
       onError();
     }
-
-    console.log('profile', profile?.kycDetails);
   };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      console.log('event', e);
       setKeyboardHeight(e.endCoordinates.height);
     });
 
@@ -57,7 +53,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
         innerRef={formikRef}
         enableReinitialize={true}
         initialValues={InputIdData.empty()}
-        validationSchema={InputIdSchema}
+        validationSchema={InputIdSchema(i18n)}
         onSubmit={(values) => validateIdNumber(values.userId)}
       >
         {({ submitForm, setFieldValue, values }) => {
@@ -89,7 +85,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
               </View>
               <View style={{ marginBottom: marginKeyboard }}>
                 <ADBButton
-                  label={'Continue'}
+                  label={i18n.t('common.lbl_continue')}
                   onPress={submitForm}
                   isLoading={isLoading}
                   disabled={values.userId.length === 0}
