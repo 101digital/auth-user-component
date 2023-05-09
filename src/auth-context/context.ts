@@ -725,7 +725,7 @@ export const useAuthContextValue = (): AuthContextData => {
       if (token) {
         const response = await AuthServices.instance().authorizePushOnly(token);
         if (response && response.selectedDevice?.id && response.authSession && response.resumeUrl) {
-          authComponentStore.storeDeviceId(response.selectedDevice?.id);
+          // authComponentStore.storeDeviceId(response.selectedDevice?.id);
           PingOnesdkModule.setCurrentSessionId(response.authSession.id);
           saveResumeURL(response.resumeUrl);
           return true;

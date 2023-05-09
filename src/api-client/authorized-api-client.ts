@@ -139,7 +139,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
   };
 
   instance.interceptors.request.use(onRequest);
-  instance.interceptors.response.use(onResponseSuccess, onResponseError);
+  instance.interceptors.response.use(onResponseSuccess);
 
   return instance;
 };
