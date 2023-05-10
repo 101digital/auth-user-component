@@ -8,7 +8,14 @@ import {
   KeyboardAvoidingView,
   NativeModules,
 } from 'react-native';
-import { ADBButton, OTPField, TriangelDangerIcon, ImageIcon, ThemeContext } from 'react-native-theme-component';
+import {
+  ADBButton,
+  OTPField,
+  TriangelDangerIcon,
+  ImageIcon,
+  ThemeContext,
+  PinNumberComponent
+} from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
 import { fonts } from '../../assets';
@@ -38,6 +45,12 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const [retryCount, setRetryCount] = useState<number>(0);
   const { PingOnesdkModule } = NativeModules;
   const [errorModal, setErrorModal] = useState(false);
+  const [biometricStatus, setBiometricStatus] = useState(false);
+
+  const checkBiometricStatus = async () =>{
+    const response = await authComponentStore.getIsEnableBiometric();
+    setBiometricStatus(response)
+  }
 
   const validatePINNumber = async () => {
     setIsLoading(true);
@@ -47,8 +60,10 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
       if (retryCount + 1 < 3) {
         setIsNotMatched(true);
         setRetryCount(retryCount + 1);
+
+        // clear if it failed
         otpRef.current?.clearInput();
-        otpRef.current?.focus();
+        // otpRef.current?.focus();
       } else {
         onFailedVerified();
       }
@@ -65,7 +80,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         else {
           onError && onError(authorizeResponse.error);
           setIsSignedIn(false);
-        } 
+        }
       } else if (authorizeResponse.authSession && authorizeResponse?.resumeUrl) {
         // const deviceId = await authComponentStore.getDeviceId();
         // const selectedDeviceId = authorizeResponse.selectedDevice?.id;
@@ -82,6 +97,16 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     }
   };
 
+  const confirmPIN = async (value: string) => {
+    if (value==='biometrics') {
+      const response = await authComponentStore.validateBiometric();
+    }else{
+      setValue(value)
+    }
+
+  };
+
+
   useEffect(() => {
     if (value.length === 6) {
       validatePINNumber();
@@ -89,61 +114,49 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   }, [value]);
 
   useEffect(() => {
-    otpRef.current?.focus();
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
+    checkBiometricStatus();
   }, []);
+
+  // TODO: need to remove
+  // useEffect(() => {
+  //   otpRef.current?.focus();
+  //   const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+  //     setKeyboardHeight(e.endCoordinates.height);
+  //   });
+  //
+  //   const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+  //     setKeyboardHeight(0);
+  //   });
+  //
+  //   return () => {
+  //     keyboardDidHideListener.remove();
+  //     keyboardDidShowListener.remove();
+  //   };
+  // }, []);
 
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Aeon Digital Bank</Text>
+          <Text style={styles.title}>{i18n.t('aoen_digital_bank.bank_name') ?? `Aeon Digital Bank`}</Text>
           <View style={styles.imagePlaceHolderContainer}>
             <View style={styles.imagePlaceHolderWrapper}>
               <ImageIcon color={'#FFFFFF'} />
             </View>
           </View>
-          <Text style={styles.pinTitle}>Enter your PIN</Text>
+          <Text style={styles.pinTitle}>{i18n.t('login_component.lbl_enter_pin') ?? `Enter your PIN`}</Text>
         </View>
-        <OTPField
-          ref={otpRef}
-          cellCount={6}
-          onChanged={setValue}
-          style={{
-            focusCellContainerStyle: { borderBottomColor: '#1EBCE8' },
-          }}
-          isUnMasked={false}
-        />
 
-        {isNotMatched && (
-          <View style={styles.errorWrapper}>
-            <View style={styles.rowCenter}>
-              <TriangelDangerIcon size={20} />
-              <Text style={styles.errorText}>{`PIN is incorrect. You have ${
-                3 - retryCount
-              } remaining attempts.`}</Text>
-            </View>
-          </View>
-        )}
-      </View>
-      <View style={{ marginBottom: marginKeyboard }}>
-        <ADBButton
-          label={'Continue'}
-          disabled={value.length < 6}
-          onPress={validatePINNumber}
-          isLoading={isLoading}
-        />
+        {<PinNumberComponent
+          key={'PinInput'}
+          ref={otpRef}
+          onPressNext={confirmPIN}
+          isBiometricEnable={biometricStatus}
+          showError={isNotMatched}
+          errorMessage={( i18n?.t('login_component.lbl_incorrect_pin') ??'PIN is incorrect. You have %s remaining attempts.').replace('%s', 3 - retryCount)}
+          isProcessing={isLoading}
+        />}
+
       </View>
       <BottomSheetModal isVisible={errorModal}>
         <View style={styles.cameraDisableContainer}>
