@@ -14,7 +14,7 @@ import {
   TriangelDangerIcon,
   ImageIcon,
   ThemeContext,
-  PinNumberComponent
+  PinNumberComponent,
 } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
@@ -47,10 +47,10 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const [errorModal, setErrorModal] = useState(false);
   const [biometricStatus, setBiometricStatus] = useState(false);
 
-  const checkBiometricStatus = async () =>{
+  const checkBiometricStatus = async () => {
     const response = await authComponentStore.getIsEnableBiometric();
-    setBiometricStatus(response)
-  }
+    setBiometricStatus(response);
+  };
 
   const validatePINNumber = async () => {
     setIsLoading(true);
@@ -76,8 +76,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         if (authorizeResponse.error?.code === PASSWORD_LOCKED_OUT) {
           setErrorModal(true);
           return;
-        }
-        else {
+        } else {
           onError && onError(authorizeResponse.error);
           setIsSignedIn(false);
         }
@@ -98,14 +97,12 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   };
 
   const confirmPIN = async (value: string) => {
-    if (value==='biometrics') {
+    if (value === 'biometrics') {
       const response = await authComponentStore.validateBiometric();
-    }else{
-      setValue(value)
+    } else {
+      setValue(value);
     }
-
   };
-
 
   useEffect(() => {
     if (value.length === 6) {
@@ -138,25 +135,33 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>{i18n.t('aoen_digital_bank.bank_name') ?? `Aeon Digital Bank`}</Text>
+          <Text style={styles.title}>
+            {i18n.t('aoen_digital_bank.bank_name') ?? `Aeon Digital Bank`}
+          </Text>
           <View style={styles.imagePlaceHolderContainer}>
             <View style={styles.imagePlaceHolderWrapper}>
               <ImageIcon color={'#FFFFFF'} />
             </View>
           </View>
-          <Text style={styles.pinTitle}>{i18n.t('login_component.lbl_enter_pin') ?? `Enter your PIN`}</Text>
+          <Text style={styles.pinTitle}>
+            {i18n.t('login_component.lbl_enter_pin') ?? `Enter your PIN`}
+          </Text>
         </View>
 
-        {<PinNumberComponent
-          key={'PinInput'}
-          ref={otpRef}
-          onPressNext={confirmPIN}
-          isBiometricEnable={biometricStatus}
-          showError={isNotMatched}
-          errorMessage={( i18n?.t('login_component.lbl_incorrect_pin') ??'PIN is incorrect. You have %s remaining attempts.').replace('%s', 3 - retryCount)}
-          isProcessing={isLoading}
-        />}
-
+        {
+          <PinNumberComponent
+            key={'PinInput'}
+            ref={otpRef}
+            onPressNext={confirmPIN}
+            isBiometricEnable={biometricStatus}
+            showError={isNotMatched}
+            errorMessage={(
+              i18n?.t('login_component.lbl_incorrect_pin') ??
+              'PIN is incorrect. You have %s remaining attempts.'
+            ).replace('%s', 3 - retryCount)}
+            isProcessing={isLoading}
+          />
+        }
       </View>
       <BottomSheetModal isVisible={errorModal}>
         <View style={styles.cameraDisableContainer}>

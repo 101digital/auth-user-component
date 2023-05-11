@@ -103,7 +103,6 @@ export interface AuthContextData {
   adbGetAccessToken: (username: string, password: string) => Promise<void>;
   pairingDevice: () => Promise<void>;
   adbAuthorizePushOnly: () => Promise<boolean>;
-  adbGetLoginHintToken: () => Promise<string>;
   obtainNewAccessToken: () => Promise<boolean>;
   saveResumeURL: (url: string) => void;
 
@@ -170,7 +169,6 @@ export const authDefaultValue: AuthContextData = {
   adbGetAccessToken: async () => undefined,
   pairingDevice: async () => undefined,
   adbAuthorizePushOnly: async () => false,
-  adbGetLoginHintToken: async () => '',
   obtainNewAccessToken: async () => false,
   saveResumeURL: () => false,
   getListDevices: async () => undefined,
@@ -223,7 +221,6 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_listBindedDevices, setListBindedDevices] = React.useState<Devices[]>();
   const [_isUpdatingUserStatus, setIsUpdatingUserStatus] = useState<boolean>(false);
   const [_userMobileNumberHint, setUserMobileNumberHint] = useState<string>();
-  const [loginHintToken, setLoginHintToken] = useState<string>();
   const [_currentVerificationMethod, setCurrentVerificationMethod] = useState<VerificationMethod>(
     VerificationMethod.PENDING
   );
@@ -696,46 +693,27 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const adbGetLoginHintToken = useCallback(async () => {
-    try {
-      setIsSigning(true);
-      const data = await AuthServices.instance().getLoginHintToken();
-      return data;
-    } catch (error) {
-      setIsSigning(false);
-      setErrorSignIn(error as Error);
-      return '';
-    }
-  }, []);
-
   const pairingDevice = useCallback(async () => {
     try {
-      const response = await AuthServices.instance().getPairingCode();
-      setLoginHintToken(response.token);
-      PingOnesdkModule.pairDevice(response.pairingCode);
+      const code = await AuthServices.instance().getPairingCode();
+      PingOnesdkModule.pairDevice(code);
     } catch (error) {}
   }, []);
 
   const adbAuthorizePushOnly = useCallback(async () => {
     try {
-      let token = loginHintToken;
-      if (!token) {
-        token = await AuthServices.instance().getLoginHintToken();
-      }
-      if (token) {
-        const response = await AuthServices.instance().authorizePushOnly(token);
-        if (response && response.selectedDevice?.id && response.authSession && response.resumeUrl) {
-          // authComponentStore.storeDeviceId(response.selectedDevice?.id);
-          PingOnesdkModule.setCurrentSessionId(response.authSession.id);
-          saveResumeURL(response.resumeUrl);
-          return true;
-        }
+      const response = await AuthServices.instance().authorizePushOnly();
+      if (response && response.selectedDevice?.id && response.authSession && response.resumeUrl) {
+        // authComponentStore.storeDeviceId(response.selectedDevice?.id);
+        PingOnesdkModule.setCurrentSessionId(response.authSession.id);
+        saveResumeURL(response.resumeUrl);
+        return true;
       }
     } catch (error) {
       return false;
     }
     return false;
-  }, [loginHintToken]);
+  }, []);
 
   const obtainNewAccessToken = useCallback(async () => {
     try {
@@ -855,7 +833,6 @@ export const useAuthContextValue = (): AuthContextData => {
       adbGetAccessToken,
       pairingDevice,
       adbAuthorizePushOnly,
-      adbGetLoginHintToken,
       obtainNewAccessToken,
       saveResumeURL,
       errorRebindedDevice: _errorRebindedDevice,

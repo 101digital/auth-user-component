@@ -70,16 +70,21 @@ class AuthComponentStore {
   };
 
   setPin = async (pinNumber: string) => {
-    const loginHintToken = await AuthServices.instance().getLoginHintToken();
-    const salt = await this.getSalt();
-    const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost 10000
-    const encryptedData = await AESCryptoStore.encryptData(loginHintToken, key);
-
-    await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
+    const loginHintToken = AuthServices.instance().getLoginHintToken();
+    if(loginHintToken) {
+      const salt = await this.getSalt();
+      const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost 10000
+      const encryptedData = await AESCryptoStore.encryptData(loginHintToken, key);
+  
+      await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
+    } else {
+      return false;
+    }
   };
 
   setBiometric = async () => {
     const loginHintToken = await AuthServices.instance().getLoginHintToken();
+    if(loginHintToken) {
     try {
       await SInfo.setItem(BIO_TOKEN, loginHintToken, {
         ...sensitiveInfoOptions,
@@ -90,6 +95,8 @@ class AuthComponentStore {
 
       return true;
     } catch (error) {
+      return false;
+    }} else {
       return false;
     }
   };

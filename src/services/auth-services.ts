@@ -41,6 +41,18 @@ export class AuthServices {
     }
   }
 
+  public setLoginHintToken(token: string) {
+    if (this._configs) {
+      this._configs.loginHintToken = token;
+    }
+  }
+
+  public getLoginHintToken() {
+    if (this._configs) {
+      return this._configs.loginHintToken;
+    }
+  }
+
   private refreshPKCEChallenge() {
     this._pkce = pkceChallenge();
     return this._pkce;
@@ -139,18 +151,6 @@ export class AuthServices {
     };
   };
 
-  public getLoginHintToken = async () => {
-    const { identityPingUrl, accessToken } = this._configs || {};
-
-    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
-      headers: {
-        Authorization: `${accessToken}`,
-      },
-    });
-
-    return responseTokenHint.data.data[0].token;
-  };
-
   public getPairingCode = async () => {
     const { identityPingUrl, accessToken } = this._configs || {};
 
@@ -159,8 +159,9 @@ export class AuthServices {
         Authorization: `${accessToken}`,
       },
     });
-
-    return responseTokenHint.data.data[0];
+    const { pairingCode, token } = responseTokenHint.data.data[0];
+    this.setLoginHintToken(token);
+    return pairingCode;
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
@@ -459,12 +460,8 @@ export class AuthServices {
     return response.data;
   };
 
-  public authorizePushOnly = async (
-    loginHintToken: string,
-    clientIdInit?: string,
-    scope?: string
-  ) => {
-    const { clientId, responseType, responseMode } = this._configs || {};
+  public authorizePushOnly = async (token?: string, clientIdInit?: string, scope?: string) => {
+    const { clientId, responseType, responseMode, loginHintToken } = this._configs || {};
     try {
       const { codeChallenge } = this.refreshPKCEChallenge();
       const responseAuth = await AuthApiClient.instance()
@@ -478,10 +475,13 @@ export class AuthServices {
             code_challenge_method: 'S256',
             response_mode: responseMode,
             acr_values: 'Push_Only',
-            login_hint_token: loginHintToken,
+            login_hint_token: token ? token : loginHintToken,
           },
         });
       if (responseAuth) {
+        if (token) {
+          this.setLoginHintToken(token);
+        }
         return responseAuth.data;
       }
     } catch (error) {
