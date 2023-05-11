@@ -30,7 +30,7 @@ export interface AuthContextData {
   logout: () => void;
   clearSignInError: () => void;
   updateProfile: (userId: string, data: any) => Promise<boolean>;
-  fetchProfile: () => void;
+  fetchProfile: (onSuccess?: () => void) => void;
   isUpdatingProfile?: boolean;
   errorUpdateProfile?: Error;
   clearUpdateProfileError: () => void;
@@ -460,7 +460,7 @@ export const useAuthContextValue = (): AuthContextData => {
     return false;
   }, []);
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = useCallback(async (onSuccess?: () => void ) => {
     try {
       setIsUpdatingProfile(true);
       const { data } = await AuthServices.instance().fetchProfile();
@@ -468,6 +468,7 @@ export const useAuthContextValue = (): AuthContextData => {
       getProfilePicture(data);
       await authComponentStore.storeIsUserLogged(true);
       setIsUpdatingProfile(false);
+      if(onSuccess) {onSuccess()}
       return true;
     } catch (error) {
       setIsUpdatingProfile(false);
