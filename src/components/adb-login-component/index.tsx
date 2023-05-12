@@ -33,10 +33,11 @@ export interface ILogin {
   onLoginSuccess: () => void;
   onLoginFailed: () => void;
   onForgotPassword: () => void;
+  onLoginRestrict: (status: string) => void;
 }
 
 const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onLoginSuccess, onLoginFailed, onForgotPassword } = props;
+  const { onLoginSuccess, onLoginFailed, onForgotPassword, onLoginRestrict } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const { adbLogin, isSigning, errorSignIn } = useContext(AuthContext);
@@ -60,7 +61,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {
       console.log('DATA ERROR RESPONSED::::', _err)
     })
-    if(responseVerified?.status != 'Rejected' || responseVerified?.status != 'Exited' || responseVerified?.status != 'Archived' || responseVerified?.status != '“Prospect”') {
+    if(responseVerified?.status === 'Onboarded' || responseVerified?.status === 'Active') {
       const response = await adbLogin(_username, _password);
       if (response) {
         if (response.status && response.status === OTP_REQUIRED) {
@@ -72,7 +73,8 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
         }
       }
     }
-    onLoginFailed();
+    onLoginRestrict(responseVerified?.status);
+    return;
   };
 
   useEffect(() => {
