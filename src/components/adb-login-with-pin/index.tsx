@@ -46,6 +46,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const { PingOnesdkModule } = NativeModules;
   const [errorModal, setErrorModal] = useState(false);
   const [biometricStatus, setBiometricStatus] = useState(false);
+  const [biometricAttempt, setBiometricAttempt] = useState(0);
 
   const checkBiometricStatus = async () => {
     const response = await authComponentStore.getIsEnableBiometric();
@@ -108,6 +109,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
           saveResumeURL(authorizeResponse.resumeUrl);
         } else if (authorizeResponse.error && authorizeResponse.error.code) {
+          setBiometricAttempt(biometricAttempt+1)
           if (authorizeResponse.error.code === 'PASSWORD_LOCKED_OUT') {
             setErrorModal(true);
           } else if (authorizeResponse.error.code === 'BIOMETRIC_CHANGE') {
@@ -133,25 +135,9 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     checkBiometricStatus();
   }, []);
 
-  // TODO: need to remove
-  // useEffect(() => {
-  //   otpRef.current?.focus();
-  //   const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-  //     setKeyboardHeight(e.endCoordinates.height);
-  //   });
-  //
-  //   const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-  //     setKeyboardHeight(0);
-  //   });
-  //
-  //   return () => {
-  //     keyboardDidHideListener.remove();
-  //     keyboardDidShowListener.remove();
-  //   };
-  // }, []);
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>
@@ -166,21 +152,18 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
             {i18n.t('login_component.lbl_enter_pin') ?? `Enter your PIN`}
           </Text>
         </View>
-
-        {
-          <PinNumberComponent
-            key={'PinInput'}
-            ref={otpRef}
-            onPressNext={confirmPIN}
-            isBiometricEnable={biometricStatus}
-            showError={isNotMatched}
-            errorMessage={(
-              i18n?.t('login_component.lbl_incorrect_pin') ??
-              'PIN is incorrect. You have %s remaining attempts.'
-            ).replace('%s', 3 - retryCount)}
-            isProcessing={isLoading}
-          />
-        }
+        <PinNumberComponent
+          key={'PinInput'}
+          ref={otpRef}
+          onPressNext={confirmPIN}
+          isBiometricEnable={biometricAttempt < 3 && biometricStatus}
+          showError={isNotMatched}
+          errorMessage={(
+            i18n?.t('login_component.lbl_incorrect_pin') ??
+            'PIN is incorrect. You have %s remaining attempts.'
+          ).replace('%s', 3 - retryCount)}
+          isProcessing={isLoading}
+        />
       </View>
       <BottomSheetModal isVisible={errorModal}>
         <View style={styles.cameraDisableContainer}>
@@ -195,7 +178,6 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
             {i18n.t('login_component.lbl_entered_wrong_password') ??
               `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
           </Text>
-          <View style={{ height: 32 }} />
           <ADBButton
             label={i18n.t('login_component.btn_done') ?? 'Done'}
             onPress={() => {
@@ -204,7 +186,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           />
         </View>
       </BottomSheetModal>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -307,7 +289,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.primaryBlack,
     fontFamily: fonts.regular,
-    marginTop: 8
+    marginTop: 8,
+    marginBottom: 32
   },
   loginTitle: {
     fontSize: 24,

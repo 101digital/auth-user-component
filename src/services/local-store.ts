@@ -83,7 +83,7 @@ class AuthComponentStore {
   };
 
   setBiometric = async () => {
-    const loginHintToken = await AuthServices.instance().getLoginHintToken();
+    const loginHintToken = AuthServices.instance().getLoginHintToken();
     if(loginHintToken) {
     try {
       await SInfo.setItem(BIO_TOKEN, loginHintToken, {

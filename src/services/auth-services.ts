@@ -29,7 +29,7 @@ export class AuthServices {
     this._configs = configs;
   }
 
-  private storeAccessToken(token: string) {
+  public storeAccessToken(token: string) {
     if (this._configs) {
       this._configs.accessToken = token;
     }
@@ -53,6 +53,17 @@ export class AuthServices {
     }
   }
 
+  public setPairingCode(code: string) {
+    if (this._configs) {
+      this._configs.paringCode = code;
+    }
+  }
+
+  public getPairingCode() {
+    if (this._configs) {
+      return this._configs.paringCode;
+    }
+  }
   private refreshPKCEChallenge() {
     this._pkce = pkceChallenge();
     return this._pkce;
@@ -144,14 +155,14 @@ export class AuthServices {
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
 
     this.storeAccessToken(response.data.access_token);
-
+    this.getLoginhintTokenAndPairingCode();
     return {
       access_token: response.data.access_token,
       refresh_token: '',
     };
   };
 
-  public getPairingCode = async () => {
+  public getLoginhintTokenAndPairingCode = async () => {
     const { identityPingUrl, accessToken } = this._configs || {};
 
     const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
@@ -159,9 +170,10 @@ export class AuthServices {
         Authorization: `${accessToken}`,
       },
     });
+    
     const { pairingCode, token } = responseTokenHint.data.data[0];
     this.setLoginHintToken(token);
-    return pairingCode;
+    this.setPairingCode(pairingCode);
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
@@ -178,7 +190,7 @@ export class AuthServices {
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
     const access_token = response.data.access_token;
     this.storeAccessToken(access_token);
-
+    this.getLoginhintTokenAndPairingCode();
     return {
       access_token,
       refresh_token: '',
@@ -354,7 +366,7 @@ export class AuthServices {
   };
 
   validateUserForgotPassword = async (email: string, nric: string) => {
-    const { identityBaseUrl } = this._configs!;
+    const { identityPingUrl } = this._configs!;
     const publicAppToken = await this.fetchAppAccessToken();
     const body = {
       email: email,
@@ -362,7 +374,7 @@ export class AuthServices {
       idNumber: nric,
     };
     const response = await axios.post(
-      `${identityBaseUrl}/users/passwords/validate-reset-request`,
+      `${identityPingUrl}/users/passwords/validate-reset-request`,
       body,
       {
         headers: {
