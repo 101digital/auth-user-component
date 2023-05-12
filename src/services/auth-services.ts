@@ -354,7 +354,7 @@ export class AuthServices {
   };
 
   validateUserForgotPassword = async (email: string, nric: string) => {
-    const { identityBaseUrl } = this._configs!;
+    const { identityPingUrl } = this._configs!;
     const publicAppToken = await this.fetchAppAccessToken();
     const body = {
       email: email,
@@ -362,7 +362,7 @@ export class AuthServices {
       idNumber: nric,
     };
     const response = await axios.post(
-      `${identityBaseUrl}/users/passwords/validate-reset-request`,
+      `${identityPingUrl}/users/passwords/validate-reset-request`,
       body,
       {
         headers: {
