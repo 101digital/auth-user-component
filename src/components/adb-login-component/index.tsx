@@ -61,7 +61,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {
       console.log('DATA ERROR RESPONSED::::', _err)
     })
-    if(responseVerified?.status === 'Onboarded' || responseVerified?.status === 'Active') {
+    if(responseVerified?.status === 'Onboarded' || responseVerified?.status === 'Active' || responseVerified?.status === 'Verified') {
       const response = await adbLogin(_username, _password);
       if (response) {
         if (response.status && response.status === OTP_REQUIRED) {
