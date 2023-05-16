@@ -105,6 +105,7 @@ export interface AuthContextData {
   adbAuthorizePushOnly: () => Promise<boolean>;
   obtainNewAccessToken: () => Promise<boolean>;
   saveResumeURL: (url: string) => void;
+  reSelectDevice: () => Promise<boolean | undefined>;
 
   //rebinding
   getListDevices: () => Promise<Devices[] | undefined>;
@@ -116,6 +117,8 @@ export interface AuthContextData {
   userMobileNumberHint?: string;
   currentVerificationMethod: VerificationMethod;
   setCurrentVerificationMethod: (method: VerificationMethod) => void;
+  isReselectingDevice: boolean;
+  clearErrorVerifySignIn: () => void;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -178,6 +181,9 @@ export const authDefaultValue: AuthContextData = {
   isUpdatingUserStatus: false,
   currentVerificationMethod: VerificationMethod.PENDING,
   setCurrentVerificationMethod: () => false,
+  reSelectDevice: async () => undefined,
+  isReselectingDevice: false,
+  clearErrorVerifySignIn: () => false,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -224,12 +230,18 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_currentVerificationMethod, setCurrentVerificationMethod] = useState<VerificationMethod>(
     VerificationMethod.PENDING
   );
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>();
+  const [_isReselectingDevice, setIsReselectingDevice] = useState<boolean>(false);
 
   const { PingOnesdkModule } = NativeModules;
 
   useEffect(() => {
     checkIsLogged();
   }, []);
+
+  const clearErrorVerifySignIn = () => {
+    setErrorVerifySignIn(undefined);
+  };
 
   const checkIsLogged = async () => {
     const isLogged = await authComponentStore.getIsUserLogged();
@@ -287,6 +299,9 @@ export const useAuthContextValue = (): AuthContextData => {
           if (smsDevice) {
             setUserMobileNumberHint(smsDevice.phone);
           }
+        }
+        if (data.selectedDevice?.id) {
+          setSelectedDeviceId(data.selectedDevice.id);
         }
         authComponentStore.storeUserName(username);
         setUsername(username);
@@ -460,7 +475,7 @@ export const useAuthContextValue = (): AuthContextData => {
     return false;
   }, []);
 
-  const fetchProfile = useCallback(async (onSuccess?: () => void ) => {
+  const fetchProfile = useCallback(async (onSuccess?: () => void) => {
     try {
       setIsUpdatingProfile(true);
       const { data } = await AuthServices.instance().fetchProfile();
@@ -468,7 +483,9 @@ export const useAuthContextValue = (): AuthContextData => {
       getProfilePicture(data);
       await authComponentStore.storeIsUserLogged(true);
       setIsUpdatingProfile(false);
-      if(onSuccess) {onSuccess()}
+      if (onSuccess) {
+        onSuccess();
+      }
       return true;
     } catch (error) {
       setIsUpdatingProfile(false);
@@ -775,8 +792,24 @@ export const useAuthContextValue = (): AuthContextData => {
     [_profile]
   );
 
+  const reSelectDevice = useCallback(async () => {
+    if (selectedDeviceId && _flowId) {
+      setIsReselectingDevice(true);
+      try {
+        const response = await AuthServices.instance().selectDevice(selectedDeviceId, _flowId);
+        return true;
+      } catch (error) {
+        console.log('error');
+      } finally {
+        setIsReselectingDevice(false);
+      }
+    }
+    return false;
+  }, [selectedDeviceId, _flowId]);
+
   return useMemo(
     () => ({
+      reSelectDevice,
       profile: _profile,
       recovery: _recovery,
       isSignedIn: _isSignedIn,
@@ -845,6 +878,8 @@ export const useAuthContextValue = (): AuthContextData => {
       userMobileNumberHint: _userMobileNumberHint,
       currentVerificationMethod: _currentVerificationMethod,
       setCurrentVerificationMethod,
+      isReselectingDevice: _isReselectingDevice,
+      clearErrorVerifySignIn,
     }),
     [
       _profile,
@@ -881,6 +916,8 @@ export const useAuthContextValue = (): AuthContextData => {
       _isUpdatingUserStatus,
       _userMobileNumberHint,
       _currentVerificationMethod,
+      selectedDeviceId,
+      _isReselectingDevice,
     ]
   );
 };

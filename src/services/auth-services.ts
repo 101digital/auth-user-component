@@ -404,6 +404,27 @@ export class AuthServices {
     return response.data;
   };
 
+  selectDevice = async (
+    deviceId: string,
+    flowId: string
+  ) => {
+    const { authBaseUrl } = this._configs!;
+    
+    const body = {
+      "device": {
+        "id": deviceId
+      }
+    };
+
+    const response = await axios.post(`${authBaseUrl}/flows/${flowId}`, body, {
+      headers: {
+        'access-control-allow-origin': '*',
+        'Content-Type': 'application/vnd.pingidentity.device.select+json',
+      },
+    });
+    return response.data;
+  };
+
   registerDevice = async (
     token: string,
     platform: 'IOS' | 'Android',
