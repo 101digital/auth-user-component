@@ -11,7 +11,7 @@ const USER_NAME = 'authcomponent.userName';
 const IS_ENABLE_BIOMETRIC = 'authcomponent.enableBio';
 const SELECTED_BIOMETRIC_METHOD = 'authcomponent.selectedBioMethod';
 const PIN_TOKEN = 'authcomponent.pinToken';
-const BIO_TOKEN = 'authcomponent.biometricToken';
+const BIO_TOKEN = 'authcomponent.biometricToken.currentSet';
 const IS_USER_LOGGED = 'authcomponent.isUserLogged';
 
 const keySize = 256;
