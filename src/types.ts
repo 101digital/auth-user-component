@@ -138,6 +138,7 @@ export type AuthComponentConfig = {
   accessToken?: string;
   loginHintToken?: string;
   paringCode?: string;
+  sessionId?: string;
 };
 
 export enum VerificationMethod {
@@ -175,4 +176,9 @@ export enum ResponseStatus {
   BAD_REQUEST = '400',
   UNAUTHORIZED = '401',
   TOO_MANY_REQUEST = '000.01.429.00',
+}
+
+
+export enum AccountStatus {
+  Prospect = 'Prospect'
 }

@@ -47,6 +47,8 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
     };
   }, []);
 
+  console.log('profile?.kycDetails', profile?.kycDetails);
+
   return (
     <View style={styles.container}>
       <Formik
