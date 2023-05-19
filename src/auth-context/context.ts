@@ -327,6 +327,7 @@ export const useAuthContextValue = (): AuthContextData => {
             return false;
           }
           const afterValidateData = await AuthServices.instance().resumeUrl(loginData.resumeUrl);
+          AuthServices.instance().setSessionId(afterValidateData.session.id);
           await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
           const { data } = await AuthServices.instance().fetchProfile();
           setProfile({ ...data });
@@ -353,6 +354,7 @@ export const useAuthContextValue = (): AuthContextData => {
         SINGLE_FACTOR_ACR_VALUE
       );
       const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
+      AuthServices.instance().setSessionId(resAfterValidate.session.id);
       await AuthServices.instance().obtainTokenSingleFactor(
         resAfterValidate.authorizeResponse.code,
         SINGLE_FACTOR_SCOPE
@@ -377,6 +379,7 @@ export const useAuthContextValue = (): AuthContextData => {
           await AuthServices.instance().obtainTokenSingleFactor(
             resAfterValidate.authorizeResponse.code
           );
+          AuthServices.instance().setSessionId(resAfterValidate.session.id);
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeIsUserLogged(true);
           await authComponentStore.storeUserName(username);

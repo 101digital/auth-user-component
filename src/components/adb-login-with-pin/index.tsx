@@ -6,7 +6,7 @@ import {
   Platform,
   Text,
   KeyboardAvoidingView,
-  NativeModules
+  NativeModules,
 } from 'react-native';
 import {
   ADBButton,
@@ -14,7 +14,7 @@ import {
   TriangelDangerIcon,
   ImageIcon,
   ThemeContext,
-  PinNumberComponent
+  PinNumberComponent,
 } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
@@ -24,6 +24,7 @@ import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { colors } from '../../assets';
+import { AuthServices } from 'react-native-auth-component';
 
 type ADBLoginWithPINProps = {
   onFailedVerified: () => void;
@@ -90,6 +91,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         //   authComponentStore.storeIsUserLogged(false);
         // } else {
         PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
+        AuthServices.instance().setSessionId(authorizeResponse.authSession.id);
         saveResumeURL(authorizeResponse?.resumeUrl);
         onSuccessVerified();
         // }
@@ -109,7 +111,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
           saveResumeURL(authorizeResponse.resumeUrl);
         } else if (authorizeResponse.error && authorizeResponse.error.code) {
-          setBiometricAttempt(biometricAttempt+1)
+          setBiometricAttempt(biometricAttempt + 1);
           if (authorizeResponse.error.code === 'PASSWORD_LOCKED_OUT') {
             setErrorModal(true);
           } else if (authorizeResponse.error.code === 'BIOMETRIC_CHANGE') {
@@ -134,7 +136,6 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   useEffect(() => {
     checkBiometricStatus();
   }, []);
-
 
   return (
     <View style={styles.container}>
@@ -193,51 +194,51 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 22
+    paddingHorizontal: 22,
   },
   header: {
     alignItems: 'center',
-    paddingTop: 15
+    paddingTop: 15,
   },
   bottomSection: {
-    marginBottom: 15
+    marginBottom: 15,
   },
   flex: {
-    flex: 1
+    flex: 1,
   },
   rowSpaceBetween: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   validContainer: {
-    marginTop: 15
+    marginTop: 15,
   },
   validationLabel: {
-    marginLeft: 6
+    marginLeft: 6,
   },
   title: {
     color: '#1B1B1B',
     fontSize: 16,
-    fontFamily: fonts.medium
+    fontFamily: fonts.medium,
   },
   rowItemValid: {
     marginVertical: 5,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   errorWrapper: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   errorText: {
     color: '#020000',
-    marginLeft: 7
+    marginLeft: 7,
   },
   imagePlaceHolderContainer: {
     alignItems: 'center',
     justifyContent: 'space-around',
     marginTop: 55,
-    marginBottom: 75
+    marginBottom: 75,
   },
   imagePlaceHolderWrapper: {
     height: 80,
@@ -245,58 +246,58 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     backgroundColor: '#D9D9D9',
-    borderRadius: 80
+    borderRadius: 80,
   },
   iconBtn: {
-    marginRight: 10
+    marginRight: 10,
   },
   buttonAction: {
     padding: 12,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#333',
-    marginBottom: 15
+    marginBottom: 15,
   },
   content: {
-    flex: 1
+    flex: 1,
   },
   rowCenter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    marginTop: 30
+    marginTop: 30,
   },
   pinTitle: {
     color: '#858585',
-    fontSize: 12
+    fontSize: 12,
   },
   cameraDisableContainer: {
     width: '100%',
     alignItems: 'center',
     paddingVertical: 24,
-    paddingHorizontal: 24
+    paddingHorizontal: 24,
   },
   gap16: {
-    height: 16
+    height: 16,
   },
   gap40: {
-    height: 40
+    height: 40,
   },
   gap8: {
-    height: 8
+    height: 8,
   },
   subTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
     fontFamily: fonts.regular,
     marginTop: 8,
-    marginBottom: 32
+    marginBottom: 32,
   },
   loginTitle: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.semiBold
-  }
+    fontFamily: fonts.semiBold,
+  },
 });
 
 export default ADBLoginWithPINComponent;
