@@ -64,6 +64,12 @@ export class AuthServices {
       return this._configs.paringCode;
     }
   }
+
+  public setSessionId(sessionId: string) {
+    if (this._configs) {
+      return (this._configs.sessionId = sessionId);
+    }
+  }
   private refreshPKCEChallenge() {
     this._pkce = pkceChallenge();
     return this._pkce;
@@ -163,14 +169,14 @@ export class AuthServices {
   };
 
   public getLoginhintTokenAndPairingCode = async () => {
-    const { identityPingUrl, accessToken } = this._configs || {};
-
+    const { identityPingUrl, accessToken, sessionId } = this._configs || {};
     const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
       headers: {
         Authorization: `${accessToken}`,
+        'x-session-id': sessionId,
       },
     });
-    
+
     const { pairingCode, token } = responseTokenHint.data.data[0];
     this.setLoginHintToken(token);
     this.setPairingCode(pairingCode);
@@ -404,16 +410,13 @@ export class AuthServices {
     return response.data;
   };
 
-  selectDevice = async (
-    deviceId: string,
-    flowId: string
-  ) => {
+  selectDevice = async (deviceId: string, flowId: string) => {
     const { authBaseUrl } = this._configs!;
-    
+
     const body = {
-      "device": {
-        "id": deviceId
-      }
+      device: {
+        id: deviceId,
+      },
     };
 
     const response = await axios.post(`${authBaseUrl}/flows/${flowId}`, body, {

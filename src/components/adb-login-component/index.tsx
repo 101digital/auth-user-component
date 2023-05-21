@@ -17,9 +17,7 @@ import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { EyesClosedIcon, EyesIcon } from '../../assets/icons';
 import { OTP_REQUIRED, PASSWORD_LOCKED_OUT } from '../../utils/index';
-import {
-  RegistrationContext,
-} from 'react-native-register-component';
+import { RegistrationContext } from 'react-native-register-component';
 
 export class SignInData {
   constructor(readonly username: string, readonly password: string) {}
@@ -40,9 +38,9 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { onLoginSuccess, onLoginFailed, onForgotPassword, onLoginRestrict } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
-  const { adbLogin, isSigning, errorSignIn } = useContext(AuthContext);
-  const { verifyExistedUserByEmail } =
-    useContext(RegistrationContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const { adbLogin, errorSignIn } = useContext(AuthContext);
+  const { verifyExistedUserByEmail } = useContext(RegistrationContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
   const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
@@ -55,24 +53,32 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
 
   const handleOnSignIn = async (values: SignInData) => {
     Keyboard.dismiss();
+    setIsLoading(true);
     const { username, password } = values;
     const _username = username.trim();
     const _password = password.trim();
     const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {
-      console.log('DATA ERROR RESPONSED::::', _err)
-    })
-    if(responseVerified?.status === 'Onboarded' || responseVerified?.status === 'Active' || responseVerified?.status === 'Verified') {
+      console.log('DATA ERROR RESPONSED::::', _err);
+    });
+    if (
+      responseVerified?.status === 'Onboarded' ||
+      responseVerified?.status === 'Active' ||
+      responseVerified?.status === 'Verified'
+    ) {
       const response = await adbLogin(_username, _password);
       if (response) {
         if (response.status && response.status === OTP_REQUIRED) {
           onLoginSuccess();
+          setIsLoading(false);
           return;
         } else if (response.error?.code === PASSWORD_LOCKED_OUT) {
           setErrorModal(true);
+          setIsLoading(false);
           return;
         }
       }
     }
+    setIsLoading(false);
     onLoginRestrict(responseVerified?.status);
     return;
   };
@@ -143,7 +149,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
               }}
             >
               <ADBButton
-                isLoading={isSigning}
+                isLoading={isLoading}
                 label={i18n.t('common.lbl_continue') ?? 'Continue'}
                 onPress={submitForm}
                 disabled={values.password.length < 8 || values.username.length === 0}
