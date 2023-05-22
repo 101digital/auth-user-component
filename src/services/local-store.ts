@@ -70,11 +70,17 @@ class AuthComponentStore {
   };
 
   setPin = async (pinNumber: string) => {
-    const loginHintToken = AuthServices.instance().getLoginHintToken();
-    if(loginHintToken) {
+    let newLoginHintToken = AuthServices.instance().getLoginHintToken();
+    if(!newLoginHintToken) {
+      const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
+      newLoginHintToken = loginHintToken
+    }
+
+
+    if(newLoginHintToken) {
       const salt = await this.getSalt();
       const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost 10000
-      const encryptedData = await AESCryptoStore.encryptData(loginHintToken, key);
+      const encryptedData = await AESCryptoStore.encryptData(newLoginHintToken, key);
   
       await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
     } else {
@@ -83,10 +89,15 @@ class AuthComponentStore {
   };
 
   setBiometric = async () => {
-    const loginHintToken = AuthServices.instance().getLoginHintToken();
-    if(loginHintToken) {
+    let newLoginHintToken = AuthServices.instance().getLoginHintToken();
+    if(!newLoginHintToken) {
+      const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
+      newLoginHintToken = loginHintToken
+    }
+
+    if(newLoginHintToken) {
     try {
-      await SInfo.setItem(BIO_TOKEN, loginHintToken, {
+      await SInfo.setItem(BIO_TOKEN, newLoginHintToken, {
         ...sensitiveInfoOptions,
         touchID: true, //add this key
         showModal: true, //add this key

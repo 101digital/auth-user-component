@@ -717,7 +717,12 @@ export const useAuthContextValue = (): AuthContextData => {
   const pairingDevice = useCallback(async () => {
     try {
       const code = AuthServices.instance().getPairingCode();
-      PingOnesdkModule.pairDevice(code);
+      if(!code) {
+        const { pairingCode } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
+        PingOnesdkModule.pairDevice(pairingCode);
+      } else {
+        PingOnesdkModule.pairDevice(code);
+      }
     } catch (error) {}
   }, []);
 
