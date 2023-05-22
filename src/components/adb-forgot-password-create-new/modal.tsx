@@ -12,8 +12,8 @@ export const ADBChangePasswordSchema = (i18n: any) =>
   Yup.object().shape({
     createNew: Yup.string()
       .trim()
-      .required(i18n.t('lbl_required_error') ?? 'This field is required'),
+      .required(i18n.t('common.lbl_required_error') ?? 'This field is required'),
     confirmNew: Yup.string()
       .trim()
-      .required(i18n.t('lbl_required_error') ?? 'This field is required'),
+      .required(i18n.t('common.lbl_required_error') ?? 'This field is required'),
   });
