@@ -161,7 +161,6 @@ export class AuthServices {
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
 
     this.storeAccessToken(response.data.access_token);
-    this.getLoginhintTokenAndPairingCode();
     return {
       access_token: response.data.access_token,
       refresh_token: '',
@@ -180,6 +179,10 @@ export class AuthServices {
     const { pairingCode, token } = responseTokenHint.data.data[0];
     this.setLoginHintToken(token);
     this.setPairingCode(pairingCode);
+    return {
+      loginHintToken: token,
+      pairingCode
+    }
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
@@ -196,7 +199,6 @@ export class AuthServices {
     const response = await axios.post(`${authBaseUrl}/as/token`, body);
     const access_token = response.data.access_token;
     this.storeAccessToken(access_token);
-    this.getLoginhintTokenAndPairingCode();
     return {
       access_token,
       refresh_token: '',
