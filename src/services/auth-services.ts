@@ -475,6 +475,25 @@ export class AuthServices {
     }
   };
 
+  getNotifications = async (pageNumber: number, pageSize: number = 10) => {
+    const { notificationBaseUrl, accessToken } = this._configs!;
+    try {
+      const response = await axios.get(`${notificationBaseUrl}/notifications?pageSize=${pageSize}&pageNumber=${pageNumber}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('data notifications list', response.data);
+      if(response.data) {
+        return response.data;
+      }
+    } catch (error) {
+      console.log('ERROR:', error);
+      return false;
+    }
+  };
+
   updateUserInfo = async (
     userId: string,
     fullName: string,

@@ -121,6 +121,8 @@ export interface AuthContextData {
   clearErrorVerifySignIn: () => void;
   getNotificationBadge:  () => void;
   badgeNumber: number;
+  getNotifications:  (pageNumber: number) => void;
+  notificationData: any;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -188,6 +190,8 @@ export const authDefaultValue: AuthContextData = {
   clearErrorVerifySignIn: () => false,
   getNotificationBadge: async () => false,
   badgeNumber: 0,
+  getNotifications:  async () => false,
+  notificationData: false,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -237,6 +241,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>();
   const [_isReselectingDevice, setIsReselectingDevice] = useState<boolean>(false);
   const [_badgeNumber, setbadgeNumber] = useState<number>(0);
+  const [_notificationData, setNotificationData] = useState<any>(null);
 
   const { PingOnesdkModule } = NativeModules;
 
@@ -825,6 +830,18 @@ export const useAuthContextValue = (): AuthContextData => {
     setbadgeNumber(response ? response : 0)
   };
 
+  const getNotifications = async (pageNumber: number) => {
+    const response = await AuthServices.instance().getNotifications(pageNumber);
+    if(response) {
+      let newData = Object.assign({}, response)
+      if(newData.paging.pageNumber !== 1) {
+        let dataNotifications = _notificationData?.data ? _notificationData?.data : [];
+        newData.data = [...dataNotifications, ...newData.data];
+      } 
+      setNotificationData(newData)
+    } 
+  };
+
   return useMemo(
     () => ({
       reSelectDevice,
@@ -899,7 +916,9 @@ export const useAuthContextValue = (): AuthContextData => {
       isReselectingDevice: _isReselectingDevice,
       clearErrorVerifySignIn,
       getNotificationBadge,
-      badgeNumber: _badgeNumber
+      badgeNumber: _badgeNumber,
+      getNotifications,
+      notificationData: _notificationData
     }),
     [
       _profile,
@@ -938,7 +957,8 @@ export const useAuthContextValue = (): AuthContextData => {
       _currentVerificationMethod,
       selectedDeviceId,
       _isReselectingDevice,
-      _badgeNumber
+      _badgeNumber,
+      _notificationData
     ]
   );
 };
