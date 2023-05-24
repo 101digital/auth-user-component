@@ -119,7 +119,8 @@ export interface AuthContextData {
   setCurrentVerificationMethod: (method: VerificationMethod) => void;
   isReselectingDevice: boolean;
   clearErrorVerifySignIn: () => void;
-  getNotificationBadge:  () => Promise<number>;
+  getNotificationBadge:  () => void;
+  badgeNumber: number;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -185,7 +186,8 @@ export const authDefaultValue: AuthContextData = {
   reSelectDevice: async () => undefined,
   isReselectingDevice: false,
   clearErrorVerifySignIn: () => false,
-  getNotificationBadge: async () => 0,
+  getNotificationBadge: async () => false,
+  badgeNumber: 0,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -234,6 +236,7 @@ export const useAuthContextValue = (): AuthContextData => {
   );
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>();
   const [_isReselectingDevice, setIsReselectingDevice] = useState<boolean>(false);
+  const [_badgeNumber, setbadgeNumber] = useState<number>(0);
 
   const { PingOnesdkModule } = NativeModules;
 
@@ -819,7 +822,7 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const getNotificationBadge = async () => {
     const response = await AuthServices.instance().getNotificationBadge();
-    return response;
+    setbadgeNumber(response ? response : 0)
   };
 
   return useMemo(
@@ -895,7 +898,8 @@ export const useAuthContextValue = (): AuthContextData => {
       setCurrentVerificationMethod,
       isReselectingDevice: _isReselectingDevice,
       clearErrorVerifySignIn,
-      getNotificationBadge
+      getNotificationBadge,
+      badgeNumber: _badgeNumber
     }),
     [
       _profile,
@@ -934,6 +938,7 @@ export const useAuthContextValue = (): AuthContextData => {
       _currentVerificationMethod,
       selectedDeviceId,
       _isReselectingDevice,
+      _badgeNumber
     ]
   );
 };
