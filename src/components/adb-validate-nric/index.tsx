@@ -59,16 +59,29 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
         onSubmit={(values) => validateIdNumber(values.userId)}
       >
         {({ submitForm, setFieldValue, values }) => {
+          let formattedId = values.userId.replace(/[-]+/g, '');
+          if (formattedId.length > 8) {
+            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(
+              6,
+              8
+            )}-${formattedId.slice(8)}`;
+          } else if (formattedId.length > 6) {
+            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(6)}`;
+          }
 
-        if(values.userId !== values.userId.toUpperCase()) {
-          setFieldValue('userId', values.userId.toUpperCase());
-        } 
+          if (formattedId !== values.userId) {
+            if (formattedId[formattedId.length - 1] === '-') {
+              formattedId = formattedId.slice(0, formattedId.length - 2);
+            }
+            setFieldValue('userId', formattedId);
+          }
+
           return (
             <>
               <View style={styles.content}>
                 <ADBInputField
                   name={'userId'}
-                  placeholder={i18n.t('id_number.placeholder') ?? 'ID number'}
+                  placeholder={i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'}
                   maxLength={14}
                 />
               </View>
