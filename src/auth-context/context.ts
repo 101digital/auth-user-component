@@ -119,6 +119,7 @@ export interface AuthContextData {
   setCurrentVerificationMethod: (method: VerificationMethod) => void;
   isReselectingDevice: boolean;
   clearErrorVerifySignIn: () => void;
+  getNotificationBadge:  () => Promise<number>;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -184,6 +185,7 @@ export const authDefaultValue: AuthContextData = {
   reSelectDevice: async () => undefined,
   isReselectingDevice: false,
   clearErrorVerifySignIn: () => false,
+  getNotificationBadge: async () => 0,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -815,6 +817,11 @@ export const useAuthContextValue = (): AuthContextData => {
     return false;
   }, [selectedDeviceId, _flowId]);
 
+  const getNotificationBadge = async () => {
+    const response = await AuthServices.instance().getNotificationBadge();
+    return response;
+  };
+
   return useMemo(
     () => ({
       reSelectDevice,
@@ -888,6 +895,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setCurrentVerificationMethod,
       isReselectingDevice: _isReselectingDevice,
       clearErrorVerifySignIn,
+      getNotificationBadge
     }),
     [
       _profile,

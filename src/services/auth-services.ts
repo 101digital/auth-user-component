@@ -454,6 +454,27 @@ export class AuthServices {
     return response.data;
   };
 
+  getNotificationBadge = async () => {
+    const { notificationBaseUrl, accessToken } = this._configs!;
+    let badgeNumber: number = 0;
+    try {
+      const response = await axios.get(`${notificationBaseUrl}/notifications`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('data notifications', response.data);
+      if(response.data) {
+        badgeNumber = response.data.additionalData?.totalNotView ?? 0
+        return badgeNumber;
+      }
+    } catch (error) {
+      console.log('ERROR:', error);
+      return badgeNumber;
+    }
+  };
+
   updateUserInfo = async (
     userId: string,
     fullName: string,
