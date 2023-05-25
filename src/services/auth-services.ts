@@ -35,6 +35,12 @@ export class AuthServices {
     }
   }
 
+  public getLocale() {
+    if(this._configs) {
+      return this._configs.locale;
+    }
+  }
+
   public getAccessToken() {
     if (this._configs) {
       return this._configs.accessToken;
