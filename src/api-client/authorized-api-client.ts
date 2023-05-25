@@ -86,6 +86,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     const authBearer = AuthServices.instance().getAccessToken();
     if (authBearer) {
       request.headers.Authorization = `${authBearer}`;
+      console.log('onRequest -> request', request)
     }
     return request;
   };

@@ -41,6 +41,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const [isLoading, setIsLoading] = useState(false);
   const { adbLogin, errorSignIn } = useContext(AuthContext);
   const { verifyExistedUserByEmail } = useContext(RegistrationContext);
+  const { adbLoginSingleFactor, isSignin } = useContext(AuthContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
   const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
@@ -57,29 +58,24 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const { username, password } = values;
     const _username = username.trim();
     const _password = password.trim();
-    const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {
-      console.log('DATA ERROR RESPONSED::::', _err);
-    });
-    if (
-      responseVerified?.status === 'Onboarded' ||
-      responseVerified?.status === 'Active' ||
-      responseVerified?.status === 'Verified'
-    ) {
-      const response = await adbLogin(_username, _password);
-      if (response) {
-        if (response.status && response.status === OTP_REQUIRED) {
-          onLoginSuccess();
-          setIsLoading(false);
-          return;
-        } else if (response.error?.code === PASSWORD_LOCKED_OUT) {
-          setErrorModal(true);
-          setIsLoading(false);
-          return;
-        }
-      }
-    }
-    setIsLoading(false);
-    onLoginRestrict(responseVerified?.status);
+    // const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {
+    //   console.log('DATA ERROR RESPONSED::::', _err)
+    // })
+    const response = await adbLoginSingleFactor(_username, _password, true);
+    onLoginSuccess();
+    // if(responseVerified?.status === 'Onboarded' || responseVerified?.status === 'Active' || responseVerified?.status === 'Verified') {
+    //   const response = await adbLogin(_username, _password);
+    //   if (response) {
+    //     if (response.status && response.status === OTP_REQUIRED) {
+    //       onLoginSuccess();
+    //       return;
+    //     } else if (response.error?.code === PASSWORD_LOCKED_OUT) {
+    //       setErrorModal(true);
+    //       return;
+    //     }
+    //   }
+    // }
+    // onLoginRestrict(responseVerified?.status);
     return;
   };
 

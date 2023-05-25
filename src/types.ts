@@ -139,6 +139,10 @@ export type AuthComponentConfig = {
   loginHintToken?: string;
   paringCode?: string;
   sessionId?: string;
+  idToken?: string;
+  jwtPushNotification?: string;
+  notificationAppId?: string;
+  notificationEntityId?: string;
 };
 
 export enum VerificationMethod {
@@ -178,7 +182,6 @@ export enum ResponseStatus {
   TOO_MANY_REQUEST = '000.01.429.00',
 }
 
-
 export enum AccountStatus {
-  Prospect = 'Prospect'
+  Prospect = 'Prospect',
 }
