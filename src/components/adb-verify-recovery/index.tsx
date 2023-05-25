@@ -3,8 +3,6 @@ import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
 import { Formik, FormikProps } from 'formik';
-import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
-import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
 

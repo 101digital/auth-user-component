@@ -4,7 +4,6 @@ import { StyleSheet, View, Keyboard, Platform } from 'react-native';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { Formik, FormikProps } from 'formik';
 import { AuthContext } from '../../auth-context';
-import moment from 'moment';
 
 type ADBInputIdProps = {
   onVerifyNRICSuccess: () => void;
@@ -60,9 +59,6 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
       keyboardDidShowListener.remove();
     };
   }, []);
-
-  console.log('profile?.kycDetails', profile?.kycDetails);
-
   return (
     <View style={styles.container}>
       <Formik

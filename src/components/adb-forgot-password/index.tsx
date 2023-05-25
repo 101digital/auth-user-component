@@ -8,7 +8,6 @@ import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
-import moment from 'moment';
 
 export interface IForgotPassword {
   onValidationSuccess: (flowId: string) => void;
