@@ -116,6 +116,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                   isLoading={isRecoveringUserPassword}
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}
                   onPress={submitForm}
+                  disabled={values.nric.length == 0 || values.email.length == 0}
                 />
               </View>
             </>
