@@ -75,7 +75,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                 <ADBInputField
                   type={'custom'}
                   name={'userId'}
-                  placeholder={i18n.t('id_number.placeholder') ?? 'ID number'}
+                  placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
                   maxLength={12}
                 />
               </View>
