@@ -139,6 +139,8 @@ export type AuthComponentConfig = {
   loginHintToken?: string;
   paringCode?: string;
   sessionId?: string;
+  locale?: string;
+  deviceId?: string;
 };
 
 export enum VerificationMethod {

@@ -35,6 +35,12 @@ export class AuthServices {
     }
   }
 
+  public getLocale() {
+    if(this._configs) {
+      return this._configs.locale;
+    }
+  }
+
   public getAccessToken() {
     if (this._configs) {
       return this._configs.accessToken;
@@ -65,6 +71,18 @@ export class AuthServices {
     }
   }
 
+  public setDeviceId(id: string) {
+    if (this._configs) {
+      this._configs.deviceId = id;
+    }
+  }
+
+  public getDeviceId() {
+    if (this._configs) {
+      return this._configs.deviceId;
+    }
+  }
+
   public setSessionId(sessionId: string) {
     if (this._configs) {
       return (this._configs.sessionId = sessionId);
@@ -74,7 +92,7 @@ export class AuthServices {
     this._pkce = pkceChallenge();
     return this._pkce;
   }
-
+  
   public fetchAppAccessToken = async () => {
     const body = qs.stringify({
       grant_type: this._configs?.appGrantType ?? 'client_credentials',
