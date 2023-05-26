@@ -1,0 +1,26 @@
+name: Repo-Sync
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  mirror-to-remote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1 # <-- Set value to 0 for clone with complete history
+      - name: Push
+        uses: 101digital/code-share-action@main
+        with:
+          username: anurudda
+          password: ${{ secrets.ADB_GIT_PASSWORD }}
+          company: adb
+          repository: ${{ github.event.repository.name }}
+          branch: main
+          ignorelist: ".github/"
+          dest_repo_url: github.acsdigital.dev
+          commithistory: "true"
