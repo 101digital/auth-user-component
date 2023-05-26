@@ -2,16 +2,11 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
-  Keyboard,
-  Platform,
   Text,
-  KeyboardAvoidingView,
   NativeModules,
 } from 'react-native';
 import {
   ADBButton,
-  OTPField,
-  TriangelDangerIcon,
   ImageIcon,
   ThemeContext,
   PinNumberComponent,
@@ -37,10 +32,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const { onFailedVerified, onSuccessVerified, onError } = prop;
   const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
   const { i18n } = useContext(ThemeContext);
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-  const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
   const otpRef = useRef<OTPFieldRef>();
-  const [value, setValue] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isNotMatched, setIsNotMatched] = useState<boolean>(false);
   const [retryCount, setRetryCount] = useState<number>(0);
@@ -50,11 +42,13 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const [biometricAttempt, setBiometricAttempt] = useState(0);
 
   const checkBiometricStatus = async () => {
-    const response = await authComponentStore.getIsEnableBiometric();
-    setBiometricStatus(response);
+    const isEnabled = await authComponentStore.getIsEnableBiometric();
+    if(isEnabled && JSON.parse(isEnabled)) {
+      setBiometricStatus(true);
+    }
   };
 
-  const validatePINNumber = async () => {
+  const onValidatePINNumber = async (value: string) => {
     setIsLoading(true);
     const authorizeResponse = await authComponentStore.validatePin(value);
     if (!authorizeResponse) {
@@ -62,10 +56,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
       if (retryCount + 1 < 3) {
         setIsNotMatched(true);
         setRetryCount(retryCount + 1);
-
-        // clear if it failed
         otpRef.current?.clearInput();
-        // otpRef.current?.focus();
       } else {
         onFailedVerified();
       }
@@ -83,55 +74,37 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           setIsSignedIn(false);
         }
       } else if (authorizeResponse.authSession && authorizeResponse?.resumeUrl) {
-        // const deviceId = await authComponentStore.getDeviceId();
-        // const selectedDeviceId = authorizeResponse.selectedDevice?.id;
-
-        // if (deviceId !== selectedDeviceId) {
-        //   setIsSignedIn(false);
-        //   authComponentStore.storeIsUserLogged(false);
-        // } else {
         PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
         AuthServices.instance().setSessionId(authorizeResponse.authSession.id);
         saveResumeURL(authorizeResponse?.resumeUrl);
         onSuccessVerified();
-        // }
       }
     }
   };
 
-  const confirmPIN = async (value: string) => {
-    if (value === 'biometrics') {
-      const authorizeResponse = await authComponentStore.validateBiometric();
-      if (authorizeResponse) {
-        if (
-          authorizeResponse.resumeUrl &&
-          authorizeResponse.authSession &&
-          authorizeResponse.selectedDevice?.id
-        ) {
-          PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
-          saveResumeURL(authorizeResponse.resumeUrl);
-        } else if (authorizeResponse.error && authorizeResponse.error.code) {
-          setBiometricAttempt(biometricAttempt + 1);
-          if (authorizeResponse.error.code === 'PASSWORD_LOCKED_OUT') {
-            setErrorModal(true);
-          } else if (authorizeResponse.error.code === 'BIOMETRIC_CHANGE') {
-            setIsSignedIn(false);
-          }
-        } else {
-          //Todo :  sanniv
+  const onValidateBiometric = async () => {
+    const authorizeResponse = await authComponentStore.validateBiometric();
+    if (authorizeResponse) {
+      if (
+        authorizeResponse.resumeUrl &&
+        authorizeResponse.authSession &&
+        authorizeResponse.selectedDevice?.id
+      ) {
+        PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
+        saveResumeURL(authorizeResponse.resumeUrl);
+      } else if (authorizeResponse.error && authorizeResponse.error.code) {
+        setBiometricAttempt(biometricAttempt + 1);
+        if (authorizeResponse.error.code === 'PASSWORD_LOCKED_OUT') {
+          setErrorModal(true);
+        } else if (authorizeResponse.error.code === 'BIOMETRIC_CHANGE') {
+          setIsSignedIn(false);
         }
-        return;
+      } else {
+        //Todo :  sanniv
       }
-    } else {
-      setValue(value);
+      return;
     }
   };
-
-  useEffect(() => {
-    if (value.length === 6) {
-      validatePINNumber();
-    }
-  }, [value]);
 
   useEffect(() => {
     checkBiometricStatus();
@@ -156,7 +129,8 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         <PinNumberComponent
           key={'PinInput'}
           ref={otpRef}
-          onPressNext={confirmPIN}
+          onValidatePin={onValidatePINNumber}
+          onValidateBiometric={onValidateBiometric}
           isBiometricEnable={biometricAttempt < 3 && biometricStatus}
           showError={isNotMatched}
           errorMessage={(
