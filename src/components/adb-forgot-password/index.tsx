@@ -98,9 +98,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                   <ADBInputField
                     type='custom'
                     name={'nric'}
-                    placeholder={
-                      i18n.t('id_number.title') ?? 'ID number'
-                    }
+                    placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
                     maxLength={12}
                     returnKeyType="done"
                     keyboardType={'ascii-capable'}
