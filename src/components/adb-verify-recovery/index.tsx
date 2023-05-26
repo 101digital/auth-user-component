@@ -3,17 +3,16 @@ import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
 import { Formik, FormikProps } from 'formik';
-import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
-import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
 
-export interface ILogin {
+export interface IRecovery {
   onContinue: (recoveryCode: string) => void;
+  onError: () => void;
 }
 
-const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onContinue } = props;
+const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) => {
+  const { onContinue, onError } = props;
   const { i18n } = useContext(ThemeContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const formikRef = useRef<FormikProps<InputIdData>>(null);
@@ -23,6 +22,10 @@ const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
     Keyboard.dismiss();
     const { recoveryCode } = values;
     const _recoveryCode = recoveryCode.trim();
+    if(_recoveryCode.match(/^[^0-9a-zA-Z]+$/)) {
+      onError();
+      return;
+    }
     onContinue(_recoveryCode);
   };
 
@@ -56,6 +59,7 @@ const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
               <View style={styles.content}>
                 <View style={styles.rowInput}>
                   <ADBInputField
+                    type='custom'
                     name="recoveryCode"
                     maxLength={8}
                     returnKeyType="done"
@@ -73,7 +77,7 @@ const ADVerifyRecoveryCodeComponent: React.FC<ILogin> = (props: ILogin) => {
                 <ADBButton
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}
                   onPress={submitForm}
-                  disabled={values.recoveryCode.length != 8}
+                  disabled={values.recoveryCode.length == 0}
                 />
               </View>
             </>
