@@ -469,7 +469,6 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const logout = useCallback(async () => {
     setCurrentVerificationMethod(VerificationMethod.PIN);
-    setProfile(undefined);
     setIsValidatedSubsequenceLogin(false);
   }, []);
 
