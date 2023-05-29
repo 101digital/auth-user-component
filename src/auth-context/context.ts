@@ -12,7 +12,6 @@ import { useMemo, useState } from 'react';
 import { AuthServices } from '../services/auth-services';
 import _ from 'lodash';
 import { NativeModules, Platform } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
 import { SINGLE_FACTOR_ACR_VALUE, SINGLE_FACTOR_SCOPE } from '../utils';
 
 export interface AuthContextData {
@@ -334,9 +333,6 @@ export const useAuthContextValue = (): AuthContextData => {
           setProfile({ ...data });
           // setisManualLogin(true);
           // setIsSignedIn(true);
-          const fcmToken = await messaging().getToken();
-          const deviceOs = Platform.OS === 'ios' ? 'IOS' : 'Android';
-          await AuthServices.instance().registerDevice(fcmToken, deviceOs, data.userId);
           setIsVerifyLogin(false);
           return true;
         }
@@ -388,9 +384,6 @@ export const useAuthContextValue = (): AuthContextData => {
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeIsUserLogged(true);
           await authComponentStore.storeUserName(username);
-          const fcmToken = await messaging().getToken();
-          const deviceOs = Platform.OS === 'ios' ? 'IOS' : 'Android';
-          await AuthServices.instance().registerDevice(fcmToken, deviceOs, data.userId);
           setPassword(undefined);
           setProfile({ ...data });
           if (!isSkipLogged) {
