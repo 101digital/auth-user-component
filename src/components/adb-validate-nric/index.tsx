@@ -20,11 +20,24 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
 
   const { onVerifyNRICSuccess, onError, isLoading } = prop;
 
+  const onShowInvalidIDNumber = () => {
+    onError();
+  };
+
   const validateIdNumber = async (id: string) => {
-    const formatedId = id.replace(/[-]+/g, '');
+    Keyboard.dismiss();
+    try {
+      if(id.match(/^[^0-9a-zA-Z]+$/)) {
+        onShowInvalidIDNumber();
+        return;
+      }
+    } catch {
+      onShowInvalidIDNumber();
+      return;
+    }
     if (
-      profile?.kycDetails?.idNumber === formatedId ||
-      profile?.kycDetails?.altIdNumber === formatedId
+      profile?.kycDetails?.idNumber === id ||
+      profile?.kycDetails?.altIdNumber === id
     ) {
       onVerifyNRICSuccess();
     } else {
@@ -46,9 +59,6 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
       keyboardDidShowListener.remove();
     };
   }, []);
-
-  console.log('profile?.kycDetails', profile?.kycDetails);
-
   return (
     <View style={styles.container}>
       <Formik
@@ -58,31 +68,15 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
         validationSchema={InputIdSchema(i18n)}
         onSubmit={(values) => validateIdNumber(values.userId)}
       >
-        {({ submitForm, setFieldValue, values }) => {
-          let formattedId = values.userId.replace(/[-]+/g, '');
-          if (formattedId.length > 8) {
-            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(
-              6,
-              8
-            )}-${formattedId.slice(8)}`;
-          } else if (formattedId.length > 6) {
-            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(6)}`;
-          }
-
-          if (formattedId !== values.userId) {
-            if (formattedId[formattedId.length - 1] === '-') {
-              formattedId = formattedId.slice(0, formattedId.length - 2);
-            }
-            setFieldValue('userId', formattedId);
-          }
-
+        {({ submitForm, values }) => {
           return (
             <>
               <View style={styles.content}>
                 <ADBInputField
+                  type={'custom'}
                   name={'userId'}
-                  placeholder={i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'}
-                  maxLength={14}
+                  placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
+                  maxLength={12}
                 />
               </View>
               <View style={{ marginBottom: marginKeyboard }}>

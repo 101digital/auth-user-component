@@ -11,7 +11,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
 import { AuthServices } from '../services/auth-services';
 import _ from 'lodash';
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 import { SINGLE_FACTOR_ACR_VALUE, SINGLE_FACTOR_SCOPE } from '../utils';
 
 export interface AuthContextData {
@@ -30,7 +30,7 @@ export interface AuthContextData {
   logout: () => void;
   clearSignInError: () => void;
   updateProfile: (userId: string, data: any) => Promise<boolean>;
-  fetchProfile: (onSuccess?: () => void) => void;
+  fetchProfile: (onSuccess?: (data?: Profile) => void) => void;
   isUpdatingProfile?: boolean;
   errorUpdateProfile?: Error;
   clearUpdateProfileError: () => void;
@@ -69,9 +69,9 @@ export interface AuthContextData {
   registerDevice: (
     token: string,
     platform: 'IOS' | 'Android',
-    userId: string,
-    appId: string,
-    entityId: string
+    // userId: string,
+    // appId: string,
+    // entityId: string
   ) => Promise<boolean>;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
@@ -386,10 +386,11 @@ export const useAuthContextValue = (): AuthContextData => {
           return resLogin;
         } else {
           const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
+          AuthServices.instance().setSessionId(resAfterValidate.session.id);
           await AuthServices.instance().obtainTokenSingleFactor(
             resAfterValidate.authorizeResponse.code
           );
-          AuthServices.instance().setSessionId(resAfterValidate.session.id);
+          console.log('adbLoginSingleFactor => setSessionId', resAfterValidate.session.id)
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeIsUserLogged(true);
           await authComponentStore.storeUserName(username);
@@ -398,6 +399,7 @@ export const useAuthContextValue = (): AuthContextData => {
           if (!isSkipLogged) {
             setIsSignedIn(true);
           }
+
           setIsManualLogin(true);
           return resLogin._embedded.user.id;
         }
@@ -470,7 +472,6 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const logout = useCallback(async () => {
     setCurrentVerificationMethod(VerificationMethod.PIN);
-    setProfile(undefined);
     setIsValidatedSubsequenceLogin(false);
   }, []);
 
@@ -488,7 +489,7 @@ export const useAuthContextValue = (): AuthContextData => {
     return false;
   }, []);
 
-  const fetchProfile = useCallback(async (onSuccess?: () => void) => {
+  const fetchProfile = useCallback(async (onSuccess?: (data: Profile) => void) => {
     try {
       setIsUpdatingProfile(true);
       const { data } = await AuthServices.instance().fetchProfile();
@@ -497,7 +498,7 @@ export const useAuthContextValue = (): AuthContextData => {
       await authComponentStore.storeIsUserLogged(true);
       setIsUpdatingProfile(false);
       if (onSuccess) {
-        onSuccess();
+        onSuccess(data);
       }
       return true;
     } catch (error) {
@@ -669,16 +670,20 @@ export const useAuthContextValue = (): AuthContextData => {
   const registerDevice = useCallback(
     async (
       token: string,
-      platform: 'IOS' | 'Android',
-      userId: string,
-      appId: string,
-      entityId: string
+      platform: 'IOS' | 'Android'
     ) => {
       try {
-        setIsDeviceRegistering(true);
-        await AuthServices.instance().registerDevice(token, platform, userId, appId, entityId);
-        setIsDeviceRegistered(true);
-        return true;
+        if(_profile) {
+          setIsDeviceRegistering(true);
+          await AuthServices.instance().registerDevice(token, platform, _profile.userId);
+          setIsDeviceRegistered(true);
+          return true;
+        } else {
+          const { data } = await AuthServices.instance().fetchProfile();
+          await AuthServices.instance().registerDevice(token, platform, data.userId);
+          setProfile({ ...data });
+          return true
+        }
       } catch (error) {
         setIsDeviceRegistering(false);
         return false;
@@ -686,7 +691,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setIsDeviceRegistering(false);
       }
     },
-    []
+    [_profile]
   );
 
   const updateUserInfo = useCallback(

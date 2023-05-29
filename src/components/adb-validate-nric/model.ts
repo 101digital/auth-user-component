@@ -11,5 +11,6 @@ export const InputIdSchema = (i18n: any) =>
   Yup.object().shape({
     userId: Yup.string()
       .trim()
-      .required(i18n.t('errors.forgot_password.nric_required') ?? 'Please input your id number'),
+      .required(i18n.t('errors.common.id_required') ?? 'Please input your id number')
+      .matches(/^[0-9a-zA-Z]+$/,i18n.t('id_number.error_invalid_id') ?? 'Invalid ID number'),
   });

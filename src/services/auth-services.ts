@@ -13,6 +13,7 @@ export class AuthServices {
 
   private _configs?: AuthComponentConfig;
   private _pkce: PKCE = pkceChallenge();
+  private notificationPayload: any;
 
   constructor() {
     if (AuthServices._instance) {
@@ -32,12 +33,46 @@ export class AuthServices {
   public storeAccessToken(token: string) {
     if (this._configs) {
       this._configs.accessToken = token;
+      if (this.notificationPayload) {
+        const { token, platform, userId } = this.notificationPayload;
+        this.registerDevice(token, platform, userId);
+      }
+    }
+  }
+
+  public getLocale() {
+    if(this._configs) {
+      return this._configs.locale;
     }
   }
 
   public getAccessToken() {
     if (this._configs) {
       return this._configs.accessToken;
+    }
+  }
+
+  public storeIdToken(token: string) {
+    if (this._configs) {
+      this._configs.idToken = token;
+    }
+  }
+
+  public getIdToken() {
+    if (this._configs) {
+      return this._configs.idToken;
+    }
+  }
+
+  public storeJWTPushNotification(token: string) {
+    if (this._configs) {
+      this._configs.jwtPushNotification = token;
+    }
+  }
+
+  public getJWTPushNotification() {
+    if (this._configs) {
+      return this._configs.jwtPushNotification;
     }
   }
 
@@ -65,6 +100,18 @@ export class AuthServices {
     }
   }
 
+  public setDeviceId(id: string) {
+    if (this._configs) {
+      this._configs.deviceId = id;
+    }
+  }
+
+  public getDeviceId() {
+    if (this._configs) {
+      return this._configs.deviceId;
+    }
+  }
+
   public setSessionId(sessionId: string) {
     if (this._configs) {
       return (this._configs.sessionId = sessionId);
@@ -74,7 +121,7 @@ export class AuthServices {
     this._pkce = pkceChallenge();
     return this._pkce;
   }
-
+  
   public fetchAppAccessToken = async () => {
     const body = qs.stringify({
       grant_type: this._configs?.appGrantType ?? 'client_credentials',
@@ -430,21 +477,19 @@ export class AuthServices {
     return response.data;
   };
 
-  registerDevice = async (
-    token: string,
-    platform: 'IOS' | 'Android',
-    userId: string,
-    appId: string,
-    entityId: string
-  ) => {
-    const { notificationBaseUrl, accessToken } = this._configs!;
+  registerDevice = async (token: string, platform: 'IOS' | 'Android', userId: string) => {
+    const { notificationBaseUrl, accessToken, notificationAppId, notificationEntityId } =
+      this._configs!;
     const body = {
-      entityId,
-      appId,
+      entityId: notificationEntityId,
+      appId: notificationAppId,
       userId,
       token,
       platform,
     };
+    if (!this.notificationPayload) {
+      this.notificationPayload = body;
+    }
     const response = await axios.post(`${notificationBaseUrl}/devices`, body, {
       headers: {
         Authorization: `Bearer ${accessToken}`,

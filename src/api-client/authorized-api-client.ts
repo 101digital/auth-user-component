@@ -1,7 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
 import { AuthServices } from '../services/auth-services';
 import authComponentStore from '../services/local-store';
+import DeviceInfo from 'react-native-device-info';
 
 type TokenData = {
   accessToken?: string;
@@ -84,8 +85,21 @@ export const createAuthorizedApiClient = (baseURL: string) => {
 
   const onRequest = async (request: AxiosRequestConfig) => {
     const authBearer = AuthServices.instance().getAccessToken();
+    const httpClient = 'Axios';
+    const platform = `${Platform.OS}/${DeviceInfo.getSystemVersion()}`;
+    const security = 'U';
+    const os = `${
+      Platform.OS === 'ios' ? 'ios' : DeviceInfo.getBaseOsSync()
+    }/${DeviceInfo.getSystemVersion()}`;
+    const localization = AuthServices.instance().getLocale();
+    const mobileAppNameAndVersion = `${DeviceInfo.getApplicationName()}/${DeviceInfo.getVersion()}`;
+    const mobilePingDeviceId = AuthServices.instance().getDeviceId();
+
     if (authBearer) {
       request.headers.Authorization = `${authBearer}`;
+      request.headers[
+        'user-agent'
+      ] = `${httpClient} (${platform} ; ${security} ; ${os} ; ${localization} ; ${mobileAppNameAndVersion} DeviceId:${mobilePingDeviceId})`;
     }
     return request;
   };
