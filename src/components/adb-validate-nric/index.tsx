@@ -4,6 +4,7 @@ import { StyleSheet, View, Keyboard, Platform } from 'react-native';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { Formik, FormikProps } from 'formik';
 import { AuthContext } from '../../auth-context';
+import moment from 'moment';
 
 type ADBInputIdProps = {
   onVerifyNRICSuccess: () => void;
@@ -20,11 +21,24 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
 
   const { onVerifyNRICSuccess, onError, isLoading } = prop;
 
+  const onShowInvalidIDNumber = () => {
+    onError();
+  };
+
   const validateIdNumber = async (id: string) => {
-    const formatedId = id.replace(/[-]+/g, '');
+    Keyboard.dismiss();
+    try {
+      if(id.match(/^[^0-9a-zA-Z]+$/)) {
+        onShowInvalidIDNumber();
+        return;
+      }
+    } catch {
+      onShowInvalidIDNumber();
+      return;
+    }
     if (
-      profile?.kycDetails?.idNumber === formatedId ||
-      profile?.kycDetails?.altIdNumber === formatedId
+      profile?.kycDetails?.idNumber === id ||
+      profile?.kycDetails?.altIdNumber === id
     ) {
       onVerifyNRICSuccess();
     } else {

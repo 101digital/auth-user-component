@@ -10,12 +10,12 @@ import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-compo
 import { InputIdData, InputIdSchema } from './model';
 import moment from 'moment';
 
-export interface ILogin {
+export interface IForgotPassword {
   onValidationSuccess: (flowId: string) => void;
   onErrorValidateID: (msg: string) => void;
 }
 
-const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
+const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPassword) => {
   const { onValidationSuccess, onErrorValidateID } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
@@ -25,7 +25,7 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
   const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
 
   const onShowInvalidIDNumber = () => {
-    onErrorValidateID(i18n.t('id_number.error_invalid_id') ?? 'Invalid NRIC number.');
+    onErrorValidateID(i18n.t('id_number.error_invalid_id') ?? 'Invalid ID number.');
   };
 
   const onShowInvalidAge = () => {
@@ -40,18 +40,7 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
     const _email = email.trim();
     const _nric = nric.trim();
     try {
-      const yearDOB = parseInt(_nric.slice(0, 2));
-      const monthOB = parseInt(_nric.slice(2, 4));
-      const dayOB = parseInt(_nric.slice(4, 6));
-
-      if (
-        _nric.length !== 14 ||
-        yearDOB <= 0 ||
-        monthOB <= 0 ||
-        monthOB > 12 ||
-        dayOB <= 0 ||
-        dayOB > 31
-      ) {
+      if(_nric.match(/^[^0-9a-zA-Z]+$/)) {
         onShowInvalidIDNumber();
         return;
       }
@@ -60,15 +49,7 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
       return;
     }
 
-    const currentYear = parseInt(moment().format('YY'));
-    const idYOB = parseInt(_nric.slice(0, 2));
-    const currentAge = currentYear < idYOB ? currentYear + 100 - idYOB : currentYear - idYOB;
-    if (currentAge < 18) {
-      onShowInvalidAge();
-      return;
-    }
-    const _finalNric = _nric.replace(/-/gm, '');
-    const response = await validateUserForgotPassword(_email, _finalNric);
+    const response = await validateUserForgotPassword(_email, _nric);
     if (response && isObject(response) && response.resendCode) {
       onValidationSuccess(response.resendCode);
     } else {
@@ -100,28 +81,13 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
         onSubmit={handleOnValidation}
         validationSchema={InputIdSchema(i18n)}
       >
-        {({ submitForm, setFieldValue, values }) => {
-          let formattedId = values.nric.replace(/[-]+/g, '');
-          if (formattedId.length > 8) {
-            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(
-              6,
-              8
-            )}-${formattedId.slice(8)}`;
-          } else if (formattedId.length > 6) {
-            formattedId = `${formattedId.slice(0, 6)}-${formattedId.slice(6)}`;
-          }
-
-          if (formattedId !== values.nric) {
-            if (formattedId[formattedId.length - 1] === '-') {
-              formattedId = formattedId.slice(0, formattedId.length - 2);
-            }
-            setFieldValue('nric', formattedId);
-          }
+        {({ submitForm, values }) => {
           return (
             <>
               <View style={styles.content}>
                 <View style={styles.rowInput}>
                   <ADBInputField
+                    type='custom'
                     name="email"
                     returnKeyType="done"
                     placeholder={'Email'}
@@ -131,13 +97,12 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
                 </View>
                 <View style={styles.rowInput}>
                   <ADBInputField
+                    type='custom'
                     name={'nric'}
-                    placeholder={
-                      i18n.t('id_number.placeholder') ?? 'ID number (according to MyKAD)'
-                    }
-                    maxLength={14}
+                    placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
+                    maxLength={12}
                     returnKeyType="done"
-                    keyboardType={'number-pad'}
+                    keyboardType={'ascii-capable'}
                   />
                 </View>
               </View>
@@ -150,7 +115,7 @@ const ADBForgotPasswordComponent: React.FC<ILogin> = (props: ILogin) => {
                   isLoading={isRecoveringUserPassword}
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}
                   onPress={submitForm}
-                  disabled={values.nric.length < 14 || values.email.length === 0}
+                  disabled={values.nric.length == 0 || values.email.length == 0}
                 />
               </View>
             </>
