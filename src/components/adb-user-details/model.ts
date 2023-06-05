@@ -15,7 +15,7 @@ export class UserDetailsData {
     readonly employmentSector: string,
     readonly employerName: string,
     readonly occupation: string,
-    readonly annualIncome: number
+    readonly annualIncome: string
   ) {}
 
   static empty(profile?: Profile): UserDetailsData {
@@ -32,7 +32,7 @@ export class UserDetailsData {
       profile?.employmentDetails?.[0]?.sector ?? '',
       profile?.employmentDetails?.[0]?.companyName ?? '',
       profile?.employmentDetails?.[0]?.occupation ?? '',
-      profile?.creditDetails?.[0]?.annualIncome ?? 0
+      profile?.creditDetails?.[0]?.annualIncome + '' ?? ''
     );
   }
 }
