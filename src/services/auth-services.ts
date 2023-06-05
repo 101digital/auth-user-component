@@ -33,10 +33,10 @@ export class AuthServices {
   public storeAccessToken(token: string) {
     if (this._configs) {
       this._configs.accessToken = token;
-      if (this.notificationPayload) {
-        const { token, platform, userId } = this.notificationPayload;
-        this.registerDevice(token, platform, userId);
-      }
+      // if (this.notificationPayload) {
+      //   const { token, platform, userId } = this.notificationPayload;
+      //   this.registerDevice(token, platform, userId);
+      // }
     }
   }
 
@@ -61,6 +61,18 @@ export class AuthServices {
   public getIdToken() {
     if (this._configs) {
       return this._configs.idToken;
+    }
+  }
+
+  public storeOTT(token: string) {
+    if (this._configs) {
+      this._configs.ott = token;
+    }
+  }
+
+  public getOTT() {
+    if (this._configs) {
+      return this._configs.ott;
     }
   }
 
