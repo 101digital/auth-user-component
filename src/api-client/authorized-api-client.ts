@@ -84,7 +84,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
   };
 
   const onRequest = async (request: AxiosRequestConfig) => {
-    const authBearer = AuthServices.instance().getAccessToken();
+    const authBearer = request.headers['original-token'] ? request.headers['original-token'] : AuthServices.instance().getAccessToken();
     const httpClient = 'Axios';
     const platform = `${Platform.OS}/${DeviceInfo.getSystemVersion()}`;
     const security = 'U';

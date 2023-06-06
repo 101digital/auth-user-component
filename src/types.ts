@@ -145,6 +145,7 @@ export type AuthComponentConfig = {
   jwtPushNotification?: string;
   notificationAppId?: string;
   notificationEntityId?: string;
+  ott?: string;
 };
 
 export enum VerificationMethod {
