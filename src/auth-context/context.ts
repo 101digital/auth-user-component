@@ -461,6 +461,7 @@ export const useAuthContextValue = (): AuthContextData => {
   }, []);
 
   const logout = useCallback(async () => {
+    AuthServices.instance().revokeToken();
     setCurrentVerificationMethod(VerificationMethod.PIN);
     setIsValidatedSubsequenceLogin(false);
   }, []);

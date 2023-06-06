@@ -384,6 +384,17 @@ export class AuthServices {
     return response.data;
   };
 
+  public revokeToken = async () => {
+    const { authBaseUrl, clientId, accessToken } = this._configs || {};
+    const body = qs.stringify({
+      token: accessToken,
+      client_id: clientId,
+    });
+    const response = await axios.post(`${authBaseUrl}/as/revoke`, body);
+
+    return response.data;
+  };
+
   recoveryUserPassword = async (mobileNumber: string) => {
     const { identityBaseUrl } = this._configs!;
     const appAccessToken = await this.fetchAppAccessToken();
