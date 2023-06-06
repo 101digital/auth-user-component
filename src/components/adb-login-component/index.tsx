@@ -32,14 +32,15 @@ export interface ILogin {
   onLoginFailed: () => void;
   onForgotPassword: () => void;
   onLoginRestrict: (status: string) => void;
+  isSkipOTPMode?: boolean;
 }
 
 const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
-  const { onLoginSuccess, onLoginFailed, onForgotPassword, onLoginRestrict } = props;
+  const { onLoginSuccess, onLoginFailed, onForgotPassword, onLoginRestrict, isSkipOTPMode } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { adbLogin, errorSignIn } = useContext(AuthContext);
+  const { adbLoginSingleFactor, adbLogin, errorSignIn } = useContext(AuthContext);
   const { verifyExistedUserByEmail } = useContext(RegistrationContext);
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
@@ -57,6 +58,11 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const { username, password } = values;
     const _username = username.trim();
     const _password = password.trim();
+    if(isSkipOTPMode) {
+      await adbLoginSingleFactor(_username, _password, true);
+      onLoginSuccess();
+      return;
+    }
     const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {
       console.log('DATA ERROR RESPONSED::::', _err);
     });
