@@ -13,6 +13,7 @@ export class AuthServices {
 
   private _configs?: AuthComponentConfig;
   private _pkce: PKCE = pkceChallenge();
+  private notificationPayload: any;
 
   constructor() {
     if (AuthServices._instance) {
@@ -32,12 +33,58 @@ export class AuthServices {
   public storeAccessToken(token: string) {
     if (this._configs) {
       this._configs.accessToken = token;
+      // if (this.notificationPayload) {
+      //   const { token, platform, userId } = this.notificationPayload;
+      //   this.registerDevice(token, platform, userId);
+      // }
+    }
+  }
+
+  public getLocale() {
+    if (this._configs) {
+      return this._configs.locale;
     }
   }
 
   public getAccessToken() {
     if (this._configs) {
       return this._configs.accessToken;
+    }
+  }
+
+  public storeIdToken(token: string) {
+    if (this._configs) {
+      this._configs.idToken = token;
+    }
+  }
+
+  public getIdToken() {
+    if (this._configs) {
+      return this._configs.idToken;
+    }
+  }
+
+  public storeOTT(token: string) {
+    if (this._configs) {
+      this._configs.ott = token;
+    }
+  }
+
+  public getOTT() {
+    if (this._configs) {
+      return this._configs.ott;
+    }
+  }
+
+  public storeJWTPushNotification(token: string) {
+    if (this._configs) {
+      this._configs.jwtPushNotification = token;
+    }
+  }
+
+  public getJWTPushNotification() {
+    if (this._configs) {
+      return this._configs.jwtPushNotification;
     }
   }
 
@@ -62,6 +109,18 @@ export class AuthServices {
   public getPairingCode() {
     if (this._configs) {
       return this._configs.paringCode;
+    }
+  }
+
+  public setDeviceId(id: string) {
+    if (this._configs) {
+      this._configs.deviceId = id;
+    }
+  }
+
+  public getDeviceId() {
+    if (this._configs) {
+      return this._configs.deviceId;
     }
   }
 
@@ -181,8 +240,8 @@ export class AuthServices {
     this.setPairingCode(pairingCode);
     return {
       loginHintToken: token,
-      pairingCode
-    }
+      pairingCode,
+    };
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
@@ -325,6 +384,17 @@ export class AuthServices {
     return response.data;
   };
 
+  public revokeToken = async () => {
+    const { authBaseUrl, clientId, accessToken } = this._configs || {};
+    const body = qs.stringify({
+      token: accessToken,
+      client_id: clientId,
+    });
+    const response = await axios.post(`${authBaseUrl}/as/revoke`, body);
+
+    return response.data;
+  };
+
   recoveryUserPassword = async (mobileNumber: string) => {
     const { identityBaseUrl } = this._configs!;
     const appAccessToken = await this.fetchAppAccessToken();
@@ -430,21 +500,19 @@ export class AuthServices {
     return response.data;
   };
 
-  registerDevice = async (
-    token: string,
-    platform: 'IOS' | 'Android',
-    userId: string,
-    appId: string,
-    entityId: string
-  ) => {
-    const { notificationBaseUrl, accessToken } = this._configs!;
+  registerDevice = async (token: string, platform: 'IOS' | 'Android', userId: string) => {
+    const { notificationBaseUrl, accessToken, notificationAppId, notificationEntityId } =
+      this._configs!;
     const body = {
-      entityId,
-      appId,
+      entityId: notificationEntityId,
+      appId: notificationAppId,
       userId,
       token,
       platform,
     };
+    if (!this.notificationPayload) {
+      this.notificationPayload = body;
+    }
     const response = await axios.post(`${notificationBaseUrl}/devices`, body, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
