@@ -14,6 +14,8 @@ let isRefreshed = false;
 let isRefreshing = false;
 let failedQueue: any = [];
 
+const oneTimeToken = 'original-token';
+
 type OriginalRequest = AxiosRequestConfig & { retry?: boolean; queued?: boolean };
 
 const shouldIntercept = (error: AxiosError) => {
@@ -84,7 +86,15 @@ export const createAuthorizedApiClient = (baseURL: string) => {
   };
 
   const onRequest = async (request: AxiosRequestConfig) => {
-    const authBearer = request.headers['original-token'] ? request.headers['original-token'] : AuthServices.instance().getAccessToken();
+    let authBearer = AuthServices.instance().getAccessToken();
+
+    if(request.headers[oneTimeToken]) {
+      authBearer = AuthServices.instance().getAccessToken();
+      // request.headers[oneTimeToken] = '';
+      // delete request.headers[oneTimeToken];
+    }
+      
+
     const httpClient = 'Axios';
     const platform = `${Platform.OS}/${DeviceInfo.getSystemVersion()}`;
     const security = 'U';
@@ -104,7 +114,13 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     return request;
   };
 
-  const onResponseSuccess = (response: AxiosResponse) => response;
+  const onResponseSuccess = (response: AxiosResponse) => {
+    if(response.request?.headers?.['original-token']) {
+      AuthServices.instance().storeOTT("");
+    }
+
+    return response;
+  };
 
   const onResponseError = async (axiosError: AxiosError) => {
     // if (!options.shouldIntercept(axiosError)) {
