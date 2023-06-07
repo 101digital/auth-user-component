@@ -3,6 +3,7 @@ import { DeviceEventEmitter, Platform } from 'react-native';
 import { AuthServices } from '../services/auth-services';
 import authComponentStore from '../services/local-store';
 import DeviceInfo from 'react-native-device-info';
+import { ONE_TIME_TOKEN_KEY } from '@/types';
 
 type TokenData = {
   accessToken?: string;
@@ -13,8 +14,6 @@ type TokenData = {
 let isRefreshed = false;
 let isRefreshing = false;
 let failedQueue: any = [];
-
-const oneTimeToken = 'original-token';
 
 type OriginalRequest = AxiosRequestConfig & { retry?: boolean; queued?: boolean };
 
@@ -88,12 +87,11 @@ export const createAuthorizedApiClient = (baseURL: string) => {
   const onRequest = async (request: AxiosRequestConfig) => {
     let authBearer = AuthServices.instance().getAccessToken();
 
-    if(request.headers[oneTimeToken]) {
-      authBearer = AuthServices.instance().getAccessToken();
-      // request.headers[oneTimeToken] = '';
-      // delete request.headers[oneTimeToken];
+    if (request.headers[ONE_TIME_TOKEN_KEY]) {
+      authBearer = request.headers[ONE_TIME_TOKEN_KEY];
+      request.headers[ONE_TIME_TOKEN_KEY] = '';
+      delete request.headers[ONE_TIME_TOKEN_KEY];
     }
-      
 
     const httpClient = 'Axios';
     const platform = `${Platform.OS}/${DeviceInfo.getSystemVersion()}`;
@@ -115,8 +113,8 @@ export const createAuthorizedApiClient = (baseURL: string) => {
   };
 
   const onResponseSuccess = (response: AxiosResponse) => {
-    if(response.request?.headers?.['original-token']) {
-      AuthServices.instance().storeOTT("");
+    if (response.request?.headers?.['original-token']) {
+      AuthServices.instance().storeOTT('');
     }
 
     return response;
