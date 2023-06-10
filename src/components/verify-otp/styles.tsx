@@ -14,7 +14,6 @@ const useMergeStyles = (style?: VerifyOTPComponentStyles): VerifyOTPComponentSty
     container: {
       paddingHorizontal: 25,
       flex: 1,
-      backgroundColor: '#FFFFFF',
     },
     pageTitle: {
       fontSize: 24,
