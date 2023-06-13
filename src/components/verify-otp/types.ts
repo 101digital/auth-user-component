@@ -36,4 +36,5 @@ export type VerifyOTPComponentStyles = {
   countdownWrapper?: StyleProp<ViewStyle>;
   errorText?: StyleProp<TextStyle>;
   errorWrapper?: StyleProp<ViewStyle>;
+  spacing?: StyleProp<ViewStyle>;
 };

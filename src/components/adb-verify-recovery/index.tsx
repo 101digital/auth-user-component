@@ -5,6 +5,7 @@ import { fonts } from '../../assets/fonts';
 import { Formik, FormikProps } from 'formik';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
+import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
 export interface IRecovery {
   onContinue: (recoveryCode: string) => void;
@@ -60,6 +61,7 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
                 <View style={styles.rowInput}>
                   <ADBInputField
                     type='custom'
+                    inputType={InputTypeEnum.MATERIAL}
                     name="recoveryCode"
                     maxLength={8}
                     returnKeyType="done"
@@ -93,7 +95,6 @@ export default ADVerifyRecoveryCodeComponent;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
     marginHorizontal: 25,
     paddingTop: 20,
   },

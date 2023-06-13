@@ -4,6 +4,7 @@ import { StyleSheet, View, Keyboard, Platform } from 'react-native';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { Formik, FormikProps } from 'formik';
 import { AuthContext } from '../../auth-context';
+import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
 type ADBInputIdProps = {
   onVerifyNRICSuccess: () => void;
@@ -74,6 +75,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
               <View style={styles.content}>
                 <ADBInputField
                   type={'custom'}
+                  inputType={InputTypeEnum.MATERIAL}
                   name={'userId'}
                   placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
                   maxLength={12}
