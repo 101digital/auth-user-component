@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 1 # <-- Set value to 0 for clone with complete history
+          fetch-depth: 0 # <-- Set value to 0 for clone with complete history
       - name: Push
         uses: 101digital/code-share-action@main
         with:

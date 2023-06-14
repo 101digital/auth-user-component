@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { PasswordHideIcon, PasswordShowIcon } from '../../assets/icons';
+import { EyesClosedIcon, EyesIcon } from 'react-native-theme-component';
 
 interface ComponentProps {
   isVisible: boolean;
@@ -19,9 +19,9 @@ export const PasswordMask = ({ isVisible, style, ...restProps }: PasswordMaskPro
   return (
     <TouchableOpacity activeOpacity={0.8} style={[styles.container, style]} {...restProps}>
       {isVisible ? (
-        <PasswordHideIcon color={'black'} size={20} />
+        <EyesClosedIcon />
       ) : (
-        <PasswordShowIcon color={'black'} size={20} />
+        <EyesIcon />
       )}
     </TouchableOpacity>
   );

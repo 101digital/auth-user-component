@@ -7,6 +7,8 @@ import {
   OTPField,
   TriangelDangerIcon,
   ThemeContext,
+  NumberPadComponent,
+  AlertCircleIcon,
 } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import CountdownTimer, {
@@ -17,7 +19,6 @@ import { ResponseStatus } from '../../types';
 
 const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
   const styles = useMergeStyles(style);
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const otpRef = useRef<OTPFieldRef>();
   const countdownRef = useRef<CountDownTimerRef>();
   const {
@@ -36,27 +37,17 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
   const [attemptCount, setAttemptCount] = useState<number>(0);
   const [isShowingResendButton, setIsShowingResendButton] = useState<boolean>(false);
 
-  const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
 
   useEffect(() => {
     if (!isSkipInitGenerateOtp) {
       generateOTP();
     }
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
   }, []);
+
 
   useEffect(() => {
     setIsValid(value.length === 6);
+    otpRef.current?.setValue(value);
   }, [value]);
 
   useEffect(() => {
@@ -126,12 +117,15 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
   };
 
   return (
+    
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.safeArea}>
         <View style={styles.content}>
           <OTPField
             ref={otpRef}
             cellCount={6}
+            disabled={isVerifyLogin}
+            isError={!!errorVerifySignIn}
             isUnMasked={true}
             onChanged={setValue}
             style={{
@@ -141,7 +135,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
           {errorVerifySignIn && (
             <View style={styles.errorWrapper}>
               <View style={styles.rowCenter}>
-                <TriangelDangerIcon size={12} />
+                <AlertCircleIcon size={16}/>
                 <Text style={styles.errorText}>{getErrorMessage()}</Text>
               </View>
             </View>
@@ -164,14 +158,28 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
           </View>
         </View>
       </View>
-      <View style={{ marginBottom: marginKeyboard }}>
-        <ADBButton
-          label={'Continue'}
-          onPress={onValidateOTP}
-          isLoading={isVerifyLogin}
-          disabled={!isValid || isShowingResendButton}
-        />
-      </View>
+          <NumberPadComponent onPress={(e: string | number) => {
+        switch (e) {
+          case 'r':
+            const newStr = value.substring(0, value.length - 1);
+            setValue(newStr);
+            break;
+          case 'o':
+            if (value.length < 6) {
+              clearError?.();
+              setValue(value + '0');
+            }
+            break;
+          case 's':
+            onValidateOTP();
+            break;
+          default:
+            if (value.length < 6) {
+              clearError?.();
+              setValue(value + e);
+            }
+        }
+      } } isDisabled={value.length < 6 || isShowingResendButton || isVerifyLogin}/>
     </KeyboardAvoidingView>
   );
 };
