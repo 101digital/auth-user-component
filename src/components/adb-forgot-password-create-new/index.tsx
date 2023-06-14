@@ -13,7 +13,6 @@ import {
 import { ADBChangePasswordData, ADBChangePasswordSchema } from './modal';
 import { PasswordMask } from './password-mask';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
-import { SuccessIcon } from 'react-native-theme-component/src/assets/success.icon';
 import { colors } from '../../assets';
 import { AuthContext } from '../../auth-context/context';
 import {

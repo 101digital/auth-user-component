@@ -78,12 +78,6 @@ const ADBLoginWithPasswordComponent = ({
     }
   };
 
-  // const checkUserName = async () => {
-  //   const userName = await authComponentStore.getUserName();
-  //   if (!userName || userName.length === 0) {
-  //   }
-  // };
-
   useEffect(() => {
     if (isFocused) {
       CookieManager.clearAll().then(() => {});
@@ -213,13 +207,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  buttonAction: {
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.grey90,
-    marginBottom: 15,
   },
   content: {
     flex: 1,

@@ -64,7 +64,6 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
       return;
     }
     const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {
-      console.log('DATA ERROR RESPONSED::::', _err);
     });
     if (
       responseVerified?.status === 'Onboarded' ||

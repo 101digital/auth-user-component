@@ -9,9 +9,6 @@ type TokenData = {
   orgToken?: string;
   refreshToken?: string;
 };
-
-let isRefreshed = false;
-let isRefreshing = false;
 let failedQueue: any = [];
 
 type OriginalRequest = AxiosRequestConfig & { retry?: boolean; queued?: boolean };
@@ -117,52 +114,6 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     }
 
     return response;
-  };
-
-  const onResponseError = async (axiosError: AxiosError) => {
-    // if (!options.shouldIntercept(axiosError)) {
-    //   return Promise.reject(axiosError);
-    // }
-    // const originalRequest: OriginalRequest = { ...axiosError.config };
-    // if (originalRequest.retry || originalRequest.queued) {
-    //   return Promise.reject(axiosError);
-    // }
-    // if (isRefreshing) {
-    //   return new Promise<TokenData>(function (resolve, reject) {
-    //     failedQueue.push({ resolve, reject });
-    //   })
-    //     .then((data) => {
-    //       if (isRefreshed) {
-    //         originalRequest.queued = true;
-    //         options.attachTokenToRequest(originalRequest, data.accessToken);
-    //         return axios.request(originalRequest);
-    //       }
-    //     })
-    //     .catch((_) => {
-    //       return Promise.reject(axiosError);
-    //     });
-    // }
-    // isRefreshing = true;
-    // originalRequest.retry = true;
-    // return new Promise((resolve, reject) => {
-    //   options
-    //     .refreshTokens()
-    //     .then((data) => {
-    //       options.attachTokenToRequest(originalRequest, data.accessToken, data.orgToken);
-    //       isRefreshed = true;
-    //       processQueue(null, data.accessToken, data.orgToken);
-    //       resolve(axios.request(originalRequest));
-    //     })
-    //     .catch(async (_) => {
-    //       await options.forceLogout();
-    //       processQueue(axiosError);
-    //       reject(axiosError);
-    //     })
-    //     .finally(() => {
-    //       isRefreshing = false;
-    //       isRefreshed = false;
-    //     });
-    // });
   };
 
   instance.interceptors.request.use(onRequest);

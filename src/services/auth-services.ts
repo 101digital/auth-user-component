@@ -290,23 +290,6 @@ export class AuthServices {
     return response.data;
   };
 
-  // public adbRefreshToken = async () => {
-  //   const loginHintToken = await this.getLoginHintToken();
-  //   const body = qs.stringify({
-  //     response_type: 'code',
-  //     client_id: this._configs?.clientId,
-  //     scope: 'openid profile profilep',
-  //     code_challenge: 'mjc9QqK3PHOoW4gAU6mTtd0MMrcDzmilXfePfCFtO5K33rzALUimBrwsuoigelpiNqzN7IOSOQ',
-  //     response_mode: 'pi.flow',
-  //     login_hint_token: loginHintToken,
-  //   });
-  //   const responseAuthorize = await AuthApiClient.instance()
-  //     .getAuthApiClient()
-  //     .post('as/authorize', body);
-
-  //   return await this.obtainTokenSingleFactor(responseAuthorize.data.id);
-  // };
-
   public fetchProfile = async () => {
     const { membershipBaseUrl, accessToken } = this._configs!;
     const response = await axios.get(`${membershipBaseUrl}/users/me`, {
