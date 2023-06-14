@@ -1,16 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Keyboard,
-  ScrollView,
-  Platform,
-} from 'react-native';
-import { ADBInputField, ThemeContext, ADBButton } from 'react-native-theme-component';
+  ADBInputField,
+  ThemeContext,
+  ADBButton,
+  EyesClosedIcon,
+  EyesIcon,
+} from 'react-native-theme-component';
 import { Formik } from 'formik';
-import { EyesClosedIcon, EyesIcon } from '../../assets/icons';
 import { colors, fonts } from '../../assets';
 import { AuthContext } from '../../auth-context/context';
 import authComponentStore from '../../services/local-store';
@@ -19,25 +16,26 @@ import { useIsFocused } from '@react-navigation/native';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
+import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
 type ADBLoginWithPasswordProps = {
   onSuccessVerified: () => void;
   onFailedVerified: () => void;
   onInvalidPassword: () => void;
   isEdit: boolean;
+  onResetPassword: () => void;
 };
 const ADBLoginWithPasswordComponent = ({
   onSuccessVerified,
   onFailedVerified,
   onInvalidPassword,
   isEdit = false,
+  onResetPassword,
 }: ADBLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
   const { adbLoginSingleFactor, errorSignIn, isSigning, setIsSignedIn } = useContext(AuthContext);
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
-  const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
   const formikRef = useRef(null);
   const [errorModal, setErrorModal] = useState(false);
   const [passwordLock, setPasswordLock] = useState('');
@@ -78,42 +76,22 @@ const ADBLoginWithPasswordComponent = ({
     }
   };
 
-  // const checkUserName = async () => {
-  //   const userName = await authComponentStore.getUserName();
-  //   if (!userName || userName.length === 0) {
-  //   }
-  // };
-
   useEffect(() => {
     if (isFocused) {
       CookieManager.clearAll().then(() => {});
     }
   }, [isFocused]);
 
-  useEffect(() => {
-    // checkUserName();
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
   return (
     <View style={styles.container}>
-      <Formik innerRef={formikRef} initialValues={{}} onSubmit={() => {}}>
-        {() => {
+      <Formik innerRef={formikRef} initialValues={{ password: '' }} onSubmit={() => {}}>
+        {({ values }) => {
           return (
             <>
-              <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+              <View style={styles.content}>
                 <ADBInputField
+                  type="custom"
+                  inputType={InputTypeEnum.MATERIAL}
                   name={'password'}
                   secureTextEntry={!isVisiblePassword}
                   placeholder={'Password'}
@@ -122,7 +100,7 @@ const ADBLoginWithPasswordComponent = ({
                       onPress={() => setIsVisiblePassword(!isVisiblePassword)}
                       style={styles.iconBtn}
                     >
-                      {isVisiblePassword ? <EyesClosedIcon size={25} /> : <EyesIcon size={25} />}
+                      {!isVisiblePassword ? <EyesClosedIcon /> : <EyesIcon />}
                     </TouchableOpacity>
                   }
                 />
@@ -131,14 +109,18 @@ const ADBLoginWithPasswordComponent = ({
                     <Text>{passwordLock}</Text>
                   </View>
                 )}
-              </ScrollView>
-              <View style={{ marginBottom: marginKeyboard }}>
-                <ADBButton
-                  isLoading={isSigning}
-                  label={isEdit ? 'Continue' : 'Login'}
-                  onPress={onSubmit}
-                />
+                <TouchableOpacity onPress={onResetPassword}>
+                  <Text style={styles.forgetPasswordLabel}>{`${
+                    i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
+                  }?`}</Text>
+                </TouchableOpacity>
               </View>
+              <ADBButton
+                isLoading={isSigning}
+                disabled={values?.password.length < 8}
+                label={'Continue'}
+                onPress={onSubmit}
+              />
             </>
           );
         }}
@@ -171,7 +153,7 @@ const ADBLoginWithPasswordComponent = ({
 
 const styles = StyleSheet.create({
   errorSection: {
-    marginTop: 10,
+    marginTop: 8,
   },
   container: {
     flex: 1,
@@ -214,20 +196,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  buttonAction: {
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.grey90,
-    marginBottom: 15,
-  },
   content: {
     flex: 1,
   },
   title: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.OutfitSemiBold,
   },
   subtitle: {
     color: colors.primaryBlack,
@@ -236,7 +211,7 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
-    fontFamily: fonts.regular,
+    fontFamily: fonts.OutfitRegular,
     marginTop: 14,
   },
   cameraDisableContainer: {
@@ -257,13 +232,19 @@ const styles = StyleSheet.create({
   modalsubTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
-    fontFamily: fonts.regular,
+    fontFamily: fonts.OutfitRegular,
     marginTop: 8,
   },
   loginTitle: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.OutfitSemiBold,
+  },
+  forgetPasswordLabel: {
+    fontSize: 12,
+    color: colors.boldText,
+    fontFamily: fonts.OutfitSemiBold,
+    marginTop: 8,
   },
 });
 
