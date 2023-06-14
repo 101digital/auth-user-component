@@ -20,6 +20,7 @@ import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { colors } from '../../assets';
 import { AuthServices } from 'react-native-auth-component';
+import { AeonIcon } from "@/assets/icons";
 
 type ADBLoginWithPINProps = {
   onFailedVerified: () => void;
@@ -45,6 +46,8 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     const isEnabled = await authComponentStore.getIsEnableBiometric();
     if(isEnabled && JSON.parse(isEnabled)) {
       setBiometricStatus(true);
+    }else{
+      setBiometricStatus(false);
     }
   };
 
@@ -115,13 +118,8 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>
-            {i18n.t('aoen_digital_bank.bank_name') ?? `Aeon Digital Bank`}
-          </Text>
           <View style={styles.imagePlaceHolderContainer}>
-            <View style={styles.imagePlaceHolderWrapper}>
-              <ImageIcon color={'#FFFFFF'} />
-            </View>
+            <AeonIcon />
           </View>
           <Text style={styles.pinTitle}>
             {i18n.t('login_component.lbl_enter_pin') ?? `Enter your PIN`}
@@ -139,6 +137,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
             'PIN is incorrect. You have %s remaining attempts.'
           ).replace('%s', 3 - retryCount)}
           isProcessing={isLoading}
+          clearError={()=>{}}
         />
       </View>
       <BottomSheetModal isVisible={errorModal}>
@@ -170,6 +169,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 22,
+    backgroundColor:colors.lightWhite
   },
   header: {
     alignItems: 'center',
@@ -191,11 +191,6 @@ const styles = StyleSheet.create({
   },
   validationLabel: {
     marginLeft: 6,
-  },
-  title: {
-    color: '#1B1B1B',
-    fontSize: 16,
-    fontFamily: fonts.medium,
   },
   rowItemValid: {
     marginVertical: 5,

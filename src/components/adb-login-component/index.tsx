@@ -14,10 +14,10 @@ import { AuthContext } from '../../auth-context';
 import { Formik } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
-import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
-import { EyesClosedIcon, EyesIcon } from '../../assets/icons';
+import { ADBButton, ADBInputField, EyesClosedIcon, EyesIcon, ThemeContext } from 'react-native-theme-component';
 import { OTP_REQUIRED, PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { RegistrationContext } from 'react-native-register-component';
+import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
 export class SignInData {
   constructor(readonly username: string, readonly password: string) {}
@@ -116,6 +116,8 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
               <View style={styles.rowInput}>
                 <ADBInputField
                   name="username"
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
                   returnKeyType="done"
                   placeholder={'Email'}
                   autoCapitalize="none"
@@ -124,13 +126,15 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
               <View style={styles.rowInput}>
                 <ADBInputField
                   name="password"
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
                   returnKeyType="done"
                   secureTextEntry={!isVisiblePassword}
                   placeholder={'Password'}
                   autoCapitalize="none"
                   suffixIcon={
                     <TouchableOpacity onPress={onToggleVisiblePassword} style={styles.iconBtn}>
-                      {isVisiblePassword ? <EyesClosedIcon size={25} /> : <EyesIcon size={25} />}
+                      {!isVisiblePassword ? <EyesClosedIcon /> : <EyesIcon />}
                     </TouchableOpacity>
                   }
                 />
@@ -139,11 +143,6 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                 <TouchableOpacity onPress={onForgotPassword} style={styles.flex}>
                   <Text style={styles.forgotPasswordTitle}>{`${
                     i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                  }?`}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Text style={styles.helpTitle}>{`${
-                    i18n.t('login_component.lbl_help') ?? 'Help'
                   }?`}</Text>
                 </TouchableOpacity>
               </View>
@@ -194,7 +193,6 @@ export default ADBLoginComponent;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
     marginHorizontal: 25,
     paddingTop: 20,
   },
@@ -230,7 +228,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
   },
   forgotPasswordTitle: {
-    fontSize: 14,
+    fontSize: 12,
+    fontFamily: fonts.OutfitSemiBold
   },
   helpTitle: {
     fontSize: 14,

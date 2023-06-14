@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Keyboard, Platform, KeyboardAvoidingView } from 'react-native';
-import { ADBButton, OTPField } from 'react-native-theme-component';
+import { ADBButton, NumberPadComponent, OTPField } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
 
@@ -44,6 +44,10 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
     };
   }, []);
 
+  useEffect(() => {
+      otpRef.current?.setValue(value);
+  }, [value]);
+
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.content}>
@@ -56,15 +60,27 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
             focusCellContainerStyle: { borderBottomColor: '#1EBCE8' },
           }}
         />
-      </View>
-      <View style={{ marginBottom: marginKeyboard }}>
-        <ADBButton
-          label={'Continue'}
-          disabled={value.length < 6}
-          onPress={validatePINNumber}
-          isLoading={isLoadingStoringPIN}
-        />
-      </View>
+      </View><NumberPadComponent onPress={(e: string | number) => {
+        switch (e) {
+          case 'r':
+            const newStr = value.substring(0, value.length - 1);
+            setValue(newStr);
+            break;
+          case 'o':
+            if (value.length < 6) {
+              setValue(value + '0');
+            }
+            break;
+          case 's':
+            validatePINNumber();
+            break;
+          default:
+            if (value.length < 6) {
+              setValue(value + e);
+            }
+        }
+      } } isDisabled={
+        value.length < 6}/>
     </KeyboardAvoidingView>
   );
 };
@@ -108,6 +124,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    marginTop: 56
   },
 });
 
