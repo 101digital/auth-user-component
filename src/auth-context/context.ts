@@ -68,7 +68,7 @@ export interface AuthContextData {
   clearUserVerificationData: () => void;
   registerDevice: (
     token: string,
-    platform: 'IOS' | 'Android',
+    platform: 'IOS' | 'Android'
     // userId: string,
     // appId: string,
     // entityId: string
@@ -119,9 +119,10 @@ export interface AuthContextData {
   setCurrentVerificationMethod: (method: VerificationMethod) => void;
   isReselectingDevice: boolean;
   clearErrorVerifySignIn: () => void;
-  getNotificationBadge:  () => void;
+  getNotificationBadge: () => void;
   badgeNumber: number;
-  getNotifications:  (pageNumber: number) => void;
+  getNotifications: (pageNumber: number) => void;
+  updateReadNotifications: (notificationId: string) => void;
   notificationData: any;
 }
 
@@ -190,7 +191,8 @@ export const authDefaultValue: AuthContextData = {
   clearErrorVerifySignIn: () => false,
   getNotificationBadge: async () => false,
   badgeNumber: 0,
-  getNotifications:  async () => false,
+  getNotifications: async () => false,
+  updateReadNotifications: async () => false,
   notificationData: false,
 };
 
@@ -390,7 +392,7 @@ export const useAuthContextValue = (): AuthContextData => {
           await AuthServices.instance().obtainTokenSingleFactor(
             resAfterValidate.authorizeResponse.code
           );
-          console.log('adbLoginSingleFactor => setSessionId', resAfterValidate.session.id)
+          console.log('adbLoginSingleFactor => setSessionId', resAfterValidate.session.id);
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeIsUserLogged(true);
           await authComponentStore.storeUserName(username);
@@ -669,12 +671,9 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const registerDevice = useCallback(
-    async (
-      token: string,
-      platform: 'IOS' | 'Android'
-    ) => {
+    async (token: string, platform: 'IOS' | 'Android') => {
       try {
-        if(_profile) {
+        if (_profile) {
           setIsDeviceRegistering(true);
           await AuthServices.instance().registerDevice(token, platform, _profile.userId);
           setIsDeviceRegistered(true);
@@ -683,7 +682,7 @@ export const useAuthContextValue = (): AuthContextData => {
           const { data } = await AuthServices.instance().fetchProfile();
           await AuthServices.instance().registerDevice(token, platform, data.userId);
           setProfile({ ...data });
-          return true
+          return true;
         }
       } catch (error) {
         setIsDeviceRegistering(false);
@@ -733,7 +732,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const pairingDevice = useCallback(async () => {
     try {
       const code = AuthServices.instance().getPairingCode();
-      if(!code) {
+      if (!code) {
         const { pairingCode } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
         PingOnesdkModule.pairDevice(pairingCode);
       } else {
@@ -833,19 +832,32 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const getNotificationBadge = async () => {
     const response = await AuthServices.instance().getNotificationBadge();
-    setbadgeNumber(response ? response : 0)
+    setbadgeNumber(response ? response : 0);
   };
 
   const getNotifications = async (pageNumber: number) => {
     const response = await AuthServices.instance().getNotifications(pageNumber);
-    if(response) {
-      let newData = Object.assign({}, response)
-      if(newData.paging.pageNumber !== 1) {
-        let dataNotifications = _notificationData?.data ? _notificationData?.data : [];
+    if (response) {
+      let newData = Object.assign({}, response);
+      if (newData.paging.pageNumber !== 1) {
+        const dataNotifications = _notificationData?.data ? _notificationData?.data : [];
         newData.data = [...dataNotifications, ...newData.data];
-      } 
-      setNotificationData(newData)
-    } 
+      }
+      setNotificationData(newData);
+    }
+  };
+
+  const updateReadNotifications = async (notificationId: string) => {
+    // const response = await AuthServices.instance().updateReadNotification(notificationId);
+    // if(response) {
+    // let cloneData = [..._notificationData?.data ? _notificationData?.data : []]
+    // const itemIndex = cloneData.findIndex(item => item.id === notificationId)
+    // console.log('data update::::::::: ', itemIndex, cloneData)
+    // cloneData[itemIndex].isView = true
+    // let newUpdatedData = Object.assign({}, _notificationData)
+    // newUpdatedData.data = [...cloneData];
+    // setNotificationData(newUpdatedData)
+    // }
   };
 
   return useMemo(
@@ -924,7 +936,8 @@ export const useAuthContextValue = (): AuthContextData => {
       getNotificationBadge,
       badgeNumber: _badgeNumber,
       getNotifications,
-      notificationData: _notificationData
+      updateReadNotifications,
+      notificationData: _notificationData,
     }),
     [
       _profile,
@@ -964,7 +977,7 @@ export const useAuthContextValue = (): AuthContextData => {
       selectedDeviceId,
       _isReselectingDevice,
       _badgeNumber,
-      _notificationData
+      _notificationData,
     ]
   );
 };
