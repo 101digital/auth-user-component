@@ -41,7 +41,7 @@ export class AuthServices {
   }
 
   public getLocale() {
-    if(this._configs) {
+    if (this._configs) {
       return this._configs.locale;
     }
   }
@@ -133,7 +133,7 @@ export class AuthServices {
     this._pkce = pkceChallenge();
     return this._pkce;
   }
-  
+
   public fetchAppAccessToken = async () => {
     const body = qs.stringify({
       grant_type: this._configs?.appGrantType ?? 'client_credentials',
@@ -240,8 +240,8 @@ export class AuthServices {
     this.setPairingCode(pairingCode);
     return {
       loginHintToken: token,
-      pairingCode
-    }
+      pairingCode,
+    };
   };
 
   public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
@@ -520,6 +520,73 @@ export class AuthServices {
       },
     });
     return response.data;
+  };
+
+  getNotificationBadge = async () => {
+    const { notificationBaseUrl, accessToken } = this._configs!;
+    let badgeNumber: number = 0;
+    try {
+      const response = await axios.get(
+        `${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log('data notifications', response.data);
+      if (response.data) {
+        badgeNumber = response.data.additionalData?.totalNotView ?? 0;
+        return badgeNumber;
+      }
+    } catch (error) {
+      console.log('ERROR:', error);
+      return badgeNumber;
+    }
+  };
+
+  getNotifications = async (pageNumber: number, pageSize: number = 10) => {
+    const { notificationBaseUrl, accessToken } = this._configs!;
+    try {
+      const response = await axios.get(
+        `${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM&pageSize=${pageSize}&pageNumber=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log('data notifications list', response.data);
+      if (response.data) {
+        return response.data;
+      }
+    } catch (error) {
+      console.log('ERROR:', error);
+      return false;
+    }
+  };
+
+  updateReadNotification = async (notificationId: string) => {
+    const { notificationBaseUrl, accessToken } = this._configs!;
+    try {
+      const response = await axios.post(
+        `${notificationBaseUrl}/notifications/${notificationId}/status`,
+        { status: 'READ' },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log('success Notifcation read', response.data);
+      return true;
+    } catch (error) {
+      console.log('ERROR:', error);
+      return false;
+    }
   };
 
   updateUserInfo = async (
