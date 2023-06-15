@@ -8,6 +8,7 @@ import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
+import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
 export interface IForgotPassword {
   onValidationSuccess: (flowId: string) => void;
@@ -87,6 +88,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                 <View style={styles.rowInput}>
                   <ADBInputField
                     type='custom'
+                    inputType={InputTypeEnum.MATERIAL}
                     name="email"
                     returnKeyType="done"
                     placeholder={'Email'}
@@ -97,6 +99,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                 <View style={styles.rowInput}>
                   <ADBInputField
                     type='custom'
+                    inputType={InputTypeEnum.MATERIAL}
                     name={'nric'}
                     placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
                     maxLength={12}
@@ -150,8 +153,7 @@ export default ADBForgotPasswordComponent;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
-    marginHorizontal: 25,
+    marginHorizontal: 20,
     paddingTop: 20,
   },
   rowInput: {
@@ -162,7 +164,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 10,
-    paddingHorizontal: 5,
   },
   input: {
     borderBottomWidth: 1,

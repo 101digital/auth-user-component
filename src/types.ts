@@ -188,3 +188,8 @@ export enum ResponseStatus {
 export enum AccountStatus {
   Prospect = 'Prospect',
 }
+
+
+export const ONE_TIME_TOKEN_KEY = 'original-token';
+export const IAM_ID_TOKEN_KEY = 'iam-id-token';
+export const CONTEXT_DATA_VALUES_KEY = 'step-up-token';

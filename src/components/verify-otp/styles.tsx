@@ -4,7 +4,9 @@ import { StyleSheet } from 'react-native';
 import { VerifyOTPComponentStyles } from './types';
 import { ThemeContext } from 'react-native-theme-component';
 
-const useMergeStyles = (style?: VerifyOTPComponentStyles): VerifyOTPComponentStyles => {
+const useMergeStyles = (
+  style?: VerifyOTPComponentStyles
+): VerifyOTPComponentStyles => {
   const { fonts, colors } = useContext(ThemeContext);
 
   const defaultStyles = StyleSheet.create({
@@ -14,7 +16,6 @@ const useMergeStyles = (style?: VerifyOTPComponentStyles): VerifyOTPComponentSty
     container: {
       paddingHorizontal: 25,
       flex: 1,
-      backgroundColor: '#FFFFFF',
     },
     pageTitle: {
       fontSize: 24,
@@ -36,6 +37,7 @@ const useMergeStyles = (style?: VerifyOTPComponentStyles): VerifyOTPComponentSty
       color: '#4E4B50',
     },
     content: {
+      flex: 1,
       marginTop: 20,
     },
     infoView: {
@@ -44,8 +46,7 @@ const useMergeStyles = (style?: VerifyOTPComponentStyles): VerifyOTPComponentSty
     rowCenter: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-around',
-      marginTop: 30,
+      marginTop: 8,
     },
     receiveOTPOptionBtn: {},
     receiveOTPOptionLabel: {
@@ -75,7 +76,9 @@ const useMergeStyles = (style?: VerifyOTPComponentStyles): VerifyOTPComponentSty
     countdownWrapper: {
       flexDirection: 'row',
       justifyContent: 'center',
-      paddingTop: 40,
+      flex: 1,
+      alignItems: 'flex-end',
+      marginBottom: 32
     },
     notReceivedCodeLabel: {
       fontFamily: fonts.regular,
@@ -98,14 +101,74 @@ const useMergeStyles = (style?: VerifyOTPComponentStyles): VerifyOTPComponentSty
     },
     errorWrapper: {
       alignItems: 'center',
-      marginTop: 15,
+      flexDirection: 'row'
     },
     errorText: {
-      color: '#3F3F3F',
-      marginLeft: 7,
+      color: colors.errorColor,
+      marginLeft: 4,
       fontWeight: '400',
       fontSize: 12,
       fontFamily: fonts.regular,
+    },
+    buttonWrapper: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    buttonTextContainer: { fontFamily: fonts.OutfitSemiBold, color: colors.secondaryColor, fontSize: 16 },
+    buttonContainer: {
+      height: 64,
+      width: 64,
+      marginHorizontal: 16,
+      marginVertical: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 100,
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      // paddingHorizontal: 60,
+    },
+    pinInputWrapper: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      // paddingTop:20,
+      paddingTop: '7.5%',
+    },
+    dot: {
+      height: 16,
+      width: 16,
+      borderRadius: 20,
+      marginHorizontal: 12,
+      borderWidth: 1,
+    },
+    extraDataRow: {
+      marginVertical: 4,
+      paddingHorizontal: 24,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    inputContainer: {
+      borderWidth: 1,
+      position: 'absolute',
+      width: '100%',
+      opacity: 0,
+      marginTop: 50,
+    },
+    bodyContainerStyle: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    contentWrapper: {
+      flex: 1,
+      alignItems: 'flex-end',
+      justifyContent: 'flex-end',
+      maxWidth: 300,
+      // backgroundColor:'red'
     },
   });
   return defaultsDeep(style, defaultStyles);

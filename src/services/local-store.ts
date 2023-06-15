@@ -71,17 +71,16 @@ class AuthComponentStore {
 
   setPin = async (pinNumber: string) => {
     let newLoginHintToken = AuthServices.instance().getLoginHintToken();
-    if(!newLoginHintToken) {
+    if (!newLoginHintToken) {
       const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
-      newLoginHintToken = loginHintToken
+      newLoginHintToken = loginHintToken;
     }
 
-
-    if(newLoginHintToken) {
+    if (newLoginHintToken) {
       const salt = await this.getSalt();
       const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost 10000
       const encryptedData = await AESCryptoStore.encryptData(newLoginHintToken, key);
-  
+
       await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
     } else {
       return false;
@@ -90,24 +89,25 @@ class AuthComponentStore {
 
   setBiometric = async () => {
     let newLoginHintToken = AuthServices.instance().getLoginHintToken();
-    if(!newLoginHintToken) {
+    if (!newLoginHintToken) {
       const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
-      newLoginHintToken = loginHintToken
+      newLoginHintToken = loginHintToken;
     }
 
-    if(newLoginHintToken) {
-    try {
-      await SInfo.setItem(BIO_TOKEN, newLoginHintToken, {
-        ...sensitiveInfoOptions,
-        touchID: true, //add this key
-        showModal: true, //add this key
-        kSecAccessControl: 'kSecAccessControlBiometryCurrentSet', // optional - Add support for FaceID
-      });
+    if (newLoginHintToken) {
+      try {
+        await SInfo.setItem(BIO_TOKEN, newLoginHintToken, {
+          ...sensitiveInfoOptions,
+          touchID: true, //add this key
+          showModal: true, //add this key
+          kSecAccessControl: 'kSecAccessControlBiometryCurrentSet', // optional - Add support for FaceID
+        });
 
-      return true;
-    } catch (error) {
-      return false;
-    }} else {
+        return true;
+      } catch (error) {
+        return false;
+      }
+    } else {
       return false;
     }
   };
