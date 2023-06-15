@@ -848,16 +848,15 @@ export const useAuthContextValue = (): AuthContextData => {
   };
 
   const updateReadNotifications = async (notificationId: string) => {
-    // const response = await AuthServices.instance().updateReadNotification(notificationId);
-    // if(response) {
-    // let cloneData = [..._notificationData?.data ? _notificationData?.data : []]
-    // const itemIndex = cloneData.findIndex(item => item.id === notificationId)
-    // console.log('data update::::::::: ', itemIndex, cloneData)
-    // cloneData[itemIndex].isView = true
-    // let newUpdatedData = Object.assign({}, _notificationData)
-    // newUpdatedData.data = [...cloneData];
-    // setNotificationData(newUpdatedData)
-    // }
+    const response = await AuthServices.instance().updateReadNotification(notificationId);
+    if (response) {
+      let cloneData = [...(_notificationData?.data ? _notificationData?.data : [])];
+      const itemIndex = cloneData.findIndex((item) => item.id === notificationId);
+      cloneData[itemIndex].isView = true;
+      let newUpdatedData = Object.assign({}, _notificationData);
+      newUpdatedData.data = [...cloneData];
+      setNotificationData(newUpdatedData);
+    }
   };
 
   return useMemo(

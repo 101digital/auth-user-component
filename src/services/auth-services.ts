@@ -572,7 +572,7 @@ export class AuthServices {
     const { notificationBaseUrl, accessToken } = this._configs!;
     try {
       const response = await axios.post(
-        `${notificationBaseUrl}/notifications/${notificationId}`,
+        `${notificationBaseUrl}/notifications/${notificationId}/status`,
         { status: 'READ' },
         {
           headers: {
@@ -582,9 +582,7 @@ export class AuthServices {
         }
       );
       console.log('success Notifcation read', response.data);
-      if (response.data) {
-        return response.data;
-      }
+      return true;
     } catch (error) {
       console.log('ERROR:', error);
       return false;
