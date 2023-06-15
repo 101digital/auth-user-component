@@ -526,7 +526,7 @@ export class AuthServices {
     const { notificationBaseUrl, accessToken } = this._configs!;
     let badgeNumber: number = 0;
     try {
-      const response = await axios.get(`${notificationBaseUrl}/notifications`, {
+      const response = await axios.get(`${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM&isInAppNotification=true`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
@@ -546,7 +546,7 @@ export class AuthServices {
   getNotifications = async (pageNumber: number, pageSize: number = 10) => {
     const { notificationBaseUrl, accessToken } = this._configs!;
     try {
-      const response = await axios.get(`${notificationBaseUrl}/notifications?pageSize=${pageSize}&pageNumber=${pageNumber}`, {
+      const response = await axios.get(`${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM&isInAppNotification=true&pageSize=${pageSize}&pageNumber=${pageNumber}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
