@@ -61,6 +61,9 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         setRetryCount(retryCount + 1);
         otpRef.current?.clearInput();
       } else {
+        otpRef.current?.clearInput();
+        setIsNotMatched(false);
+        setRetryCount(0);
         onFailedVerified();
       }
     } else {
