@@ -206,8 +206,8 @@ const styles = StyleSheet.create({
   imagePlaceHolderContainer: {
     alignItems: 'center',
     justifyContent: 'space-around',
-    marginTop: 55,
-    marginBottom: 75,
+    marginTop: 35,
+    marginBottom: 32,
   },
   imagePlaceHolderWrapper: {
     height: 80,
@@ -237,7 +237,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   pinTitle: {
-    color: '#858585',
+    color: colors.lightSubtitle,
+    fontFamily: fonts.OutfitRegular,
     fontSize: 12,
   },
   cameraDisableContainer: {

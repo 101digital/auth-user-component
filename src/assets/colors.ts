@@ -42,4 +42,5 @@ export const colors = {
   primaryBlack: '#1b1b1b',
   underline: '#DDDDDD',
   boldText: '#1a1a1a',
+  lightSubtitle: '#666666',
 };
