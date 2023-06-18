@@ -37,13 +37,11 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
   const [attemptCount, setAttemptCount] = useState<number>(0);
   const [isShowingResendButton, setIsShowingResendButton] = useState<boolean>(false);
 
-
   useEffect(() => {
     if (!isSkipInitGenerateOtp) {
       generateOTP();
     }
   }, []);
-
 
   useEffect(() => {
     setIsValid(value.length === 6);
@@ -117,7 +115,6 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
   };
 
   return (
-    
     <KeyboardAvoidingView style={styles.container}>
       <View style={styles.safeArea}>
         <View style={styles.content}>
@@ -135,8 +132,10 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
           {errorVerifySignIn && (
             <View style={styles.errorWrapper}>
               <View style={styles.rowCenter}>
-                <AlertCircleIcon size={16}/>
-                <Text style={styles.errorText}>{getErrorMessage()}</Text>
+                <AlertCircleIcon size={16} />
+                <Text style={styles.errorText} testID="verify-otp-error-message">
+                  {getErrorMessage()}
+                </Text>
               </View>
             </View>
           )}
@@ -158,28 +157,32 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
           </View>
         </View>
       </View>
-          <NumberPadComponent onPress={(e: string | number) => {
-        switch (e) {
-          case 'r':
-            const newStr = value.substring(0, value.length - 1);
-            setValue(newStr);
-            break;
-          case 'o':
-            if (value.length < 6) {
-              clearError?.();
-              setValue(value + '0');
-            }
-            break;
-          case 's':
-            onValidateOTP();
-            break;
-          default:
-            if (value.length < 6) {
-              clearError?.();
-              setValue(value + e);
-            }
-        }
-      } } isDisabled={value.length < 6 || isShowingResendButton || isVerifyLogin}/>
+      <NumberPadComponent
+        testID={'verify-otp-number-pad'}
+        onPress={(e: string | number) => {
+          switch (e) {
+            case 'r':
+              const newStr = value.substring(0, value.length - 1);
+              setValue(newStr);
+              break;
+            case 'o':
+              if (value.length < 6) {
+                clearError?.();
+                setValue(value + '0');
+              }
+              break;
+            case 's':
+              onValidateOTP();
+              break;
+            default:
+              if (value.length < 6) {
+                clearError?.();
+                setValue(value + e);
+              }
+          }
+        }}
+        isDisabled={value.length < 6 || isShowingResendButton || isVerifyLogin}
+      />
     </KeyboardAvoidingView>
   );
 };
