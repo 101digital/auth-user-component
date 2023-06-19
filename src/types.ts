@@ -183,6 +183,7 @@ export enum ResponseStatus {
   BAD_REQUEST = '400',
   UNAUTHORIZED = '401',
   TOO_MANY_REQUEST = '000.01.429.00',
+  INTERNAL_SERVER_ERROR = '500',
 }
 
 export enum AccountStatus {

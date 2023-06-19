@@ -79,6 +79,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                   name={'userId'}
                   placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
                   maxLength={12}
+                  testID='validate-id-input'
                 />
               </View>
               <View style={{ marginBottom: marginKeyboard }}>
@@ -87,6 +88,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                   onPress={submitForm}
                   isLoading={isLoading}
                   disabled={values.userId.length === 0}
+                  testId='validate-id-continue-button'
                 />
               </View>
             </>
