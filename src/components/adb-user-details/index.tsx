@@ -244,6 +244,8 @@ const ADBUserDetailsScreenComponent = ({
               currencyFormated !== `${values.annualIncome}`
             ) {
               setFieldValue('annualIncome', currencyFormated);
+            } else if(values.annualIncome[0] === '.') {
+              setFieldValue('annualIncome', '0.');
             }
           }
 

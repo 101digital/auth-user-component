@@ -121,6 +121,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   returnKeyType="done"
                   placeholder={'Email'}
                   autoCapitalize="none"
+                  testID='login-user-name-input'
                 />
               </View>
               <View style={styles.rowInput}>
@@ -137,13 +138,12 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                       {!isVisiblePassword ? <EyesClosedIcon /> : <EyesIcon />}
                     </TouchableOpacity>
                   }
+                  testID='login-password-input'
                 />
               </View>
               <View style={styles.rowBetween}>
-                <TouchableOpacity onPress={onForgotPassword} style={styles.flex}>
-                  <Text style={styles.forgotPasswordTitle}>{`${
-                    i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                  }?`}</Text>
+                <TouchableOpacity onPress={onForgotPassword} style={styles.flex} testID='login-forgot-password-button'>
+                  <Text style={styles.forgotPasswordTitle}>{`${'Forgot password'}?`}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -157,6 +157,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                 label={i18n.t('common.lbl_continue') ?? 'Continue'}
                 onPress={submitForm}
                 disabled={values.password.length < 8 || values.username.length === 0}
+                testId='login-continue-button'
               />
             </View>
           </>
