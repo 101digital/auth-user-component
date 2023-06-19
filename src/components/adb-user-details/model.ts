@@ -41,7 +41,8 @@ export const UserDetailsSchema = (i18n: any) =>
   Yup.object().shape({
     nickName: Yup.string()
       .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
+      .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
     religion: Yup.string()
       .trim()
       .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
@@ -68,11 +69,13 @@ export const UserDetailsSchema = (i18n: any) =>
       .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
     employerName: Yup.string()
       .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
+      .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('user_name.invalid_name') ?? 'Invalid name'),
     occupation: Yup.string()
       .trim()
       .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
     annualIncome: Yup.string()
       .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
+      .matches(/^[0-9,.]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
   });

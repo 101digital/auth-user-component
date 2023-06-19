@@ -106,7 +106,8 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           setIsSignedIn(false);
         }
       } else {
-        //Todo :  sanniv
+        setBiometricAttempt(biometricAttempt + 1);
+        setIsSignedIn(false);
       }
       return;
     }

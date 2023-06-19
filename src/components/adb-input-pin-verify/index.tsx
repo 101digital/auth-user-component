@@ -30,7 +30,7 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
   };
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e: any) => {
       setKeyboardHeight(e.endCoordinates.height);
     });
 
