@@ -71,10 +71,6 @@ class AuthComponentStore {
 
   setPin = async (pinNumber: string) => {
     let newLoginHintToken = AuthServices.instance().getLoginHintToken();
-    if (!newLoginHintToken) {
-      const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
-      newLoginHintToken = loginHintToken;
-    }
 
     if (newLoginHintToken) {
       const salt = await this.getSalt();
@@ -82,6 +78,7 @@ class AuthComponentStore {
       const encryptedData = await AESCryptoStore.encryptData(newLoginHintToken, key);
 
       await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
+      AuthServices.instance().setLoginHintToken('');
     } else {
       return false;
     }
@@ -89,11 +86,6 @@ class AuthComponentStore {
 
   setBiometric = async () => {
     let newLoginHintToken = AuthServices.instance().getLoginHintToken();
-    if (!newLoginHintToken) {
-      const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
-      newLoginHintToken = loginHintToken;
-    }
-
     if (newLoginHintToken) {
       try {
         await SInfo.setItem(BIO_TOKEN, newLoginHintToken, {
@@ -103,6 +95,7 @@ class AuthComponentStore {
           kSecAccessControl: 'kSecAccessControlBiometryCurrentSet', // optional - Add support for FaceID
         });
 
+        AuthServices.instance().setLoginHintToken('');
         return true;
       } catch (error) {
         return false;
@@ -112,20 +105,24 @@ class AuthComponentStore {
     }
   };
 
-  validatePin = async (pinNumber: string) => {
+  validatePin = async (pinNumber: string, isUpdating?: boolean) => {
     try {
       const dataEncrypted = await SInfo.getItem(PIN_TOKEN, sensitiveInfoOptions);
       const salt = await this.getSalt();
       const key = await AESCryptoStore.generateKey(pinNumber, salt, cost, keySize); //cost = 10000
       const loginHintToken = await AESCryptoStore.decryptData(JSON.parse(dataEncrypted), key);
 
-      return await AuthServices.instance().authorizePushOnly(loginHintToken);
+      const authorizeReponse = await AuthServices.instance().authorizePushOnly(loginHintToken);
+      if (isUpdating && authorizeReponse) {
+        AuthServices.instance().setLoginHintToken(loginHintToken);
+      }
+      return authorizeReponse;
     } catch (error) {
       return error?.response?.data;
     }
   };
 
-  validateBiometric = async () => {
+  validateBiometric = async (isUpdating?: boolean) => {
     try {
       const loginHintToken = await SInfo.getItem(BIO_TOKEN, {
         ...sensitiveInfoOptions,
@@ -141,7 +138,11 @@ class AuthComponentStore {
       if (!loginHintToken) {
         return biometricChangeErrorCode;
       }
-      return await AuthServices.instance().authorizePushOnly(loginHintToken);
+      const authorizeReponse = await AuthServices.instance().authorizePushOnly(loginHintToken);
+      if (isUpdating && authorizeReponse) {
+        AuthServices.instance().setLoginHintToken(loginHintToken);
+      }
+      return authorizeReponse;
     } catch (error) {
       if (error.message === 'Key permanently invalidated') {
         return biometricChangeErrorCode;

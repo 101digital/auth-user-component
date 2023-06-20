@@ -518,13 +518,11 @@ export class AuthServices {
           },
         }
       );
-      console.log('data notifications', response.data);
       if (response.data) {
         badgeNumber = response.data.additionalData?.totalNotView ?? 0;
         return badgeNumber;
       }
     } catch (error) {
-      console.log('ERROR:', error);
       return badgeNumber;
     }
   };
@@ -541,12 +539,10 @@ export class AuthServices {
           },
         }
       );
-      console.log('data notifications list', response.data);
       if (response.data) {
         return response.data;
       }
     } catch (error) {
-      console.log('ERROR:', error);
       return false;
     }
   };
@@ -564,10 +560,8 @@ export class AuthServices {
           },
         }
       );
-      console.log('success Notifcation read', response.data);
       return true;
     } catch (error) {
-      console.log('ERROR:', error);
       return false;
     }
   };
@@ -635,9 +629,6 @@ export class AuthServices {
           },
         });
       if (responseAuth) {
-        if (token) {
-          this.setLoginHintToken(token);
-        }
         return responseAuth.data;
       }
     } catch (error) {

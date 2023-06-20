@@ -19,7 +19,7 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
 
   const validatePINNumber = async () => {
     setIsLoadingStoringPIN(true);
-    const isValid = await authComponentStore.validatePin(value);
+    const isValid = await authComponentStore.validatePin(value, true);
     if (isValid) {
       otpRef.current?.clearInput();
       onContinue();
@@ -45,7 +45,7 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
   }, []);
 
   useEffect(() => {
-      otpRef.current?.setValue(value);
+    otpRef.current?.setValue(value);
   }, [value]);
 
   return (
@@ -60,27 +60,30 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
             focusCellContainerStyle: { borderBottomColor: '#1EBCE8' },
           }}
         />
-      </View><NumberPadComponent onPress={(e: string | number) => {
-        switch (e) {
-          case 'r':
-            const newStr = value.substring(0, value.length - 1);
-            setValue(newStr);
-            break;
-          case 'o':
-            if (value.length < 6) {
-              setValue(value + '0');
-            }
-            break;
-          case 's':
-            validatePINNumber();
-            break;
-          default:
-            if (value.length < 6) {
-              setValue(value + e);
-            }
-        }
-      } } isDisabled={
-        value.length < 6}/>
+      </View>
+      <NumberPadComponent
+        onPress={(e: string | number) => {
+          switch (e) {
+            case 'r':
+              const newStr = value.substring(0, value.length - 1);
+              setValue(newStr);
+              break;
+            case 'o':
+              if (value.length < 6) {
+                setValue(value + '0');
+              }
+              break;
+            case 's':
+              validatePINNumber();
+              break;
+            default:
+              if (value.length < 6) {
+                setValue(value + e);
+              }
+          }
+        }}
+        isDisabled={value.length < 6}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginTop: 56
+    marginTop: 56,
   },
 });
 
