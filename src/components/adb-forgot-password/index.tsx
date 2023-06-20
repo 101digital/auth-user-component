@@ -76,7 +76,8 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
     <View style={styles.container}>
       <Formik
         innerRef={formikRef}
-        enableReinitialize={true}
+        validateOnBlur={true}
+        validateOnChange={false}
         initialValues={InputIdData.empty()}
         onSubmit={handleOnValidation}
         validationSchema={InputIdSchema(i18n)}
