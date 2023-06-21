@@ -71,6 +71,10 @@ class AuthComponentStore {
 
   setPin = async (pinNumber: string) => {
     let newLoginHintToken = AuthServices.instance().getLoginHintToken();
+    if (!newLoginHintToken || newLoginHintToken.length === 0) {
+      const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
+      newLoginHintToken = loginHintToken;
+    }
 
     if (newLoginHintToken) {
       const salt = await this.getSalt();
@@ -86,6 +90,11 @@ class AuthComponentStore {
 
   setBiometric = async () => {
     let newLoginHintToken = AuthServices.instance().getLoginHintToken();
+    if (!newLoginHintToken || newLoginHintToken.length === 0) {
+      const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
+      newLoginHintToken = loginHintToken;
+    }
+
     if (newLoginHintToken) {
       try {
         await SInfo.setItem(BIO_TOKEN, newLoginHintToken, {
