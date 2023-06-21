@@ -7,6 +7,7 @@ import { AuthComponentConfig, PKCE, Profile } from '../types';
 import { authorize } from 'react-native-app-auth';
 import { PASSPORT } from '../types';
 import pkceChallenge from 'react-native-pkce-challenge';
+import { Platform } from 'react-native';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
@@ -510,7 +511,9 @@ export class AuthServices {
     let badgeNumber: number = 0;
     try {
       const response = await axios.get(
-        `${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM`,
+        `${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM&platform=${
+          Platform.OS === 'android' ? 'Android' : 'IOS'
+        }`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -531,7 +534,9 @@ export class AuthServices {
     const { notificationBaseUrl, accessToken } = this._configs!;
     try {
       const response = await axios.get(
-        `${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM&pageSize=${pageSize}&pageNumber=${pageNumber}`,
+        `${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM&pageSize=${pageSize}&pageNumber=${pageNumber}&platform=${
+          Platform.OS === 'android' ? 'Android' : 'IOS'
+        }`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
