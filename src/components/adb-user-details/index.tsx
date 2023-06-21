@@ -8,7 +8,7 @@ import {
   ArrowDownIcon,
   ThemeContext,
   BSOption,
-  useADBCurrencyFormat,
+  useADBCurrencyFormat
 } from 'react-native-theme-component';
 import { Formik, FormikProps } from 'formik';
 import { colors, fonts } from '../../assets';
@@ -16,7 +16,7 @@ import { AuthContext } from '../../auth-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { UserDetailsData, UserDetailsSchema } from './model';
 import remoteConfig from '@react-native-firebase/remote-config';
-import { AccountOriginationService } from 'account-origination-component';
+import { AccountOriginationService } from 'account-origination-component/src/service/onboarding-service';
 
 type ADBUserDetailsScreenComponentProps = {
   onSuccess: () => void;
@@ -27,7 +27,7 @@ const onboardingService = AccountOriginationService.instance();
 
 const ADBUserDetailsScreenComponent = ({
   onSuccess,
-  onFailed,
+  onFailed
 }: ADBUserDetailsScreenComponentProps) => {
   const { i18n } = useContext(ThemeContext);
   const { profile, isUpdatingProfile, updateProfile } = useContext(AuthContext);
@@ -54,7 +54,7 @@ const ADBUserDetailsScreenComponent = ({
         const listBSData = response.data.map((c: any) => ({
           id: c.id,
           value: c.name,
-          type: 'String',
+          type: 'String'
         }));
         setBSData({
           items: listBSData,
@@ -62,7 +62,7 @@ const ADBUserDetailsScreenComponent = ({
           isHaveSearchBox: true,
           name: 'occupation',
           searchBoxPlaceholder: 'Search',
-          type: 'OptionsList',
+          type: 'OptionsList'
         });
       }
     } catch {
@@ -75,7 +75,7 @@ const ADBUserDetailsScreenComponent = ({
     setIsLoadingValues(true);
     remoteConfig()
       .fetchAndActivate()
-      .then((value) => {
+      .then(value => {
         const metadata: any = remoteConfig().getValue('OnboardingDataFields');
         if (metadata && metadata._value) {
           const jsonData = JSON.parse(metadata._value);
@@ -85,7 +85,7 @@ const ADBUserDetailsScreenComponent = ({
         }
         setIsLoadingValues(false);
       })
-      .catch((e) => {
+      .catch(e => {
         setIsLoadingValues(false);
       });
     setIsShowBottomSheet(true);
@@ -132,7 +132,7 @@ const ADBUserDetailsScreenComponent = ({
         isHaveSearchBox: true,
         name: 'city',
         searchBoxPlaceholder: 'Search',
-        type: 'OptionsList',
+        type: 'OptionsList'
       };
 
       const response = await onboardingService.getCities(postCode);
@@ -147,7 +147,7 @@ const ADBUserDetailsScreenComponent = ({
             id: c.id,
             value: c.locationName,
             key: c.countryId,
-            type: 'String',
+            type: 'String'
           }));
         } else {
           formikRef.current.setFieldError('postcode', 'Invalid post code');
@@ -196,7 +196,7 @@ const ADBUserDetailsScreenComponent = ({
         innerRef={formikRef}
         validationSchema={UserDetailsSchema(i18n)}
         initialValues={UserDetailsData.empty(profile)}
-        onSubmit={async (values) => {
+        onSubmit={async values => {
           const inputedValue = {
             nickName: values.nickName,
             religion: values.religion,
@@ -209,8 +209,8 @@ const ADBUserDetailsScreenComponent = ({
                 postcode: values.postcode,
                 city: values.city,
                 state: values.state,
-                country: 'Malaysia',
-              },
+                country: 'Malaysia'
+              }
             ],
             employmentDetails: [
               {
@@ -218,14 +218,14 @@ const ADBUserDetailsScreenComponent = ({
                 employmentType: values.employmentType,
                 sector: isUnEmployed ? 'Not Application' : values.employmentSector,
                 companyName: isUnEmployed ? '' : values.employerName,
-                occupation: isUnEmployed ? '' : values.occupation,
-              },
+                occupation: isUnEmployed ? '' : values.occupation
+              }
             ],
             creditDetails: [
               {
-                annualIncome: values.annualIncome,
-              },
-            ],
+                annualIncome: values.annualIncome
+              }
+            ]
           };
           const isSuccess = await updateProfile(profile?.userId, inputedValue);
           if (isSuccess) {
@@ -244,7 +244,7 @@ const ADBUserDetailsScreenComponent = ({
               currencyFormated !== `${values.annualIncome}`
             ) {
               setFieldValue('annualIncome', currencyFormated);
-            } else if(values.annualIncome[0] === '.') {
+            } else if (values.annualIncome[0] === '.') {
               setFieldValue('annualIncome', '0.');
             }
           }
@@ -422,11 +422,11 @@ const ADBUserDetailsScreenComponent = ({
                   isShowBottomSheet={isShowBottomSheet}
                   isLoadingValues={isLoadingValues}
                   bsContainerStyle={{
-                    minHeight: 450,
+                    minHeight: 450
                   }}
                   onChangeValue={setSelectedBSValue}
-                  onSearch={(t) => setSearchText(t)}
-                  onSelectValue={(value) => {
+                  onSearch={t => setSearchText(t)}
+                  onSelectValue={value => {
                     setFieldValue(bsData.name, value);
                     setSearchText('');
                     setIsShowBottomSheet(false);
@@ -456,134 +456,134 @@ const ADBUserDetailsScreenComponent = ({
 
 const styles = StyleSheet.create({
   errorSection: {
-    marginTop: 10,
+    marginTop: 10
   },
   container: {
     flex: 1,
     paddingHorizontal: 22,
-    marginTop: 20,
+    marginTop: 20
   },
   header: {
     paddingVertical: 10,
     paddingHorizontal: 5,
-    marginTop: 30,
+    marginTop: 30
   },
   validContainer: {
-    marginTop: 10,
+    marginTop: 10
   },
   validationLabel: {
-    marginLeft: 6,
+    marginLeft: 6
   },
   rowItemValid: {
     marginVertical: 5,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   iconBtn: {
-    marginRight: 10,
+    marginRight: 10
   },
   remainingLabel: {
-    textAlign: 'right',
+    textAlign: 'right'
   },
   verticalSpacing: {
-    height: 15,
+    height: 15
   },
   bottomSection: {
-    marginBottom: 15,
+    marginBottom: 15
   },
   flex: {
-    flex: 1,
+    flex: 1
   },
   rowSpaceBetween: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   buttonAction: {
     padding: 12,
     borderRadius: 10,
     borderWidth: 1,
-    marginBottom: 15,
+    marginBottom: 15
   },
   content: {
     flex: 1,
-    marginLeft: 4,
+    marginLeft: 4
   },
   title: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.semiBold
   },
   subtitle: {
     color: colors.primaryBlack,
-    marginTop: 10,
+    marginTop: 10
   },
   subTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
     fontFamily: fonts.regular,
-    marginTop: 14,
+    marginTop: 14
   },
   cameraDisableContainer: {
     width: '100%',
     alignItems: 'center',
     paddingVertical: 24,
-    paddingHorizontal: 24,
+    paddingHorizontal: 24
   },
   gap16: {
-    height: 16,
+    height: 16
   },
   gap40: {
-    height: 40,
+    height: 40
   },
   gap8: {
-    height: 8,
+    height: 8
   },
   modalsubTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
     fontFamily: fonts.regular,
-    marginTop: 8,
+    marginTop: 8
   },
   loginTitle: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.semiBold
   },
   mainheading: {
     fontFamily: fonts.semiBold,
     fontSize: 16,
-    color: colors.primaryBlack,
+    color: colors.primaryBlack
   },
   subheading: {
-    marginTop: 12,
+    marginTop: 12
   },
   underline: {
     borderBottomColor: colors.underline,
-    marginVertical: 16,
+    marginVertical: 16
   },
   rowInfoFixed: {
     paddingVertical: 5,
     marginVertical: 5,
     backgroundColor: '#F7F7F7',
-    paddingHorizontal: 10,
+    paddingHorizontal: 10
   },
   rowInfoTitle: {
     color: '#1B1B1B',
     fontSize: 16,
-    fontFamily: fonts.medium,
+    fontFamily: fonts.medium
   },
   rowInfoName: {
     color: '#858585',
     fontSize: 12,
-    fontFamily: fonts.regular,
+    fontFamily: fonts.regular
   },
   rowInfoValue: {
     color: '#333333',
     fontSize: 16,
     fontFamily: fonts.regular,
-    marginTop: 10,
-  },
+    marginTop: 10
+  }
 });
 
 export default ADBUserDetailsScreenComponent;
