@@ -14,7 +14,13 @@ import { AuthContext } from '../../auth-context';
 import { Formik } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
-import { ADBButton, ADBInputField, EyesClosedIcon, EyesIcon, ThemeContext } from 'react-native-theme-component';
+import {
+  ADBButton,
+  ADBInputField,
+  EyesClosedIcon,
+  EyesIcon,
+  ThemeContext,
+} from 'react-native-theme-component';
 import { OTP_REQUIRED, PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { RegistrationContext } from 'react-native-register-component';
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
@@ -58,13 +64,12 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const { username, password } = values;
     const _username = username.trim();
     const _password = password.trim();
-    if(isSkipOTPMode) {
+    if (isSkipOTPMode) {
       await adbLoginSingleFactor(_username, _password, true);
       onLoginSuccess();
       return;
     }
-    const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {
-    });
+    const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {});
     if (
       responseVerified?.status === 'Onboarded' ||
       responseVerified?.status === 'Active' ||
@@ -116,48 +121,54 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
               <View style={styles.rowInput}>
                 <ADBInputField
                   name="username"
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   returnKeyType="done"
                   placeholder={'Email'}
                   autoCapitalize="none"
-                  testID='login-user-name-input'
+                  testID="login-user-name-input"
+                  placeholderHint={i18n.t('login_component.example_email') ?? 'example@email.com'}
                 />
               </View>
               <View style={styles.rowInput}>
                 <ADBInputField
                   name="password"
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   returnKeyType="done"
                   secureTextEntry={!isVisiblePassword}
                   placeholder={'Password'}
                   autoCapitalize="none"
+                  placeholderHint={i18n.t('login_component.enter_password') ?? 'Enter password'}
                   suffixIcon={
                     <TouchableOpacity onPress={onToggleVisiblePassword} style={styles.iconBtn}>
                       {!isVisiblePassword ? <EyesClosedIcon /> : <EyesIcon />}
                     </TouchableOpacity>
                   }
-                  testID='login-password-input'
+                  testID="login-password-input"
                 />
               </View>
               <View style={styles.rowBetween}>
-                <TouchableOpacity onPress={onForgotPassword} style={styles.flex} testID='login-forgot-password-button'>
+                <TouchableOpacity
+                  onPress={onForgotPassword}
+                  style={styles.flex}
+                  testID="login-forgot-password-button"
+                >
                   <Text style={styles.forgotPasswordTitle}>{`${'Forgot password'}?`}</Text>
                 </TouchableOpacity>
               </View>
             </View>
             <View
-              style={{
-                marginBottom: marginKeyboard,
-              }}
+            // style={{
+            //   marginBottom: marginKeyboard,
+            // }}
             >
               <ADBButton
                 isLoading={isLoading}
                 label={i18n.t('common.lbl_continue') ?? 'Continue'}
                 onPress={submitForm}
                 disabled={values.password.length < 8 || values.username.length === 0}
-                testId='login-continue-button'
+                testId="login-continue-button"
               />
             </View>
           </>
@@ -230,7 +241,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordTitle: {
     fontSize: 12,
-    fontFamily: fonts.OutfitSemiBold
+    fontFamily: fonts.OutfitSemiBold,
   },
   helpTitle: {
     fontSize: 14,
