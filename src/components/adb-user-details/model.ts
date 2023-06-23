@@ -37,45 +37,87 @@ export class UserDetailsData {
   }
 }
 
-export const UserDetailsSchema = (i18n: any) =>
-  Yup.object().shape({
-    nickName: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-      .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
-    religion: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    maritalStatus: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    line1: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    postcode: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    city: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    state: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    employmentType: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    employmentSector: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    employerName: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-      .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('user_name.invalid_name') ?? 'Invalid name'),
-    occupation: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-    annualIncome: Yup.string()
-      .trim()
-      .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-      .matches(/^[0-9,.]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
-  });
+export const validationSchema = (isUnEmployed: boolean, i18n: any) => {
+  if(!isUnEmployed) {
+    return Yup.object().shape({
+      nickName: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
+        .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+      religion: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      maritalStatus: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      line1: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      postcode: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      city: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      state: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      employmentType: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      employmentSector: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      employerName: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
+        .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('user_name.invalid_name') ?? 'Invalid name'),
+      occupation: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      annualIncome: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
+        .matches(/^[0-9,.]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+    });
+  } else {
+    return Yup.object().shape({
+      nickName: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
+        .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+      religion: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      maritalStatus: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      line1: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      postcode: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      city: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      state: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      employmentType: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      employmentSector: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      annualIncome: Yup.string()
+        .trim()
+        .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
+        .matches(/^[0-9,.]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+    });
+  }
+  
+}
+
+
+  export const personalDetailsSchema = validationSchema;
