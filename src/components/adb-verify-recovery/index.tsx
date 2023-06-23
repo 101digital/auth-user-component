@@ -15,9 +15,7 @@ export interface IRecovery {
 const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) => {
   const { onContinue, onError } = props;
   const { i18n } = useContext(ThemeContext);
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const formikRef = useRef<FormikProps<InputIdData>>(null);
-  const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
 
   const handleOnContinue = async (values: InputIdData) => {
     Keyboard.dismiss();
@@ -29,21 +27,6 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
     }
     onContinue(_recoveryCode);
   };
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -72,9 +55,6 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
                 </View>
               </View>
               <View
-                style={{
-                  marginBottom: marginKeyboard,
-                }}
               >
                 <ADBButton
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}

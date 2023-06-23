@@ -107,16 +107,24 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
     onError();
   };
 
+
   return (
     <>
       <Formik
         innerRef={formikRef}
         enableReinitialize={true}
         initialValues={ADBChangePasswordData.empty()}
+        validateOnMount={true}
         validationSchema={ADBChangePasswordSchema(i18n)}
         onSubmit={(values) => {}}
       >
         {({ setFieldTouched, errors, values }) => {
+          const isDisabledSubmit = Object.keys(errors).length !== 0 ||
+            values.confirmNew !== values.createNew ||
+            values.confirmNew == '' ||
+            !validationCheck(values.confirmNew) ||
+            !validationCheck(values.createNew);
+
           return (
             <>
               <View style={[styles.container]}>
@@ -124,6 +132,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   name={'createNew'}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
+                  isFocusError={isDisabledSubmit}
                   onBlur={() => {
                     setFieldTouched('createNew');
                   }}
@@ -140,11 +149,21 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                       isVisible={showNewPass}
                     />
                   }
+                  errorSuffixIcon={
+                    <PasswordMask
+                      onPress={() => {
+                        setShowNewPass(!showNewPass);
+                      }}
+                      isVisible={showNewPass}
+                      isError={true}
+                    />
+                  }
                 />
                 <View style={styles.height16} />
                 <ADBInputField
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
+                  isFocusError={isDisabledSubmit}
                   name={'confirmNew'}
                   onBlur={() => {
                     setFieldTouched('confirmNew');
@@ -160,6 +179,15 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                         setShowConfirmPass(!showConfirmPass);
                       }}
                       isVisible={showConfirmPass}
+                    />
+                  }
+                  errorSuffixIcon={
+                    <PasswordMask
+                      onPress={() => {
+                        setShowNewPass(!showNewPass);
+                      }}
+                      isVisible={showNewPass}
+                      isError={true}
                     />
                   }
                 />
@@ -217,13 +245,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                 <ADBButton
                   label={i18n.t('change_password.btn_continue') ?? 'Continue'}
                   isLoading={loading}
-                  disabled={
-                    Object.keys(errors).length !== 0 ||
-                    values.confirmNew !== values.createNew ||
-                    values.confirmNew == '' ||
-                    !validationCheck(values.confirmNew) ||
-                    !validationCheck(values.createNew)
-                  }
+                  disabled={isDisabledSubmit}
                   onPress={() => changePassword(values)}
                 />
               </View>
@@ -231,23 +253,6 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
           );
         }}
       </Formik>
-      {/* <BottomSheetModal isVisible={errorModal}>
-        <View style={styles.errorContainer}>
-          <View style={styles.height30} />
-          <Text style={[styles.title, styles.alignCenter]}>{errorTitle}</Text>
-          <View style={styles.height16} />
-          <Text style={[styles.subTitle, styles.alignCenter]}>
-            {i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
-          </Text>
-          <View style={styles.height32} />
-          <ADBButton
-            label={i18n.t('common.lbl_done') ?? 'Done'}
-            onPress={() => {
-              setErrorModal(false);
-            }}
-          />
-        </View>
-      </BottomSheetModal> */}
     </>
   );
 };

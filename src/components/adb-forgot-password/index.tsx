@@ -20,9 +20,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const { validateUserForgotPassword, isRecoveringUserPassword } = useContext(AuthContext);
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const formikRef = useRef<FormikProps<InputIdData>>(null);
-  const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
 
   const onShowInvalidIDNumber = () => {
     onErrorValidateID(i18n.t('id_number.error_invalid_id') ?? 'Invalid ID number.');
@@ -56,21 +54,6 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
       setErrorModal(true);
     }
   };
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -110,9 +93,6 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                 </View>
               </View>
               <View
-                style={{
-                  marginBottom: marginKeyboard,
-                }}
               >
                 <ADBButton
                   isLoading={isRecoveringUserPassword}
