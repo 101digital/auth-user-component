@@ -92,8 +92,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                   />
                 </View>
               </View>
-              <View
-              >
+              <View>
                 <ADBButton
                   isLoading={isRecoveringUserPassword}
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}
