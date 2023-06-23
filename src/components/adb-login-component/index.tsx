@@ -67,6 +67,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     if (isSkipOTPMode) {
       await adbLoginSingleFactor(_username, _password, true);
       onLoginSuccess();
+      setIsLoading(false);
       return;
     }
     const responseVerified = await verifyExistedUserByEmail(_username, (_err: Error) => {});

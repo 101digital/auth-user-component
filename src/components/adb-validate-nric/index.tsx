@@ -36,9 +36,10 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
       onShowInvalidIDNumber();
       return;
     }
+
     if (
-      profile?.kycDetails?.idNumber === id ||
-      profile?.kycDetails?.altIdNumber === id
+      profile?.kycDetails?.idNumber?.toLowerCase() === id.toLowerCase() ||
+      profile?.kycDetails?.altIdNumber?.toLowerCase() === id.toLowerCase()
     ) {
       onVerifyNRICSuccess();
     } else {

@@ -82,7 +82,6 @@ class AuthComponentStore {
       const encryptedData = await AESCryptoStore.encryptData(newLoginHintToken, key);
 
       await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
-      AuthServices.instance().setLoginHintToken('');
     } else {
       return false;
     }
@@ -103,8 +102,6 @@ class AuthComponentStore {
           showModal: true, //add this key
           kSecAccessControl: 'kSecAccessControlBiometryCurrentSet', // optional - Add support for FaceID
         });
-
-        AuthServices.instance().setLoginHintToken('');
         return true;
       } catch (error) {
         return false;
