@@ -15,6 +15,7 @@ import { Formik } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import {
+  ADBAlertModal,
   ADBButton,
   ADBInputField,
   EyesClosedIcon,
@@ -175,28 +176,19 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
           </>
         )}
       </Formik>
-      <BottomSheetModal isVisible={errorModal}>
-        <View style={styles.cameraDisableContainer}>
-          <AlertCircleIcon size={72} />
-          <View style={styles.gap40} />
-          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.lbl_account_locked') ??
-              `Oops! Your account is temporarily locked`}
-          </Text>
-          <View style={styles.gap8} />
-          <Text style={[styles.subTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.lbl_entered_wrong_password') ??
-              `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
-          </Text>
-          <View style={{ height: 32 }} />
-          <ADBButton
-            label={i18n.t('common.lbl_done') ?? 'Done'}
-            onPress={() => {
-              setErrorModal(false);
-            }}
-          />
-        </View>
-      </BottomSheetModal>
+      <ADBAlertModal
+        title={i18n.t('login_component.lbl_account_locked') ??
+        `Oops! Your account is temporarily locked`}
+        message={i18n.t('login_component.lbl_entered_wrong_password') ??
+        `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
+        btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
+        isVisible={errorModal}
+        onConfirmBtnPress={() => {
+          setErrorModal(false);
+        }}
+        onBackdropPress={() => 
+          setErrorModal(false)}
+      />
     </View>
   );
 };
