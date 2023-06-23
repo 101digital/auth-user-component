@@ -392,7 +392,6 @@ export const useAuthContextValue = (): AuthContextData => {
           await AuthServices.instance().obtainTokenSingleFactor(
             resAfterValidate.authorizeResponse.code
           );
-          console.log('adbLoginSingleFactor => setSessionId', resAfterValidate.session.id);
           const { data } = await AuthServices.instance().fetchProfile();
           await authComponentStore.storeIsUserLogged(true);
           await authComponentStore.storeUserName(username);
@@ -822,7 +821,6 @@ export const useAuthContextValue = (): AuthContextData => {
         const response = await AuthServices.instance().selectDevice(selectedDeviceId, _flowId);
         return true;
       } catch (error) {
-        console.log('error');
       } finally {
         setIsReselectingDevice(false);
       }
