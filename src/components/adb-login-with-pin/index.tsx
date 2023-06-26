@@ -1,10 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  NativeModules,
-} from 'react-native';
+import { StyleSheet, View, Text, NativeModules } from 'react-native';
 import {
   ADBButton,
   ImageIcon,
@@ -20,17 +15,18 @@ import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { colors } from '../../assets';
 import { AuthServices } from 'react-native-auth-component';
-import { AeonIcon } from "@/assets/icons";
+import { AeonIcon } from '@/assets/icons';
 
 type ADBLoginWithPINProps = {
   onFailedVerified: () => void;
   onSuccessVerified: () => void;
   onError: (err: Error) => void;
   isSkipSMSOTP?: boolean;
+  onShowLockDownModal: () => void;
 };
 
 const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
-  const { onFailedVerified, onSuccessVerified, onError } = prop;
+  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal } = prop;
   const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
   const { i18n } = useContext(ThemeContext);
   const otpRef = useRef<OTPFieldRef>();
@@ -38,15 +34,15 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const [isNotMatched, setIsNotMatched] = useState<boolean>(false);
   const [retryCount, setRetryCount] = useState<number>(0);
   const { PingOnesdkModule } = NativeModules;
-  const [errorModal, setErrorModal] = useState(false);
+  // const [errorModal, setErrorModal] = useState(false);
   const [biometricStatus, setBiometricStatus] = useState(false);
   const [biometricAttempt, setBiometricAttempt] = useState(0);
 
   const checkBiometricStatus = async () => {
     const isEnabled = await authComponentStore.getIsEnableBiometric();
-    if(isEnabled && JSON.parse(isEnabled)) {
+    if (isEnabled && JSON.parse(isEnabled)) {
       setBiometricStatus(true);
-    }else{
+    } else {
       setBiometricStatus(false);
     }
   };
@@ -73,7 +69,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         setIsNotMatched(false);
         setRetryCount(0);
         if (authorizeResponse.error?.code === PASSWORD_LOCKED_OUT) {
-          setErrorModal(true);
+          onShowLockDownModal();
           return;
         } else {
           onError && onError(authorizeResponse.error);
@@ -101,7 +97,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
       } else if (authorizeResponse.error && authorizeResponse.error.code) {
         setBiometricAttempt(biometricAttempt + 1);
         if (authorizeResponse.error.code === 'PASSWORD_LOCKED_OUT') {
-          setErrorModal(true);
+          onShowLockDownModal();
         } else if (authorizeResponse.error.code === 'BIOMETRIC_CHANGE') {
           setIsSignedIn(false);
         }
@@ -140,10 +136,10 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
             'PIN is incorrect. You have %s remaining attempts.'
           ).replace('%s', 3 - retryCount)}
           isProcessing={isLoading}
-          clearError={()=>{}}
+          clearError={() => {}}
         />
       </View>
-      <BottomSheetModal isVisible={errorModal}>
+      {/* <BottomSheetModal isVisible={errorModal}>
         <View style={styles.cameraDisableContainer}>
           <AlertCircleIcon size={72} />
           <View style={styles.gap40} />
@@ -163,7 +159,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
             }}
           />
         </View>
-      </BottomSheetModal>
+      </BottomSheetModal> */}
     </View>
   );
 };
@@ -172,7 +168,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 22,
-    backgroundColor:colors.lightWhite
+    backgroundColor: colors.lightWhite,
   },
   header: {
     alignItems: 'center',
