@@ -101,6 +101,11 @@ class AuthComponentStore {
           touchID: true, //add this key
           showModal: true, //add this key
           kSecAccessControl: 'kSecAccessControlBiometryCurrentSet', // optional - Add support for FaceID
+          strings: {
+            description: 'Do you want to allow AEON Bank to use Finger Print ID?',
+            header:
+              'AEON Bank uses Finger Print ID to restrict unauthorized users from accessing the app.',
+          }
         });
         return true;
       } catch (error) {
@@ -135,9 +140,9 @@ class AuthComponentStore {
         touchID: true,
         showModal: true,
         strings: {
-          description: 'Do you want to allow {ADB} to use Finger Print ID?',
+          description: 'Do you want to allow AEON Bank to use Finger Print ID?',
           header:
-            '{ADB} uses Finger Print ID to restrict unauthorized users from accessing the app.',
+            'AEON Bank uses Finger Print ID to restrict unauthorized users from accessing the app.',
         },
         kSecUseOperationPrompt: 'We need your permission to retrieve encrypted data',
       });
