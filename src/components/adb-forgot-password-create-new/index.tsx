@@ -107,7 +107,6 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
     onError();
   };
 
-
   return (
     <>
       <Formik
@@ -115,11 +114,11 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
         enableReinitialize={true}
         initialValues={ADBChangePasswordData.empty()}
         validateOnMount={true}
-        validationSchema={ADBChangePasswordSchema(i18n)}
         onSubmit={(values) => {}}
       >
-        {({ setFieldTouched, errors, values }) => {
-          const isDisabledSubmit = Object.keys(errors).length !== 0 ||
+        {({ setFieldTouched, errors, values, dirty }) => {
+          const isDisabledSubmit =
+            Object.keys(errors).length !== 0 ||
             values.confirmNew !== values.createNew ||
             values.confirmNew == '' ||
             !validationCheck(values.confirmNew) ||
@@ -130,7 +129,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
               <View style={[styles.container]}>
                 <ADBInputField
                   name={'createNew'}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   isFocusError={isDisabledSubmit}
                   onBlur={() => {
@@ -162,11 +161,13 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                 />
                 <View style={styles.height16} />
                 <ADBInputField
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   isFocusError={isDisabledSubmit}
                   name={'confirmNew'}
-                  placeholderHint={i18n.t('password.confirm_password_hint') ?? 'Enter same password'}
+                  placeholderHint={
+                    i18n.t('password.confirm_password_hint') ?? 'Enter same password'
+                  }
                   onBlur={() => {
                     setFieldTouched('confirmNew');
                   }}
@@ -195,8 +196,13 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                 />
                 <View>
                   <View style={styles.row}>
-                    {checkSpecialCharacter(values.createNew) ? 
-                      <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
+                    {!dirty ? (
+                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                    ) : checkSpecialCharacter(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : (
+                      <NonCheckIcon size={18} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_special_char') ??
@@ -204,8 +210,13 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                     </Text>
                   </View>
                   <View style={styles.row}>
-                    {checkAtLeast1upperandLower(values.createNew) ? 
-                      <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
+                    {!dirty ? (
+                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                    ) : checkAtLeast1upperandLower(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : (
+                      <NonCheckIcon size={18} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_lower_uper') ??
@@ -213,16 +224,26 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                     </Text>
                   </View>
                   <View style={styles.row}>
-                    {checkAtLeast1digit(values.createNew) ? 
-                      <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
+                    {!dirty ? (
+                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                    ) : checkAtLeast1digit(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : (
+                      <NonCheckIcon size={18} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_number') ?? 'At least one number'}
                     </Text>
                   </View>
                   <View style={styles.row}>
-                    {checkIs8Character(values.createNew) ? 
-                      <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
+                    {!dirty ? (
+                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                    ) : checkIs8Character(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : (
+                      <NonCheckIcon size={18} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_be_at_least_8_char') ??
@@ -230,11 +251,15 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                     </Text>
                   </View>
                   <View style={styles.row}>
-                    {values.confirmNew !== values.createNew ||
-                    values.confirmNew.trim() === '' ||
-                    values.createNew.trim() === ''
-                      ? <NonCheckIcon size={18} /> : 
-                      <CheckIcon size={18} />}
+                    {!dirty ? (
+                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                    ) : values.confirmNew !== values.createNew ||
+                      values.confirmNew.trim() === '' ||
+                      values.createNew.trim() === '' ? (
+                      <NonCheckIcon size={18} />
+                    ) : (
+                      <CheckIcon size={18} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_both_password_match') ?? 'Both passwords match'}
