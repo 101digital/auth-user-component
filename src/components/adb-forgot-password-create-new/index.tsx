@@ -139,6 +139,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   placeholder={
                     i18n.t('change_password.lbl_title_create_new_password') ?? 'Create new password'
                   }
+                  placeholderHint={i18n.t('password.password_hint') ?? 'Enter password'}
                   secureTextEntry={showNewPass}
                   autoCapitalize="none"
                   suffixIcon={
@@ -165,6 +166,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   inputType={InputTypeEnum.MATERIAL}
                   isFocusError={isDisabledSubmit}
                   name={'confirmNew'}
+                  placeholderHint={i18n.t('password.confirm_password_hint') ?? 'Enter same password'}
                   onBlur={() => {
                     setFieldTouched('confirmNew');
                   }}
@@ -184,9 +186,9 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   errorSuffixIcon={
                     <PasswordMask
                       onPress={() => {
-                        setShowNewPass(!showNewPass);
+                        setShowConfirmPass(!showConfirmPass);
                       }}
-                      isVisible={showNewPass}
+                      isVisible={showConfirmPass}
                       isError={true}
                     />
                   }

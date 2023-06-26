@@ -51,6 +51,7 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
                     placeholder={i18n.t('login_component.recovery_code') ?? 'Recovery code'}
                     autoCapitalize="none"
                     keyboardType={'default'}
+                    placeholderHint={i18n.t('login_component.recovery_code_hint') ?? 'ADB12345678'}
                   />
                 </View>
               </View>
