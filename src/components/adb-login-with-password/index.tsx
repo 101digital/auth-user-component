@@ -29,7 +29,7 @@ const ADBLoginWithPasswordComponent = ({
   onFailedVerified,
   onInvalidPassword,
   onResetPassword,
-  onShowLockDownModal,
+  onShowLockDownModal
 }: ADBLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
@@ -53,8 +53,7 @@ const ADBLoginWithPasswordComponent = ({
         const response = await adbLoginSingleFactor(userName, formikRef.current?.values.password);
         if (response) {
           if (response?.error?.code === PASSWORD_LOCKED_OUT) {
-            formikRef.current?.setFieldError(
-              'password',
+            formikRef.current?.setFieldError('password',
               i18n.t('login_component.incorrect_password') ?? 'Forgot password'
             );
             onShowLockDownModal();
@@ -102,15 +101,7 @@ const ADBLoginWithPasswordComponent = ({
                       onPress={() => setIsVisiblePassword(!isVisiblePassword)}
                       style={styles.iconBtn}
                     >
-                      {!isVisiblePassword ? (
-                        <EyesClosedIcon
-                          color={showIncorrectPassword ? themeColors.errorColor : undefined}
-                        />
-                      ) : (
-                        <EyesIcon
-                          color={showIncorrectPassword ? themeColors.errorColor : undefined}
-                        />
-                      )}
+                      {!isVisiblePassword ? <EyesClosedIcon color={showIncorrectPassword ? themeColors.errorColor : undefined} /> : <EyesIcon color={showIncorrectPassword ? themeColors.errorColor : undefined}  />}
                     </TouchableOpacity>
                   }
                 />

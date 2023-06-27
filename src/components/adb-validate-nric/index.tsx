@@ -15,9 +15,7 @@ type ADBInputIdProps = {
 const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
   const { i18n } = useContext(ThemeContext);
   const { profile } = useContext(AuthContext);
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const formikRef = useRef<FormikProps<InputIdData>>(null);
-  const marginKeyboard = keyboardHeight > 0 && Platform.OS === 'ios' ? keyboardHeight : 15;
 
   const { onVerifyNRICSuccess, onError, isLoading } = prop;
 
@@ -28,7 +26,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
   const validateIdNumber = async (id: string) => {
     Keyboard.dismiss();
     try {
-      if(id.match(/^[^0-9a-zA-Z]+$/)) {
+      if (id.match(/^[^0-9a-zA-Z]+$/)) {
         onShowInvalidIDNumber();
         return;
       }
@@ -47,20 +45,6 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
     }
   };
 
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
   return (
     <View style={styles.container}>
       <Formik
@@ -80,18 +64,16 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                   name={'userId'}
                   placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
                   maxLength={12}
-                  testID='validate-id-input'
+                  testID="validate-id-input"
                 />
               </View>
-              <View style={{ marginBottom: marginKeyboard }}>
-                <ADBButton
-                  label={i18n.t('common.lbl_continue')}
-                  onPress={submitForm}
-                  isLoading={isLoading}
-                  disabled={values.userId.length === 0}
-                  testId='validate-id-continue-button'
-                />
-              </View>
+              <ADBButton
+                label={i18n.t('common.lbl_continue')}
+                onPress={submitForm}
+                isLoading={isLoading}
+                disabled={values.userId.length === 0}
+                testId="validate-id-continue-button"
+              />
             </>
           );
         }}

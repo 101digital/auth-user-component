@@ -1,5 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Text, NativeModules } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  NativeModules,
+} from 'react-native';
 import {
   ADBButton,
   ImageIcon,
@@ -15,7 +20,7 @@ import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { colors } from '../../assets';
 import { AuthServices } from 'react-native-auth-component';
-import { AeonIcon } from '@/assets/icons';
+import { AeonIcon } from "@/assets/icons";
 
 type ADBLoginWithPINProps = {
   onFailedVerified: () => void;
@@ -40,9 +45,9 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
 
   const checkBiometricStatus = async () => {
     const isEnabled = await authComponentStore.getIsEnableBiometric();
-    if (isEnabled && JSON.parse(isEnabled)) {
+    if(isEnabled && JSON.parse(isEnabled)) {
       setBiometricStatus(true);
-    } else {
+    }else{
       setBiometricStatus(false);
     }
   };
@@ -136,7 +141,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
             'PIN is incorrect. You have %s remaining attempts.'
           ).replace('%s', 3 - retryCount)}
           isProcessing={isLoading}
-          clearError={() => {}}
+          clearError={()=>{}}
         />
       </View>
       {/* <BottomSheetModal isVisible={errorModal}>
@@ -168,7 +173,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 22,
-    backgroundColor: colors.lightWhite,
+    backgroundColor:colors.lightWhite
   },
   header: {
     alignItems: 'center',

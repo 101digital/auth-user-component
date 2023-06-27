@@ -49,9 +49,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const [isLoading, setIsLoading] = useState(false);
   const { adbLoginSingleFactor, adbLogin, errorSignIn } = useContext(AuthContext);
   const { verifyExistedUserByEmail } = useContext(RegistrationContext);
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
-  const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
 
   useEffect(() => {
     if (errorSignIn) {
@@ -94,21 +92,6 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     onLoginRestrict(responseVerified?.status);
     return;
   };
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   const onToggleVisiblePassword = () => {
     setIsVisiblePassword(!isVisiblePassword);
@@ -177,17 +160,19 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
         )}
       </Formik>
       <ADBAlertModal
-        title={i18n.t('login_component.lbl_account_locked') ??
-        `Oops! Your account is temporarily locked`}
-        message={i18n.t('login_component.lbl_entered_wrong_password') ??
-        `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
+        title={
+          i18n.t('login_component.lbl_account_locked') ?? `Oops! Your account is temporarily locked`
+        }
+        message={
+          i18n.t('login_component.lbl_entered_wrong_password') ??
+          `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`
+        }
         btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
         isVisible={errorModal}
         onConfirmBtnPress={() => {
           setErrorModal(false);
         }}
-        onBackdropPress={() => 
-          setErrorModal(false)}
+        onBackdropPress={() => setErrorModal(false)}
       />
     </View>
   );
