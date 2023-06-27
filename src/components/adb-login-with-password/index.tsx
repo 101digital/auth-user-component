@@ -6,6 +6,7 @@ import {
   ADBButton,
   EyesClosedIcon,
   EyesIcon,
+  useThemeColors,
 } from 'react-native-theme-component';
 import { Formik } from 'formik';
 import { colors, fonts } from '../../assets';
@@ -13,8 +14,6 @@ import { AuthContext } from '../../auth-context/context';
 import authComponentStore from '../../services/local-store';
 import CookieManager from '@react-native-cookies/cookies';
 import { useIsFocused } from '@react-navigation/native';
-import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
-import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
@@ -22,25 +21,23 @@ type ADBLoginWithPasswordProps = {
   onSuccessVerified: () => void;
   onFailedVerified: () => void;
   onInvalidPassword: () => void;
-  isEdit: boolean;
   onResetPassword: () => void;
-  onExits: () => void;
+  onShowLockDownModal: () => void;
 };
 const ADBLoginWithPasswordComponent = ({
   onSuccessVerified,
   onFailedVerified,
   onInvalidPassword,
-  isEdit = false,
   onResetPassword,
-  onExits
+  onShowLockDownModal
 }: ADBLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
   const { adbLoginSingleFactor, errorSignIn, isSigning, setIsSignedIn } = useContext(AuthContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
+  const themeColors = useThemeColors();
   const formikRef = useRef(null);
-  const [errorModal, setErrorModal] = useState(false);
-  const [passwordLock, setPasswordLock] = useState('');
+  const [showIncorrectPassword, setShowIncorrectPassword] = useState<boolean>(false);
 
   useEffect(() => {
     if (errorSignIn) {
@@ -56,11 +53,12 @@ const ADBLoginWithPasswordComponent = ({
         const response = await adbLoginSingleFactor(userName, formikRef.current?.values.password);
         if (response) {
           if (response?.error?.code === PASSWORD_LOCKED_OUT) {
-            setErrorModal(true);
-            setPasswordLock(
-              i18n.t('login_component.password_lock') ??
-                'You have 0 more tries until your account is locked.'
+            formikRef.current?.setFieldError('password',
+              i18n.t('login_component.incorrect_password') ?? 'Forgot password'
             );
+            onShowLockDownModal();
+            setShowIncorrectPassword(true);
+            return;
           } else {
             onSuccessVerified();
           }
@@ -97,20 +95,16 @@ const ADBLoginWithPasswordComponent = ({
                   name={'password'}
                   secureTextEntry={!isVisiblePassword}
                   placeholder={'Password'}
+                  onChange={() => setShowIncorrectPassword(false)}
                   suffixIcon={
                     <TouchableOpacity
                       onPress={() => setIsVisiblePassword(!isVisiblePassword)}
                       style={styles.iconBtn}
                     >
-                      {!isVisiblePassword ? <EyesClosedIcon /> : <EyesIcon />}
+                      {!isVisiblePassword ? <EyesClosedIcon color={showIncorrectPassword ? themeColors.errorColor : undefined} /> : <EyesIcon color={showIncorrectPassword ? themeColors.errorColor : undefined}  />}
                     </TouchableOpacity>
                   }
                 />
-                {passwordLock !== '' && (
-                  <View style={styles.errorSection}>
-                    <Text>{passwordLock}</Text>
-                  </View>
-                )}
                 <TouchableOpacity onPress={onResetPassword}>
                   <Text style={styles.forgetPasswordLabel}>{`${
                     i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
@@ -127,29 +121,6 @@ const ADBLoginWithPasswordComponent = ({
           );
         }}
       </Formik>
-      <BottomSheetModal isVisible={errorModal}>
-        <View style={styles.cameraDisableContainer}>
-          <AlertCircleIcon size={72} />
-          <View style={styles.gap40} />
-          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.lbl_account_locked') ??
-              `Oops! Your account is temporarily locked`}
-          </Text>
-          <View style={styles.gap8} />
-          <Text style={[styles.modalsubTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.lbl_entered_wrong_password') ??
-              `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
-          </Text>
-          <View style={{ height: 32 }} />
-          <ADBButton
-            label={i18n.t('login_component.btn_done') ?? 'Done'}
-            onPress={() => {
-              setErrorModal(false);
-              onExits();
-            }}
-          />
-        </View>
-      </BottomSheetModal>
     </View>
   );
 };
