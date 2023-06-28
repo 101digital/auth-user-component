@@ -25,7 +25,6 @@ import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field'
 
 export interface IADBChangePasswordComponent {
   onPressContinue: () => void;
-  onPasswordSameHistory: () => void;
 }
 const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
   const { i18n } = useContext(ThemeContext);
@@ -36,7 +35,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
   const [successModal, setSuccessModal] = useState(false);
   const [invalidCredModal, setInvalidCredModal] = useState(false);
   const formikRef = useRef(null);
-  const { onPressContinue, onPasswordSameHistory } = prop;
+  const { onPressContinue } = prop;
   const tickIcon = <CheckIcon size={17} />;
   const closeIcon = <CrossIcon size={17} />;
   const { changeUserPassword } = useContext(AuthContext);
@@ -95,7 +94,9 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
           DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY
         )
       ) {
-        onPasswordSameHistory();
+        setErrorTitle(i18n.t('change_password.lbl_create_new_which_not_used') ??
+        'Create a new password that you have never used')
+        setErrorModal(true);
         setLoading(false);
       } else if (`${resp[0].message}`.includes(DEFAULT_ERROR_MESSAGE_INVALID_PROVIDED_PASSWORD)) {
         setInvalidCredModal(true);
@@ -135,7 +136,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   onBlur={() => {
                     setFieldTouched('oldPassword');
                   }}
-                  placeholder={'Enter password'}
+                  placeholder={i18n.t('change_password.pl_current_password') ?? 'Current password'}
                   secureTextEntry={showOldPass}
                   autoCapitalize="none"
                   suffixIcon={
@@ -146,6 +147,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                       isVisible={showOldPass}
                     />
                   }
+                  placeholderHint={i18n.t('change_password.plh_current_password') ?? 'Enter password'}
                 />
                 <View style={styles.height32} />
                 <Text style={styles.subTitle16}>
@@ -162,6 +164,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   placeholder={
                     i18n.t('change_password.lbl_title_create_new_password') ?? 'Create new password'
                   }
+                  placeholderHint={i18n.t('change_password.plh_new_password') ?? 'Enter new password'}
                   secureTextEntry={showNewPass}
                   autoCapitalize="none"
                   suffixIcon={
@@ -184,6 +187,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   placeholder={
                     i18n.t('change_password.lbl_title_confirm_password') ?? 'Confirm new password'
                   }
+                  placeholderHint={i18n.t('change_password.plh_confirm_password') ?? 'Re-enter new password'}
                   secureTextEntry={showConfirmPass}
                   autoCapitalize="none"
                   suffixIcon={
@@ -202,7 +206,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_special_char') ??
-                        'At least one special character'}
+                        'At least one special character.'}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -211,7 +215,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_lower_uper') ??
-                        'At least one uppercase and lowercase letter'}
+                        'At least one uppercase and lowercase letter.'}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -219,7 +223,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                       <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
-                      {i18n.t('change_password.lbl_at_least_one_number') ?? 'At least one number'}
+                      {i18n.t('change_password.lbl_at_least_one_number') ?? 'At least one number.'}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -228,7 +232,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_be_at_least_8_char') ??
-                        'Be at least 8 characters'}
+                        'Be at least 8 characters.'}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -239,7 +243,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                     <CheckIcon size={18} />}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
-                      {i18n.t('change_password.lbl_both_password_match') ?? 'Both passwords match'}
+                      {i18n.t('change_password.lbl_both_password_match') ?? 'Both passwords match.'}
                     </Text>
                   </View>
                 </View>
@@ -248,10 +252,6 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
               <View style={[styles.bottomSection]}>
                 <ADBButton
                   label={i18n.t('change_password.btn_continue') ?? 'Continue'}
-                  containerStyles={{
-                    borderColor: returnColor(errors, values),
-                    backgroundColor: returnColor(errors, values),
-                  }}
                   isLoading={loading}
                   disabled={
                     Object.keys(errors).length !== 0 ||
@@ -271,7 +271,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
 
       <BottomSheetModal isVisible={errorModal}>
         <View style={styles.errorContainer}>
-          <AlertCircleIcon size={55.5} />
+          <AlertCircleIcon width={178} height={165} />
           <View style={styles.height30} />
           <Text style={[styles.title, styles.alignCenter]}>{errorTitle}</Text>
           <View style={styles.height16} />
@@ -290,7 +290,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
 
       <BottomSheetModal isVisible={successModal}>
         <View style={styles.errorContainer}>
-          <SuccessIcon size={72} />
+          <SuccessIcon width={178} height={165} />
           <View style={styles.height30} />
           <Text style={[styles.title, styles.alignCenter]}>
             {i18n.t('change_password.lbl_password_updated') ?? 'Password has been updated!'}
@@ -307,7 +307,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
 
       <BottomSheetModal isVisible={invalidCredModal}>
         <View style={styles.errorContainer}>
-          <AlertCircleIcon size={55.5} />
+          <AlertCircleIcon width={178} height={165} />
           <View style={styles.height30} />
           <Text style={[styles.title, styles.alignCenter]}>
             {i18n.t('change_password.lbl_invalid_credentials') ?? 'Invalid credentials'}
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     marginHorizontal: 24,
-    marginTop: 24,
+    marginTop: 56,
   },
   header: {
     flexDirection: 'row',
