@@ -10,6 +10,7 @@ import {
   CrossIcon,
   ADBButton,
   NonCheckIcon,
+  NonCheckCrossIcon,
 } from 'react-native-theme-component';
 import { ADBChangePasswordData, ADBChangePasswordSchema } from './modal';
 import { PasswordMask } from './password-mask';
@@ -34,6 +35,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
   const [errorModal, setErrorModal] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
   const [invalidCredModal, setInvalidCredModal] = useState(false);
+  const [check, setCheck] = useState(false);
   const formikRef = useRef(null);
   const { onPressContinue } = prop;
   const tickIcon = <CheckIcon size={17} />;
@@ -43,6 +45,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
     i18n.t('change_password.lbl_sorry_there_was_problem') ?? 'Sorry, there was a problem'
   );
   const [loading, setLoading] = useState(false);
+  
   const checkIs8Character = (text: string) => {
     return /^.{8,}$/.test(text.trim());
   };
@@ -133,6 +136,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
                   name={'oldPassword'}
+                  onCheck = {() => setCheck(false)}
                   onBlur={() => {
                     setFieldTouched('oldPassword');
                   }}
@@ -158,6 +162,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
                   name={'createNew'}
+                  onCheck = {() => setCheck(true)}
                   onBlur={() => {
                     setFieldTouched('createNew');
                   }}
@@ -181,6 +186,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
                   name={'confirmNew'}
+                  onCheck={() => setCheck(true)}
                   onBlur={() => {
                     setFieldTouched('confirmNew');
                   }}
@@ -202,7 +208,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                 <View>
                   <View style={styles.row}>
                     {checkSpecialCharacter(values.createNew) ?  
-                      <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
+                      <CheckIcon size={18} /> : check ? <NonCheckCrossIcon size={18} /> : <NonCheckIcon size={18} />}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_special_char') ??
@@ -211,7 +217,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   </View>
                   <View style={styles.row}>
                     {checkAtLeast1upperandLower(values.createNew) ?  
-                      <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
+                      <CheckIcon size={18} /> : check ? <NonCheckCrossIcon size={18} /> : <NonCheckIcon size={18} />}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_lower_uper') ??
@@ -220,7 +226,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   </View>
                   <View style={styles.row}>
                     {checkAtLeast1digit(values.createNew) ?  
-                      <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
+                      <CheckIcon size={18} /> : check ? <NonCheckCrossIcon size={18} /> : <NonCheckIcon size={18} />}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_number') ?? 'At least one number.'}
@@ -228,7 +234,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   </View>
                   <View style={styles.row}>
                     {checkIs8Character(values.createNew) ?  
-                      <CheckIcon size={18} /> : <NonCheckIcon size={18} />}
+                      <CheckIcon size={18} /> : check ? <NonCheckCrossIcon size={18} /> : <NonCheckIcon size={18} />}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_be_at_least_8_char') ??
@@ -238,9 +244,8 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   <View style={styles.row}>
                     {values.confirmNew !== values.createNew ||
                     values.confirmNew.trim() === '' ||
-                    values.createNew.trim() === ''
-                    ? <NonCheckIcon size={18} /> : 
-                    <CheckIcon size={18} />}
+                    values.createNew.trim() === '' 
+                    ? (check ? <NonCheckCrossIcon size={18} /> : <NonCheckIcon size={18} />) : <CheckIcon size={18} /> }
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_both_password_match') ?? 'Both passwords match.'}
