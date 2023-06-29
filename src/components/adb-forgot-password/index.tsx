@@ -79,6 +79,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     autoCapitalize="none"
                     keyboardType={'email-address'}
                     placeholderHint={i18n.t('login_component.example_email') ?? 'example@email.com'}
+                    testID='input-email'
                   />
                 </View>
                 <View style={styles.rowInput}>
@@ -91,6 +92,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     returnKeyType="done"
                     keyboardType={'ascii-capable'}
                     placeholderHint={i18n.t('id_number.placeholder') ?? 'Enter your NRIC number'}
+                    testID='input-id'
                   />
                 </View>
               </View>
@@ -100,6 +102,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}
                   onPress={submitForm}
                   disabled={values.nric.length == 0 || values.email.length == 0}
+                  testId='continue-button'
                 />
               </View>
             </>
