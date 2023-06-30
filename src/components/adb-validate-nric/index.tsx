@@ -65,6 +65,9 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                   placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
                   maxLength={12}
                   testID="validate-id-input"
+                  placeholderHint={
+                    i18n.t('id_number.enter_your_id_number') ?? 'Enter your ID number'
+                  }
                 />
               </View>
               <ADBButton
