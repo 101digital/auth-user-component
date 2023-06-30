@@ -70,7 +70,6 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     } else {
       if (authorizeResponse?.status === 'FAILED') {
         setIsLoading(false);
-        authComponentStore.storeIsUserLogged(false);
         setIsNotMatched(false);
         setRetryCount(0);
         if (authorizeResponse.error?.code === PASSWORD_LOCKED_OUT) {

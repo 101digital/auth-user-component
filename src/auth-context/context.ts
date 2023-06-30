@@ -402,7 +402,7 @@ export const useAuthContextValue = (): AuthContextData => {
           }
 
           setIsManualLogin(true);
-          return resLogin._embedded.user.id;
+          return resLogin;
         }
       } catch (error) {
         setErrorSignIn(error as Error);

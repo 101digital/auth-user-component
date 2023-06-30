@@ -7,3 +7,4 @@ export const DEFAULT_ERROR_MESSAGE_INVALID_PROVIDED_PASSWORD =
   'The current password provided for the user is invalid';
 export const SINGLE_FACTOR_SCOPE = 'profilepsf';
 export const SINGLE_FACTOR_ACR_VALUE = 'Single_Factor';
+export const SINGLE_FACTOR_COMPLETED = 'COMPLETED';
