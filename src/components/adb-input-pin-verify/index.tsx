@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Keyboard, Platform, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
 import { ADBButton, NumberPadComponent, OTPField } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
@@ -11,14 +11,10 @@ type ADBInputPINVerifyProps = {
 
 const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
   const { onContinue, onFailed } = props;
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
-  const marginKeyboard = keyboardHeight ? keyboardHeight - 20 : Platform.OS === 'ios' ? 0 : 20;
   const otpRef = useRef<OTPFieldRef>();
-  const [isLoadingStoringPIN, setIsLoadingStoringPIN] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
 
   const validatePINNumber = async () => {
-    setIsLoadingStoringPIN(true);
     const isValid = await authComponentStore.validatePin(value, true);
     if (isValid) {
       otpRef.current?.clearInput();
@@ -26,23 +22,7 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
     } else {
       onFailed();
     }
-    setIsLoadingStoringPIN(false);
   };
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e: any) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   useEffect(() => {
     otpRef.current?.setValue(value);
