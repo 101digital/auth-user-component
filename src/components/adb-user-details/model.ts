@@ -32,7 +32,7 @@ export class UserDetailsData {
       profile?.employmentDetails?.[0]?.sector ?? '',
       profile?.employmentDetails?.[0]?.companyName ?? '',
       profile?.employmentDetails?.[0]?.occupation ?? '',
-      profile?.creditDetails?.[0]?.annualIncome + '' ?? ''
+      profile?.creditDetails?.[0]?.annualIncome + '.00' ?? ''
     );
   }
 }
