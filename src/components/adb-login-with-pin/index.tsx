@@ -4,6 +4,7 @@ import {
   View,
   Text,
   NativeModules,
+  Platform,
 } from 'react-native';
 import {
   ADBButton,
@@ -142,6 +143,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           isProcessing={isLoading}
           clearError={()=>{}}
         />
+        <View style={styles.bottomSpacing}/>
       </View>
       {/* <BottomSheetModal isVisible={errorModal}>
         <View style={styles.cameraDisableContainer}>
@@ -212,6 +214,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginTop: 35,
     marginBottom: 32,
+  },
+  bottomSpacing: {
+    height: Platform.OS === 'ios' ? 10 : 20
   },
   imagePlaceHolderWrapper: {
     height: 80,
