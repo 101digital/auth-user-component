@@ -69,10 +69,10 @@ class AuthComponentStore {
     }
   };
 
-  setPin = async (pinNumber: string, isDisableRebinding = false) => {
+  setPin = async (pinNumber: string) => {
     let newLoginHintToken = AuthServices.instance().getLoginHintToken();
     if (!newLoginHintToken || newLoginHintToken.length === 0) {
-      const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode(isDisableRebinding);
+      const { loginHintToken } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
       newLoginHintToken = loginHintToken;
     }
 
@@ -82,9 +82,6 @@ class AuthComponentStore {
       const encryptedData = await AESCryptoStore.encryptData(newLoginHintToken, key);
 
       await SInfo.setItem(PIN_TOKEN, JSON.stringify(encryptedData), sensitiveInfoOptions);
-      if(isDisableRebinding) {
-        AuthServices.instance().setLoginHintToken("");
-      }
     } else {
       return false;
     }

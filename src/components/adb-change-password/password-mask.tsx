@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { PasswordHideIcon, PasswordShowIcon } from '../../assets/icons';
 import { colors } from 'account-origination-component/src/assets';
+import { PasswordUnhideIcon } from 'react-native-auth-component/src/assets/icons/password-unhide-icon';
 
 interface ComponentProps {
   isVisible: boolean;
@@ -20,9 +20,9 @@ export const PasswordMask = ({ isVisible, style, ...restProps }: PasswordMaskPro
   return (
     <TouchableOpacity activeOpacity={0.8} style={[styles.container, style]} {...restProps}>
       {isVisible ? (
-        <PasswordHideIcon color={colors.primary} size={20} />
+        <PasswordUnhideIcon color={colors.primary} size={24} />
       ) : (
-        <PasswordShowIcon color={colors.primary} size={20} />
+        <PasswordUnhideIcon color={colors.primary} size={24} />
       )}
     </TouchableOpacity>
   );

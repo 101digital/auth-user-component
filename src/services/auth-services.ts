@@ -227,13 +227,9 @@ export class AuthServices {
     };
   };
 
-  public getLoginhintTokenAndPairingCode = async (isDisableRebinding = false) => {
+  public getLoginhintTokenAndPairingCode = async () => {
     const { identityPingUrl, accessToken, sessionId } = this._configs || {};
-    let url = `${identityPingUrl}/users/loginhint`;
-    if(isDisableRebinding) {
-      url += '?isRebindEnable=false';
-    }
-    const responseTokenHint = await axios.get(url, {
+    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
       headers: {
         Authorization: `${accessToken}`,
         'x-session-id': sessionId,
