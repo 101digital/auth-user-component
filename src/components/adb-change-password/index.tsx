@@ -14,6 +14,7 @@ import {
   SuccessBigIcon,
   AlertCircleBigIcon,
   NonCheckRightIcon,
+  ADBAlertModal,
 } from 'react-native-theme-component';
 import { ADBChangePasswordData, ADBChangePasswordSchema } from './modal';
 import { PasswordMask } from './password-mask';
@@ -109,11 +110,13 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
         setLoading(false);
       } else {
         setErrorModal(true);
-        setErrorTitle(
-          `${resp[0].message}`.includes('..')
-            ? `${resp[0].message.substring(resp[0].message.indexOf('..') + 2)}`
-            : `${resp[0].message}`
-        );
+        // setErrorTitle(
+        //   `${resp[0].message}`.includes('..')
+        //     ? `${resp[0].message.substring(resp[0].message.indexOf('..') + 2)}`
+        //     : `${resp[0].message}`
+        // );
+        setErrorTitle(i18n.t('change_password.lbl_create_new_which_not_used') ??
+        'Create a new password that you have never used')
         setLoading(false);
       }
     });
@@ -276,63 +279,37 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
           );
         }}
       </Formik>
+      
+      <ADBAlertModal 
+          title={errorTitle}
+          message= {i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
+          btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
+          type={'bottom'}
+          isVisible={errorModal}
+          icon={<AlertCircleBigIcon width={178} height={165} />}
+          onConfirmBtnPress={() => setErrorModal(false)}
+      />
 
-      <BottomSheetModal isVisible={errorModal}>
-        <View style={styles.errorContainer}>
-          <AlertCircleBigIcon width={178} height={165} />
-          <View style={styles.height30} />
-          <Text style={[styles.title, styles.alignCenter]}>{errorTitle}</Text>
-          <View style={styles.height16} />
-          <Text style={[styles.subTitle, styles.alignCenter]}>
-            {i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
-          </Text>
-          <View style={styles.height32} />
-          <ADBButton
-            label={i18n.t('common.lbl_done') ?? 'Done'}
-            onPress={() => {
-              setErrorModal(false);
-            }}
-          />
-        </View>
-      </BottomSheetModal>
+      <ADBAlertModal 
+          title={i18n.t('change_password.lbl_password_updated') ?? 'Password has been updated!'}
+          btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
+          type={'bottom'}
+          isVisible={successModal}
+          icon={<SuccessBigIcon width={178} height={165} />}
+          onConfirmBtnPress={() => {
+            setSuccessModal(false), onPressContinue();
+          }}
+      />
 
-      <BottomSheetModal isVisible={successModal}>
-        <View style={styles.errorContainer}>
-          <SuccessBigIcon width={178} height={165} />
-          <View style={styles.height30} />
-          <Text style={[styles.title, styles.alignCenter]}>
-            {i18n.t('change_password.lbl_password_updated') ?? 'Password has been updated!'}
-          </Text>
-          <View style={styles.height8} />
-          <ADBButton
-            label={i18n.t('common.lbl_done') ?? 'Done'}
-            onPress={() => {
-              setSuccessModal(false), onPressContinue();
-            }}
-          />
-        </View>
-      </BottomSheetModal>
-
-      <BottomSheetModal isVisible={invalidCredModal}>
-        <View style={styles.errorContainer}>
-          <AlertCircleBigIcon width={178} height={165} />
-          <View style={styles.height30} />
-          <Text style={[styles.title, styles.alignCenter]}>
-            {i18n.t('change_password.lbl_invalid_credentials') ?? 'Invalid credentials'}
-          </Text>
-          <View style={styles.height16} />
-          <Text style={[styles.subTitle, styles.alignCenter]}>
-            {i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
-          </Text>
-          <View style={styles.height32} />
-          <ADBButton
-            label={i18n.t('common.lbl_done') ?? 'Done'}
-            onPress={() => {
-              setInvalidCredModal(false);
-            }}
-          />
-        </View>
-      </BottomSheetModal>
+      <ADBAlertModal 
+          title={i18n.t('change_password.lbl_invalid_credentials') ?? 'Invalid credentials'}
+          message={i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
+          type={'bottom'}
+          btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
+          isVisible={invalidCredModal}
+          icon={<AlertCircleBigIcon width={178} height={165} />}
+          onConfirmBtnPress={() => setInvalidCredModal(false)}
+      />
     </>
   );
 };
@@ -346,20 +323,25 @@ const styles = StyleSheet.create({
     paddingTop: 24,
   },
   title: {
-    color: colors.primaryBlack,
+    color: colors.black100,
     fontSize: 24,
-    fontFamily: fonts.semiBold,
+    lineHeight: 32,
+    fontFamily: fonts.OutfitSemiBold,
+    fontWeight:'600'
   },
   subTitle: {
-    color: colors.primaryBlack,
+    color: colors.textColor,
     fontSize: 14,
-    fontFamily: fonts.regular,
-    marginTop: 8,
+    fontFamily: fonts.OutfitRegular,
+    lineHeight: 20,
+    fontWeight: '400',
   },
   subTitle12: {
-    color: colors.primaryBlack,
+    color: colors.lightSubtitle,
     fontSize: 12,
-    fontFamily: fonts.regular,
+    fontFamily: fonts.OutfitRegular,
+    lineHeight: 16,
+    fontWeight: '400'
   },
   subTitle16: {
     color: colors.primaryBlack,
