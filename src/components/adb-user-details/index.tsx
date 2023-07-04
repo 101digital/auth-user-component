@@ -1,22 +1,25 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Platform, Keyboard, TouchableOpacity } from 'react-native';
 import {
-  ADBBottomSheet,
   ADBButton,
   ADBInputField,
   ADB_CURRENCY_CODE,
   ArrowDownIcon,
   ThemeContext,
-  BSOption,
   useADBCurrencyFormat,
+  TextEditIcon,
+  defaultColors,
 } from 'react-native-theme-component';
 import { Formik, FormikProps } from 'formik';
-import { colors, fonts } from '../../assets';
+import { fonts } from '../../assets';
 import { AuthContext } from '../../auth-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { UserDetailsData, UserDetailsSchema, personalDetailsSchema } from './model';
 import remoteConfig from '@react-native-firebase/remote-config';
 import { AccountOriginationService } from 'account-origination-component/src/service/onboarding-service';
+import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { colors } from 'account-origination-component/src/assets';
+import ADBBottomSheet, { BSOption }  from 'account-origination-component/src/components/bottomSheet';
 
 type ADBUserDetailsScreenComponentProps = {
   onSuccess: () => void;
@@ -44,6 +47,8 @@ const ADBUserDetailsScreenComponent = ({
     profile?.employmentDetails?.[0]?.employmentType === 'Unemployed' ||
       profile?.employmentDetails?.[0]?.employmentType === 'Other Outside Labour Force'
   );
+  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+  const [checkEdit, setCheckEdit] = useState<string>('');
 
   const getOccupationList = async () => {
     setIsLoadingValues(true);
@@ -190,6 +195,33 @@ const ADBUserDetailsScreenComponent = ({
       : bsData.items.filter((i: BSOption) => i.value !== 'Not Applicable')
     : [];
 
+    useEffect(() => {
+      const keyboardDidShowListener = Keyboard.addListener(
+        "keyboardDidShow",
+        (e) => {
+          const height =
+            e.endCoordinates.height - (Platform.OS === "android" ? 50 : 0);
+          setKeyboardHeight(height);
+        }
+      );
+  
+      const keyboardDidHideListener = Keyboard.addListener(
+        "keyboardDidHide",
+        () => {
+          setKeyboardHeight(0);
+        }
+      );
+      return () => {
+        keyboardDidHideListener.remove();
+        keyboardDidShowListener.remove();
+      };
+    }, []);
+
+    const handleBlur = (value: string) => {
+      onPressCity(value);
+      setCheckEdit('');
+    }
+
   return (
     <View style={styles.container}>
       <Formik
@@ -267,6 +299,22 @@ const ADBUserDetailsScreenComponent = ({
                   name={'nickName'}
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.preferred_name')}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
+                  editable={checkEdit === 'nickName'}
+                  value={values.nickName}
+                  onBlur={() => {
+                    setCheckEdit('');
+                  }}
+                  suffixIcon={
+                    checkEdit !== 'nickName' && (
+                      <TouchableOpacity 
+                        onPress={() => setCheckEdit('nickName')}
+                      >
+                        <TextEditIcon size={21} />
+                      </TouchableOpacity>
+                    )  
+                  }
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -274,9 +322,11 @@ const ADBUserDetailsScreenComponent = ({
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.religion')}
                   editable={false}
-                  suffixIcon={<ArrowDownIcon />}
+                  suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={onPressReligionInput}
                   onPressIn={onPressReligionInput}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -284,9 +334,11 @@ const ADBUserDetailsScreenComponent = ({
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.marital_status')}
                   editable={false}
-                  suffixIcon={<ArrowDownIcon />}
+                  suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={onPressMaritialStatus}
                   onPressIn={onPressMaritialStatus}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
                 />
                 <View style={styles.underline} />
                 <Text style={styles.mainheading}>{i18n.t('user_details.mailing_address')}</Text>
@@ -295,12 +347,44 @@ const ADBUserDetailsScreenComponent = ({
                   name={'line1'}
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.line1')}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
+                  editable={checkEdit === 'line1'}
+                  value={values.line1}
+                  onBlur={() => {
+                    setCheckEdit('');
+                  }}
+                  suffixIcon={
+                    checkEdit !== 'line1' && (
+                      <TouchableOpacity 
+                        onPress={() => setCheckEdit('line1')}
+                      >
+                        <TextEditIcon size={21} />
+                      </TouchableOpacity>
+                    )  
+                  }
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
                   name={'line2'}
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.line2')}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
+                  editable={checkEdit === 'line2'}
+                  value={values.line2}
+                  onBlur={() => {
+                    setCheckEdit('');
+                  }}
+                  suffixIcon={
+                    checkEdit !== 'line2' && (
+                      <TouchableOpacity 
+                        onPress={() => setCheckEdit('line2')}
+                      >
+                        <TextEditIcon size={21} />
+                      </TouchableOpacity>
+                    )  
+                  }
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -308,11 +392,27 @@ const ADBUserDetailsScreenComponent = ({
                   hideUnderLine={true}
                   maxLength={5}
                   placeholder={i18n.t('user_details.postcode')}
-                  onBlur={() => onPressCity(values.postcode)}
+                  onBlur={() => handleBlur(values.postcode)}
                   onFocus={() => {
                     setListCity([]);
                     setListState([]);
                   }}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
+                  editable={checkEdit === 'postcode'}
+                  value={values.postcode}
+                  suffixIcon={
+                    checkEdit !== 'postcode' && (
+                      <TouchableOpacity 
+                        onPress={() => setCheckEdit('postcode')}
+                      >
+                        <TextEditIcon size={21} />
+                      </TouchableOpacity>
+                    )  
+                  }
+                  autoComplete={"off"}
+                  keyboardType={"numeric"}
+                  returnKeyType="done"
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -320,9 +420,11 @@ const ADBUserDetailsScreenComponent = ({
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.city')}
                   editable={false}
-                  suffixIcon={<ArrowDownIcon />}
+                  suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={() => getCityList(values.postcode)}
                   onPressIn={() => getCityList(values.postcode)}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -330,7 +432,9 @@ const ADBUserDetailsScreenComponent = ({
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.state')}
                   editable={false}
-                  suffixIcon={listState.length > 1 ? <ArrowDownIcon /> : null}
+                  suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
                 />
 
                 <View style={styles.underline} />
@@ -342,9 +446,11 @@ const ADBUserDetailsScreenComponent = ({
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.employment_type')}
                   editable={false}
-                  suffixIcon={<ArrowDownIcon />}
+                  suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onPressIn={onPressImploymentType}
                   onClickSuffixIcon={onPressImploymentType}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
                 />
 
                 {isUnEmployed ? (
@@ -363,7 +469,18 @@ const ADBUserDetailsScreenComponent = ({
                       editable={false}
                       onPressIn={onPressImploymentSector}
                       onClickSuffixIcon={onPressImploymentSector}
-                      suffixIcon={<ArrowDownIcon />}
+                      multiline={values.employmentSector.length > 50}
+                      style={{
+                        inputContainerStyle:
+                          values.employmentSector.length > 50
+                            ? {
+                                height: "auto",
+                              }
+                            : {},
+                      }}
+                      suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
+                      type='custom'
+                      inputType={InputTypeEnum.MATERIAL}
                     />
                   </>
                 )}
@@ -377,6 +494,22 @@ const ADBUserDetailsScreenComponent = ({
                       name={'employerName'}
                       hideUnderLine={true}
                       placeholder={i18n.t('user_details.employer_name')}
+                      type='custom'
+                      inputType={InputTypeEnum.MATERIAL}
+                      editable={checkEdit === 'employerName'}
+                      value={values.employerName}
+                      onBlur={() => {
+                        setCheckEdit('');
+                      }}
+                      suffixIcon={
+                        checkEdit !== 'employerName' && (
+                          <TouchableOpacity 
+                            onPress={() => setCheckEdit('employerName')}
+                          >
+                            <TextEditIcon size={21} />
+                          </TouchableOpacity>
+                        )  
+                      }
                     />
 
                     <View style={styles.verticalSpacing} />
@@ -387,7 +520,18 @@ const ADBUserDetailsScreenComponent = ({
                       editable={false}
                       onPressIn={onPressOccupation}
                       onClickSuffixIcon={onPressOccupation}
-                      suffixIcon={<ArrowDownIcon />}
+                      suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
+                      type='custom'
+                      inputType={InputTypeEnum.MATERIAL}
+                      multiline={values.employmentSector.length > 50}
+                      style={{
+                        inputContainerStyle:
+                          values.employmentSector.length > 50
+                            ? {
+                                height: "auto",
+                              }
+                            : {},
+                      }}
                     />
                   </View>
                 )}
@@ -398,6 +542,25 @@ const ADBUserDetailsScreenComponent = ({
                   hideUnderLine={true}
                   prefixText={ADB_CURRENCY_CODE}
                   placeholder={i18n.t('user_details.annualIncome')}
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
+                  editable={checkEdit === 'annualIncome'}
+                  value={values.annualIncome}
+                  onBlur={() => {
+                    setCheckEdit('');
+                  }}
+                  suffixIcon={
+                    checkEdit !== 'annualIncome' && (
+                      <TouchableOpacity 
+                        onPress={() => setCheckEdit('annualIncome')}
+                      >
+                        <TextEditIcon size={24} />
+                      </TouchableOpacity>
+                    )  
+                  }
+                  autoComplete={"off"}
+                  keyboardType={"numeric"}
+                  returnKeyType="done"
                 />
                 <View style={styles.verticalSpacing} />
                 <View style={styles.verticalSpacing} />
@@ -422,7 +585,8 @@ const ADBUserDetailsScreenComponent = ({
                   isShowBottomSheet={isShowBottomSheet}
                   isLoadingValues={isLoadingValues}
                   bsContainerStyle={{
-                    minHeight: 450,
+                    minHeight: 450 + keyboardHeight,
+                    backgroundColor: defaultColors.mainBackgroundColor,
                   }}
                   onChangeValue={setSelectedBSValue}
                   onSearch={(t) => setSearchText(t)}
@@ -551,9 +715,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
   },
   mainheading: {
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.OutfitSemiBold,
     fontSize: 16,
-    color: colors.primaryBlack,
+    color: colors.blackColor,
+    lineHeight: 20,
+    fontWeight: '600',
   },
   subheading: {
     marginTop: 12,

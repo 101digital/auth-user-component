@@ -22,7 +22,7 @@ import {
   EyesIcon,
   ThemeContext,
 } from 'react-native-theme-component';
-import { OTP_REQUIRED, PASSWORD_LOCKED_OUT } from '../../utils/index';
+import { OTP_REQUIRED, PASSWORD_LOCKED_OUT, SINGLE_FACTOR_COMPLETED } from '../../utils/index';
 import { RegistrationContext } from 'react-native-register-component';
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
@@ -64,9 +64,19 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const _username = username.trim();
     const _password = password.trim();
     if (isSkipOTPMode) {
-      await adbLoginSingleFactor(_username, _password, true);
-      onLoginSuccess();
-      setIsLoading(false);
+      try {
+        const response = await adbLoginSingleFactor(_username, _password, true);
+        setIsLoading(false);
+        if (response) {
+          if (response.status && response.status === SINGLE_FACTOR_COMPLETED) {
+            onLoginSuccess();
+          } else if (response.error?.code === PASSWORD_LOCKED_OUT) {
+            setErrorModal(true);
+          }
+        }
+      } catch {
+        setIsLoading(false);
+      }
       return;
     }
     const responseVerified = await verifyExistedUserByEmail(_username);
