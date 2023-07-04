@@ -110,11 +110,6 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
         setLoading(false);
       } else {
         setErrorModal(true);
-        // setErrorTitle(
-        //   `${resp[0].message}`.includes('..')
-        //     ? `${resp[0].message.substring(resp[0].message.indexOf('..') + 2)}`
-        //     : `${resp[0].message}`
-        // );
         setErrorTitle(i18n.t('change_password.lbl_create_new_which_not_used') ??
         'Create a new password that you have never used')
         setLoading(false);
