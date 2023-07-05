@@ -540,17 +540,19 @@ const ADBUserDetailsScreenComponent = ({
                 <ADBInputField
                   name={'annualIncome'}
                   hideUnderLine={true}
-                  prefixText={values.annualIncome.length > 0 ? ADB_CURRENCY_CODE : 'RM 0.00'}
+                  prefixText={values.annualIncome.length > 0 ? ADB_CURRENCY_CODE : "RM 0.00"}
                   placeholder={i18n.t('user_details.annualIncome')}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'annualIncome'}
                   onBlur={() => {
-                    const {currencyFormated} = useADBCurrencyFormat(
-                      values.annualIncome,
-                      "blur"
-                    );
-                    setFieldValue("annualIncome", currencyFormated);
+                    if (values.annualIncome) {
+                      const { currencyFormated } = useADBCurrencyFormat(
+                        values.annualIncome,
+                        'blur'
+                      );
+                      setFieldValue('annualIncome', currencyFormated);
+                    }
                     setCheckEdit('');
                   }}
                   suffixIcon={
