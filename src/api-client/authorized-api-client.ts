@@ -116,8 +116,16 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     return response;
   };
 
+  const onResponseError = async (axiosError: AxiosError) => {
+    if (axiosError.message === 'Network Error') {
+      DeviceEventEmitter.emit('axios-no-internet', axiosError);
+      return Promise.reject(undefined);
+    }
+    return Promise.reject(axiosError);
+  };
+
   instance.interceptors.request.use(onRequest);
-  instance.interceptors.response.use(onResponseSuccess);
+  instance.interceptors.response.use(onResponseSuccess, onResponseError);
 
   return instance;
 };
