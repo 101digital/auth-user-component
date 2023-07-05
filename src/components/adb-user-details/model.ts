@@ -1,3 +1,4 @@
+import { useADBCurrencyFormat } from 'react-native-theme-component';
 import { Profile } from '../../types';
 import * as Yup from 'yup';
 
@@ -18,7 +19,11 @@ export class UserDetailsData {
     readonly annualIncome: string
   ) {}
 
+
   static empty(profile?: Profile): UserDetailsData {
+
+    const newAnnualIncome = profile && profile.creditDetails && profile.creditDetails.length > 0 ?  useADBCurrencyFormat(`${profile.creditDetails[0].annualIncome}`, 'blur') : '';
+  
     return new UserDetailsData(
       profile?.nickName ?? '',
       profile?.religion ?? '',
@@ -32,10 +37,11 @@ export class UserDetailsData {
       profile?.employmentDetails?.[0]?.sector ?? '',
       profile?.employmentDetails?.[0]?.companyName ?? '',
       profile?.employmentDetails?.[0]?.occupation ?? '',
-      profile?.creditDetails?.[0]?.annualIncome + '' ?? ''
+      newAnnualIncome?.currencyFormated ?? ''
     );
   }
 }
+  
 
 export const validationSchema = (isUnEmployed: boolean, i18n: any) => {
   if(!isUnEmployed) {
