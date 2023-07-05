@@ -69,9 +69,6 @@ export interface AuthContextData {
   registerDevice: (
     token: string,
     platform: 'IOS' | 'Android'
-    // userId: string,
-    // appId: string,
-    // entityId: string
   ) => Promise<boolean>;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
@@ -343,8 +340,6 @@ export const useAuthContextValue = (): AuthContextData => {
           await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
           const { data } = await AuthServices.instance().fetchProfile();
           setProfile({ ...data });
-          // setisManualLogin(true);
-          // setIsSignedIn(true);
           setIsVerifyLogin(false);
           return true;
         }
@@ -744,7 +739,6 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       const response = await AuthServices.instance().authorizePushOnly();
       if (response && response.selectedDevice?.id && response.authSession && response.resumeUrl) {
-        // authComponentStore.storeDeviceId(response.selectedDevice?.id);
         PingOnesdkModule.setCurrentSessionId(response.authSession.id);
         saveResumeURL(response.resumeUrl);
         return true;

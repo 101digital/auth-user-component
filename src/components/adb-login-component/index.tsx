@@ -154,9 +154,6 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
               </View>
             </View>
             <View
-            // style={{
-            //   marginBottom: marginKeyboard,
-            // }}
             >
               <ADBButton
                 isLoading={isLoading}
