@@ -540,7 +540,7 @@ const ADBUserDetailsScreenComponent = ({
                 <ADBInputField
                   name={'annualIncome'}
                   hideUnderLine={true}
-                  prefixText={values.annualIncome.length > 0 ? ADB_CURRENCY_CODE : "RM 0.00"}
+                  prefixText={values.annualIncome.length > 0 ? ADB_CURRENCY_CODE + ' ' : "RM 0.00"}
                   placeholder={i18n.t('user_details.annualIncome')}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
