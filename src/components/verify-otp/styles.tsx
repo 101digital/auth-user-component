@@ -87,16 +87,17 @@ const useMergeStyles = (
       color: '#020000',
     },
     sendAnotherLabel: {
-      fontFamily: fonts.OutfitSemiBold,
+      fontFamily: fonts.medium,
       fontSize: 14,
-      lineHeight: 20,
-      color: colors.black800,
+      lineHeight: 24,
+      textDecorationLine: 'underline',
+      color: '#1B1B1B',
     },
     durationLabel: {
-      fontFamily: fonts.OutfitSemiBold,
-      fontSize: 14,
-      lineHeight: 20,
-      color: colors.black800,
+      fontFamily: fonts.medium,
+      fontSize: 16,
+      lineHeight: 24,
+      color: '#1B1B1B',
     },
     errorWrapper: {
       alignItems: 'center',
@@ -105,8 +106,9 @@ const useMergeStyles = (
     errorText: {
       color: colors.errorColor,
       marginLeft: 4,
+      fontWeight: '400',
       fontSize: 12,
-      fontFamily: fonts.OutfitRegular,
+      fontFamily: fonts.regular,
     },
     buttonWrapper: {
       flexDirection: 'row',
