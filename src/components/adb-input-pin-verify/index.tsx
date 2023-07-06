@@ -20,6 +20,7 @@ const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
       otpRef.current?.clearInput();
       onContinue();
     } else {
+      setValue('');
       onFailed();
     }
   };
