@@ -125,7 +125,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
         validationSchema={ADBChangePasswordSchema(i18n)}
         onSubmit={(values) => {}}
       >
-        {({ setFieldTouched, errors, values }) => {
+        {({ setFieldTouched, errors, values, touched }) => {
           return (
             <>
               <View style={[styles.container]}>
@@ -152,6 +152,8 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                       isVisible={showOldPass}
                     />
                   }
+                  errors={errors}
+                  touched={touched}
                   placeholderHint={i18n.t('change_password.plh_current_password') ?? 'Enter password'}
                 />
                 <View style={styles.height32} />
@@ -181,6 +183,8 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                       isVisible={showNewPass}
                     />
                   }
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.height16} />
                 <ADBInputField
@@ -205,6 +209,8 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                       isVisible={showConfirmPass}
                     />
                   }
+                  errors={errors}
+                  touched={touched}
                 />
                 <View>
                   <View style={styles.row}>
@@ -339,17 +345,18 @@ const styles = StyleSheet.create({
     fontWeight: '400'
   },
   subTitle16: {
-    color: colors.primaryBlack,
-    fontSize: 16,
-    fontFamily: fonts.semiBold,
-    fontWeight: '500',
+    color: colors.black100,
+    fontSize: 14,
+    fontFamily: fonts.OutfitSemiBold,
+    fontWeight: '600',
+    lineHeight: 20,
   },
   inputContainer: {
     paddingTop: 20,
   },
   bottomSection: {
     marginHorizontal: 24,
-    marginTop: 56,
+    marginTop: 102,
   },
   header: {
     flexDirection: 'row',
