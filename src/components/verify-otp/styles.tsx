@@ -130,12 +130,10 @@ const useMergeStyles = (
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      // paddingHorizontal: 60,
     },
     pinInputWrapper: {
       justifyContent: 'center',
       alignItems: 'center',
-      // paddingTop:20,
       paddingTop: '7.5%',
     },
     dot: {
@@ -168,7 +166,6 @@ const useMergeStyles = (
       alignItems: 'flex-end',
       justifyContent: 'flex-end',
       maxWidth: 300,
-      // backgroundColor:'red'
     },
   });
   return defaultsDeep(style, defaultStyles);

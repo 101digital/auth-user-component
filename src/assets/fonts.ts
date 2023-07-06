@@ -8,8 +8,3 @@ export const fonts = {
   OutfitRegular: 'Outfit-Regular',
   OutfitSemiBold: 'Outfit-SemiBold',
 };
-
-//
-// const fonts = {};
-//
-// export default fonts;

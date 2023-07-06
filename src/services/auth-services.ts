@@ -1,4 +1,3 @@
-// @ts-ignore
 import qs from 'qs';
 import authComponentStore from './local-store';
 import axios from 'axios';
@@ -34,10 +33,6 @@ export class AuthServices {
   public storeAccessToken(token: string) {
     if (this._configs) {
       this._configs.accessToken = token;
-      // if (this.notificationPayload) {
-      //   const { token, platform, userId } = this.notificationPayload;
-      //   this.registerDevice(token, platform, userId);
-      // }
     }
   }
 

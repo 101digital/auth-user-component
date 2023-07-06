@@ -33,26 +33,6 @@ const attachTokenToRequest = (
   }
 };
 
-const refreshTokens = async () => {
-  // const refreshToken = await authComponentStore.getRefreshToken();
-  // return new Promise<TokenData>((resolve, reject) => {
-  //   AuthServices.instance()
-  //     .refreshToken(refreshToken ?? '')
-  //     .then(async ({ refresh_token, access_token }) => {
-  //       const { orgToken } = await AuthServices.instance().fetchProfile();
-  //       return [refresh_token, access_token, orgToken];
-  //     })
-  //     .then(([refresh_token, access_token, orgToken]) => {
-  //       resolve({
-  //         accessToken: access_token,
-  //         refreshToken: refresh_token,
-  //         orgToken,
-  //       });
-  //     })
-  //     .catch((err) => reject(err));
-  // });
-};
-
 const forceLogout = async () => {
   DeviceEventEmitter.emit('authcomponent.session.expired');
 };
@@ -60,7 +40,6 @@ const forceLogout = async () => {
 export const createAuthorizedApiClient = (baseURL: string) => {
   const options = {
     attachTokenToRequest,
-    refreshTokens,
     shouldIntercept,
     forceLogout,
   };

@@ -103,7 +103,6 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
         return;
       }
     }
-    // setErrorModal(true);
     onError();
   };
 
@@ -318,7 +317,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   bottomSection: {
-    // marginBottom: 15,
     marginHorizontal: 24,
     marginTop: 24,
   },

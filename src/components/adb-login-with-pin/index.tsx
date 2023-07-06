@@ -40,7 +40,6 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   const [isNotMatched, setIsNotMatched] = useState<boolean>(false);
   const [retryCount, setRetryCount] = useState<number>(0);
   const { PingOnesdkModule } = NativeModules;
-  // const [errorModal, setErrorModal] = useState(false);
   const [biometricStatus, setBiometricStatus] = useState(false);
   const [biometricAttempt, setBiometricAttempt] = useState(0);
 
@@ -145,27 +144,6 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         />
         <View style={styles.bottomSpacing}/>
       </View>
-      {/* <BottomSheetModal isVisible={errorModal}>
-        <View style={styles.cameraDisableContainer}>
-          <AlertCircleIcon size={72} />
-          <View style={styles.gap40} />
-          <Text style={[styles.loginTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.lbl_account_locked') ??
-              `Oops! Your account is temporarily locked`}
-          </Text>
-          <View style={styles.gap8} />
-          <Text style={[styles.subTitle, { textAlign: 'center' }]}>
-            {i18n.t('login_component.lbl_entered_wrong_password') ??
-              `You’ve entered the wrong credentials too many times. Please try again after 1 hour.`}
-          </Text>
-          <ADBButton
-            label={i18n.t('login_component.btn_done') ?? 'Done'}
-            onPress={() => {
-              setErrorModal(false);
-            }}
-          />
-        </View>
-      </BottomSheetModal> */}
     </View>
   );
 };
