@@ -63,19 +63,24 @@ const ADBLoginWithPasswordComponent = ({
           } else {
             onSuccessVerified();
           }
-        } else {
-          onInvalidPassword();
-          onFailedVerified();
+          onError();
         }
       } catch {
-        onInvalidPassword();
-        onFailedVerified();
+        onError();
       }
     } else {
-      onInvalidPassword();
-      onFailedVerified();
+      onError();
     }
   };
+
+  const onError = () => {
+    formikRef.current?.setFieldError(
+      'password',
+      i18n.t('login_component.incorrect_password') ?? 'Forgot password'
+    );
+    onInvalidPassword();
+    onFailedVerified();
+  }
 
   useEffect(() => {
     if (isFocused) {
