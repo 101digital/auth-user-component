@@ -4,7 +4,7 @@ import {
   CountryInformation,
   Recovery,
   VerificationMethod,
-  Devices,
+  Devices
 } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
@@ -66,10 +66,7 @@ export interface AuthContextData {
   errorUserVerify?: Error;
   errorRequestResetPassword?: Error;
   clearUserVerificationData: () => void;
-  registerDevice: (
-    token: string,
-    platform: 'IOS' | 'Android'
-  ) => Promise<boolean>;
+  registerDevice: (token: string, platform: 'IOS' | 'Android') => Promise<boolean>;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
   updateUserInfo: (
@@ -190,7 +187,7 @@ export const authDefaultValue: AuthContextData = {
   badgeNumber: 0,
   getNotifications: async () => false,
   updateReadNotifications: async () => false,
-  notificationData: false,
+  notificationData: false
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -281,6 +278,7 @@ export const useAuthContextValue = (): AuthContextData => {
         await AuthServices.instance().login(username, password);
         const { data } = await AuthServices.instance().fetchProfile();
         await authComponentStore.storeIsUserLogged(true);
+        await authComponentStore.storeUserName(username);
         setProfile({ ...data, country });
         setIsSignedIn(true);
         getProfilePicture(data);
@@ -605,7 +603,7 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   }, [_userMobileNumber]);
 
-  const saveUserNewPassword = useCallback((newPassword) => {
+  const saveUserNewPassword = useCallback(newPassword => {
     setUserNewPassword(newPassword);
   }, []);
 
@@ -622,7 +620,7 @@ export const useAuthContextValue = (): AuthContextData => {
           if (result && result.resendCode) {
             setRecovery({
               ...recovery,
-              recoveryCode: result.resendCode,
+              recoveryCode: result.resendCode
             });
           }
         }
@@ -843,7 +841,7 @@ export const useAuthContextValue = (): AuthContextData => {
     const response = await AuthServices.instance().updateReadNotification(notificationId);
     if (response) {
       let cloneData = [...(_notificationData?.data ? _notificationData?.data : [])];
-      const itemIndex = cloneData.findIndex((item) => item.id === notificationId);
+      const itemIndex = cloneData.findIndex(item => item.id === notificationId);
       cloneData[itemIndex].isView = true;
       let newUpdatedData = Object.assign({}, _notificationData);
       newUpdatedData.data = [...cloneData];
@@ -928,7 +926,7 @@ export const useAuthContextValue = (): AuthContextData => {
       badgeNumber: _badgeNumber,
       getNotifications,
       updateReadNotifications,
-      notificationData: _notificationData,
+      notificationData: _notificationData
     }),
     [
       _profile,
@@ -968,7 +966,7 @@ export const useAuthContextValue = (): AuthContextData => {
       selectedDeviceId,
       _isReselectingDevice,
       _badgeNumber,
-      _notificationData,
+      _notificationData
     ]
   );
 };
