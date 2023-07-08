@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Text, Platform, Keyboard, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Platform, Keyboard, TouchableOpacity, Dimensions } from 'react-native';
 import {
   ADBButton,
   ADBInputField,
@@ -25,6 +25,8 @@ type ADBUserDetailsScreenComponentProps = {
   onSuccess: () => void;
   onFailed: () => void;
 };
+
+const { height } = Dimensions.get('screen');
 
 const onboardingService = AccountOriginationService.instance();
 
@@ -267,7 +269,7 @@ const ADBUserDetailsScreenComponent = ({
           }
         }}
       >
-        {({ submitForm, dirty, errors, isValid, values, setFieldValue }) => {
+        {({ submitForm, dirty, errors, isValid, values, setFieldValue, touched }) => {
           if (`${values.annualIncome}`.length > 0) {
             const { currencyFormated } = useADBCurrencyFormat(`${values.annualIncome}`);
             if (
@@ -275,7 +277,7 @@ const ADBUserDetailsScreenComponent = ({
               `${values.annualIncome}`.length > 0 &&
               currencyFormated !== `${values.annualIncome}`
             ) {
-              setFieldValue('annualIncome', currencyFormated);
+              setFieldValue("annualIncome", currencyFormated === '0.00'? '' :currencyFormated);
             } else if (values.annualIncome[0] === '.') {
               setFieldValue('annualIncome', '0.');
             }
@@ -315,6 +317,8 @@ const ADBUserDetailsScreenComponent = ({
                       </TouchableOpacity>
                     )  
                   }
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -327,6 +331,8 @@ const ADBUserDetailsScreenComponent = ({
                   onPressIn={onPressReligionInput}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -339,6 +345,8 @@ const ADBUserDetailsScreenComponent = ({
                   onPressIn={onPressMaritialStatus}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.underline} />
                 <Text style={styles.mainheading}>{i18n.t('user_details.mailing_address')}</Text>
@@ -363,6 +371,8 @@ const ADBUserDetailsScreenComponent = ({
                       </TouchableOpacity>
                     )  
                   }
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -385,6 +395,8 @@ const ADBUserDetailsScreenComponent = ({
                       </TouchableOpacity>
                     )  
                   }
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -413,6 +425,8 @@ const ADBUserDetailsScreenComponent = ({
                   autoComplete={"off"}
                   keyboardType={"numeric"}
                   returnKeyType="done"
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -425,6 +439,8 @@ const ADBUserDetailsScreenComponent = ({
                   onPressIn={() => getCityList(values.postcode)}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
@@ -435,6 +451,8 @@ const ADBUserDetailsScreenComponent = ({
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
+                  errors={errors}
+                  touched={touched}
                 />
 
                 <View style={styles.underline} />
@@ -451,6 +469,8 @@ const ADBUserDetailsScreenComponent = ({
                   onClickSuffixIcon={onPressImploymentType}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
+                  errors={errors}
+                  touched={touched}
                 />
 
                 {isUnEmployed ? (
@@ -481,6 +501,8 @@ const ADBUserDetailsScreenComponent = ({
                       suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                       type='custom'
                       inputType={InputTypeEnum.MATERIAL}
+                      errors={errors}
+                      touched={touched}
                     />
                   </>
                 )}
@@ -510,6 +532,8 @@ const ADBUserDetailsScreenComponent = ({
                           </TouchableOpacity>
                         )  
                       }
+                      errors={errors}
+                      touched={touched}
                     />
 
                     <View style={styles.verticalSpacing} />
@@ -532,6 +556,8 @@ const ADBUserDetailsScreenComponent = ({
                               }
                             : {},
                       }}
+                      errors={errors}
+                      touched={touched}
                     />
                   </View>
                 )}
@@ -540,7 +566,11 @@ const ADBUserDetailsScreenComponent = ({
                 <ADBInputField
                   name={'annualIncome'}
                   hideUnderLine={true}
-                  prefixText={values.annualIncome.length > 0 ? ADB_CURRENCY_CODE + ' ' : "RM 0.00"}
+                  prefixText={values.annualIncome.length > 0 ? i18n?.t(
+                        "account_origination.employment_details.currency"
+                      )+ ' ' ?? "RM " : i18n?.t(
+                        "account_origination.employment_details.currency"
+                      )+' 0.00' ?? "RM"+' 0.00'}
                   placeholder={i18n.t('user_details.annualIncome')}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
@@ -551,7 +581,7 @@ const ADBUserDetailsScreenComponent = ({
                         values.annualIncome,
                         'blur'
                       );
-                      setFieldValue('annualIncome', currencyFormated);
+                      setFieldValue("annualIncome", currencyFormated === '0.00'? '' :currencyFormated);
                     }
                     setCheckEdit('');
                   }}
@@ -567,6 +597,8 @@ const ADBUserDetailsScreenComponent = ({
                   autoComplete={"off"}
                   keyboardType={"numeric"}
                   returnKeyType="done"
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.verticalSpacing} />
                 <View style={styles.verticalSpacing} />
@@ -591,7 +623,7 @@ const ADBUserDetailsScreenComponent = ({
                   isShowBottomSheet={isShowBottomSheet}
                   isLoadingValues={isLoadingValues}
                   bsContainerStyle={{
-                    minHeight: 450 + keyboardHeight,
+                    minHeight: bsData.name === "employmentSector" || bsData.name === "occupation" ? height / 1.1: bsData.name === "employmentType"? height / 1.5 : 450,
                     backgroundColor: defaultColors.mainBackgroundColor,
                   }}
                   onChangeValue={setSelectedBSValue}

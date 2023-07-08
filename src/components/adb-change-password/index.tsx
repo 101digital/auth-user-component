@@ -255,7 +255,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                     ? (check ? <NonCheckCrossIcon size={18} /> : <NonCheckRightIcon size={18} color={colors.lightSubtitle} />) : <CheckIcon size={18} /> }
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
-                      {i18n.t('change_password.lbl_both_password_match') ?? 'Both passwords match.'}
+                      {i18n.t('change_password.lbl_both_password_match') ?? 'Both password matches.'}
                     </Text>
                   </View>
                 </View>
