@@ -115,7 +115,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
         validateOnMount={true}
         onSubmit={(values) => {}}
       >
-        {({ setFieldTouched, errors, values, dirty }) => {
+        {({ setFieldTouched, errors, values, dirty, touched }) => {
           const isDisabledSubmit =
             Object.keys(errors).length !== 0 ||
             values.confirmNew !== values.createNew ||
@@ -157,6 +157,8 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                       isError={true}
                     />
                   }
+                  errors={errors}
+                  touched={touched}
                 />
                 <View style={styles.height16} />
                 <ADBInputField
@@ -192,6 +194,8 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                       isError={true}
                     />
                   }
+                  errors={errors}
+                  touched={touched}
                 />
                 <View>
                   <View style={styles.row}>

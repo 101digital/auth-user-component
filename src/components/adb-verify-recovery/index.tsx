@@ -37,7 +37,7 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
         onSubmit={handleOnContinue}
         validationSchema={InputIdSchema(i18n)}
       >
-        {({ submitForm, values }) => {
+        {({ submitForm, values, errors, touched }) => {
           return (
             <>
               <View style={styles.content}>
@@ -52,6 +52,8 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
                     autoCapitalize="none"
                     keyboardType={'default'}
                     placeholderHint={i18n.t('login_component.recovery_code_hint') ?? 'ADB12345678'}
+                    errors={errors}
+                    touched={touched}
                   />
                 </View>
               </View>
