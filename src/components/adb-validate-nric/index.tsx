@@ -70,6 +70,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                   }
                 />
               </View>
+              <View style={styles.bottomSection}>
               <ADBButton
                 label={i18n.t('common.lbl_continue')}
                 onPress={submitForm}
@@ -77,6 +78,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                 disabled={values.userId.length === 0}
                 testId="validate-id-continue-button"
               />
+              </View>
             </>
           );
         }}
