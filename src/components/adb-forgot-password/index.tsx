@@ -65,7 +65,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
         onSubmit={handleOnValidation}
         validationSchema={InputIdSchema(i18n)}
       >
-        {({ submitForm, values }) => {
+        {({ submitForm, values, errors, touched }) => {
           return (
             <>
               <View style={styles.content}>
@@ -80,6 +80,8 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     keyboardType={'email-address'}
                     placeholderHint={i18n.t('login_component.example_email') ?? 'example@email.com'}
                     testID='input-email'
+                    errors={errors}
+                    touched={touched}
                   />
                 </View>
                 <View style={styles.rowInput}>
@@ -93,6 +95,8 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     keyboardType={'ascii-capable'}
                     placeholderHint={i18n.t('id_number.placeholder') ?? 'Enter your NRIC number'}
                     testID='input-id'
+                    errors={errors}
+                    touched={touched}
                   />
                 </View>
               </View>

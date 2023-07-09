@@ -54,7 +54,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
         validationSchema={InputIdSchema(i18n)}
         onSubmit={(values) => validateIdNumber(values.userId)}
       >
-        {({ submitForm, values }) => {
+        {({ submitForm, values, errors, touched }) => {
           return (
             <>
               <View style={styles.content}>
@@ -68,6 +68,8 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                   placeholderHint={
                     i18n.t('id_number.enter_your_id_number') ?? 'Enter your ID number'
                   }
+                  errors={errors}
+                  touched={touched}
                 />
               </View>
               <View style={styles.bottomSection}>
