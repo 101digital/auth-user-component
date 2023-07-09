@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 25,
     paddingTop: 20,
+    marginBottom: 15,
   },
   rowInput: {
     marginTop: 15,

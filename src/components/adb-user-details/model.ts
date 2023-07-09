@@ -23,21 +23,26 @@ export class UserDetailsData {
   static empty(profile?: Profile): UserDetailsData {
 
     const newAnnualIncome = profile && profile.creditDetails && profile.creditDetails.length > 0 ?  useADBCurrencyFormat(`${profile.creditDetails[0].annualIncome}`, 'blur') : '';
-  
+    
+    const profileAddress =
+            profile?.addresses && profile?.addresses.length > 0 && profile.addresses.find(
+              (a: any) => a.addressType === 'Mailing Address'
+            );
+
     return new UserDetailsData(
       profile?.nickName ?? '',
       profile?.religion ?? '',
       profile?.maritalStatus ?? '',
-      profile?.addresses?.[0]?.line1 ?? '',
-      profile?.addresses?.[0]?.line2 ?? '',
-      profile?.addresses?.[0]?.postcode ?? '',
-      profile?.addresses?.[0]?.city ?? '',
-      profile?.addresses?.[0]?.state ?? '',
+      profileAddress?.line1 ?? '',
+      profileAddress?.line2 ?? '',
+      profileAddress?.postcode ?? '',
+      profileAddress?.city ?? '',
+      profileAddress?.state ?? '',
       profile?.employmentDetails?.[0]?.employmentType ?? '',
       profile?.employmentDetails?.[0]?.sector ?? '',
       profile?.employmentDetails?.[0]?.companyName ?? '',
       profile?.employmentDetails?.[0]?.occupation ?? '',
-      newAnnualIncome?.currencyFormated ?? ''
+      newAnnualIncome?.currencyFormated ? newAnnualIncome?.currencyFormated === '0.00' ? '' : newAnnualIncome?.currencyFormated : '',
     );
   }
 }
