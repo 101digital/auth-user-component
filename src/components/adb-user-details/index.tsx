@@ -475,8 +475,8 @@ const ADBUserDetailsScreenComponent = ({
 
                 {isUnEmployed ? (
                   <View style={styles.rowInfoFixed}>
-                    <Text style={styles.rowInfoName}>Employment sector</Text>
-                    <Text style={styles.rowInfoValue}>{'Not Applicable'}</Text>
+                    <Text style={styles.rowInfoName}>{i18n.t('user_details.employment_sector')}</Text>
+                    <Text style={styles.rowInfoValue}>{i18n.t('user_details.not_applicable')}</Text>
                   </View>
                 ) : (
                   <>
@@ -767,10 +767,11 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   rowInfoFixed: {
-    paddingVertical: 5,
+    paddingVertical: 8,
     marginVertical: 5,
-    backgroundColor: '#F7F7F7',
-    paddingHorizontal: 10,
+    backgroundColor: defaultColors.neutral,
+    paddingHorizontal: 16,
+    borderRadius: 12
   },
   rowInfoTitle: {
     color: '#1B1B1B',
@@ -778,15 +779,19 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
   rowInfoName: {
-    color: '#858585',
+    color: defaultColors.black500,
     fontSize: 12,
-    fontFamily: fonts.regular,
+    lineHeight: 20,
+    fontWeight: '400',
+    fontFamily: fonts.OutfitRegular,
   },
   rowInfoValue: {
-    color: '#333333',
-    fontSize: 16,
-    fontFamily: fonts.regular,
-    marginTop: 10,
+    color: defaultColors.black500,
+    fontSize: 14,
+    fontFamily: fonts.OutfitRegular,
+    lineHeight: 20,
+    fontWeight: '400',
+    marginTop: 4,
   },
 });
 
