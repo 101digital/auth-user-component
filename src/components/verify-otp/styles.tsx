@@ -38,7 +38,6 @@ const useMergeStyles = (
     },
     content: {
       flex: 1,
-      marginTop: 20,
     },
     infoView: {
       marginTop: 25,

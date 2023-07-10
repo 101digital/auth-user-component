@@ -69,7 +69,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
           return (
             <>
               <View style={styles.content}>
-                <View style={styles.rowInput}>
+                <View>
                   <ADBInputField
                     type='custom'
                     inputType={InputTypeEnum.MATERIAL}
@@ -143,7 +143,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 20,
-    paddingTop: 20,
   },
   rowInput: {
     marginTop: 15,
