@@ -283,7 +283,7 @@ const ADBUserDetailsScreenComponent = ({
               setFieldValue('annualIncome', '0.');
             }
           }
-
+          
           return (
             <>
               <KeyboardAwareScrollView
@@ -650,11 +650,12 @@ const ADBUserDetailsScreenComponent = ({
                       } else if (value === 'Outside Labour Force') {
                         setIsUnEmployed(false);
                         setIsOutsizeLabourForce(true);
-                        setFieldValue('occupation', '');
+                        setFieldValue('occupation',  profile?.employmentDetails?.[0]?.employmentType === value ? profile?.employmentDetails?.[0]?.occupation :'');
                       } else {
                         setIsUnEmployed(false);
                         setIsOutsizeLabourForce(false);
-                        setFieldValue('occupation', profile?.employmentDetails?.[0]?.occupation ?? '');
+                        setFieldValue('employmentSector', '');
+                        setFieldValue('occupation', profile?.employmentDetails?.[0]?.employmentType === value ? profile?.employmentDetails?.[0]?.occupation :'');
                       }
                     }
                     setTimeout(() => {

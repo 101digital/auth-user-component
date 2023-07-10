@@ -108,9 +108,6 @@ export const validationSchema = (isUnEmployed: boolean, isOutsideLabourForce: bo
       employmentType: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
-      employmentSector: Yup.string()
-        .trim()
-        .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
       annualIncome: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
