@@ -293,7 +293,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 32,
   },
   title: {
     color: colors.primaryBlack,
