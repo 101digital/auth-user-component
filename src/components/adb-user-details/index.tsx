@@ -46,9 +46,10 @@ const ADBUserDetailsScreenComponent = ({
   const [selectedBSSubValue, setSelectedBSSubValue] = useState<BSOption>();
   const [listState, setListState] = useState<any>([]);
   const [isUnEmployed, setIsUnEmployed] = useState<boolean>(
-    profile?.employmentDetails?.[0]?.employmentType === 'Unemployed' ||
-      profile?.employmentDetails?.[0]?.employmentType === 'Other Outside Labour Force'
+    profile?.employmentDetails?.[0]?.employmentType === 'Unemployed'
   );
+  const [isOutsideLabourForce, setIsOutsizeLabourForce] =
+    useState<boolean>(profile?.employmentDetails?.[0]?.employmentType === "Outside Labour Force");
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [checkEdit, setCheckEdit] = useState<string>('');
 
@@ -228,7 +229,7 @@ const ADBUserDetailsScreenComponent = ({
     <View style={styles.container}>
       <Formik
         innerRef={formikRef}
-        validationSchema={personalDetailsSchema(isUnEmployed, i18n)}
+        validationSchema={personalDetailsSchema(isUnEmployed, isOutsideLabourForce, i18n)}
         initialValues={UserDetailsData.empty(profile)}
         onSubmit={async (values) => {
           const inputedValue = {
@@ -473,7 +474,7 @@ const ADBUserDetailsScreenComponent = ({
                   touched={touched}
                 />
 
-                {isUnEmployed ? (
+                {isUnEmployed || isOutsideLabourForce ? (
                   <View style={styles.rowInfoFixed}>
                     <Text style={styles.rowInfoName}>{i18n.t('user_details.employment_sector')}</Text>
                     <Text style={styles.rowInfoValue}>{i18n.t('user_details.not_applicable')}</Text>
@@ -511,31 +512,37 @@ const ADBUserDetailsScreenComponent = ({
                   <View />
                 ) : (
                   <View>
-                    <View style={styles.verticalSpacing} />
-                    <ADBInputField
-                      name={'employerName'}
-                      hideUnderLine={true}
-                      placeholder={i18n.t('user_details.employer_name')}
-                      type='custom'
-                      inputType={InputTypeEnum.MATERIAL}
-                      editable={checkEdit === 'employerName'}
-                      value={values.employerName}
-                      onBlur={() => {
-                        setCheckEdit('');
-                      }}
-                      suffixIcon={
-                        checkEdit !== 'employerName' && (
-                          <TouchableOpacity 
-                            onPress={() => setCheckEdit('employerName')}
-                          >
-                            <TextEditIcon size={21} />
-                          </TouchableOpacity>
-                        )  
-                      }
-                      errors={errors}
-                      touched={touched}
-                    />
-
+                    {
+                      !isOutsideLabourForce && (
+                        <>
+                         <View style={styles.verticalSpacing} />
+                          <ADBInputField
+                            name={'employerName'}
+                            hideUnderLine={true}
+                            placeholder={i18n.t('user_details.employer_name')}
+                            type='custom'
+                            inputType={InputTypeEnum.MATERIAL}
+                            editable={checkEdit === 'employerName'}
+                            value={values.employerName}
+                            onBlur={() => {
+                              setCheckEdit('');
+                            }}
+                            suffixIcon={
+                              checkEdit !== 'employerName' && (
+                                <TouchableOpacity 
+                                  onPress={() => setCheckEdit('employerName')}
+                                >
+                                  <TextEditIcon size={21} />
+                                </TouchableOpacity>
+                              )  
+                            }
+                            errors={errors}
+                            touched={touched}
+                          />    
+                        </>
+                      )
+                    }
+                    
                     <View style={styles.verticalSpacing} />
                     <ADBInputField
                       name={'occupation'}
@@ -636,12 +643,23 @@ const ADBUserDetailsScreenComponent = ({
                       onSelectCity(value);
                     }
                     if (bsData.name === 'employmentType') {
-                      if (value === 'Unemployed' || value === 'Other Outside Labour Force') {
+                      if (value === 'Unemployed') {
                         setIsUnEmployed(true);
+                        setIsOutsizeLabourForce(false);
+                        setFieldValue('occupation', '');
+                      } else if (value === 'Outside Labour Force') {
+                        setIsUnEmployed(false);
+                        setIsOutsizeLabourForce(true);
+                        setFieldValue('occupation', '');
                       } else {
                         setIsUnEmployed(false);
+                        setIsOutsizeLabourForce(false);
+                        setFieldValue('occupation', profile?.employmentDetails?.[0]?.occupation ?? '');
                       }
                     }
+                    setTimeout(() => {
+                        formikRef.current?.validateForm();
+                    }, 500)
                   }}
                   selectedValue={selectedBSValue}
                   selectedBSSubValue={selectedBSSubValue}
