@@ -6,7 +6,7 @@ import {
   ADBButton,
   EyesClosedIcon,
   EyesIcon,
-  useThemeColors,
+  useThemeColors
 } from 'react-native-theme-component';
 import { Formik } from 'formik';
 import { colors, fonts } from '../../assets';
@@ -29,7 +29,7 @@ const ADBLoginWithPasswordComponent = ({
   onFailedVerified,
   onInvalidPassword,
   onResetPassword,
-  onShowLockDownModal,
+  onShowLockDownModal
 }: ADBLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
@@ -62,8 +62,8 @@ const ADBLoginWithPasswordComponent = ({
             return;
           } else {
             onSuccessVerified();
+            return;
           }
-          onError();
         }
       } catch {
         onError();
@@ -80,7 +80,7 @@ const ADBLoginWithPasswordComponent = ({
     );
     onInvalidPassword();
     onFailedVerified();
-  }
+  };
 
   useEffect(() => {
     if (isFocused) {
@@ -121,9 +121,9 @@ const ADBLoginWithPasswordComponent = ({
                   testID="password-input"
                 />
                 <TouchableOpacity onPress={onResetPassword} testID="forgot-password-button">
-                  <Text style={styles.forgetPasswordLabel}>{`${
-                    i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
-                  }?`}</Text>
+                  <Text style={styles.forgetPasswordLabel}>{`${i18n.t(
+                    'login_component.btn_forgot_password'
+                  ) ?? 'Forgot password'}?`}</Text>
                 </TouchableOpacity>
               </View>
               <ADBButton
@@ -143,98 +143,98 @@ const ADBLoginWithPasswordComponent = ({
 
 const styles = StyleSheet.create({
   errorSection: {
-    marginTop: 8,
+    marginTop: 8
   },
   container: {
     flex: 1,
-    paddingHorizontal: 22,
+    paddingHorizontal: 22
   },
   header: {
     paddingVertical: 10,
     paddingHorizontal: 5,
-    marginTop: 30,
+    marginTop: 30
   },
   validContainer: {
-    marginTop: 10,
+    marginTop: 10
   },
   validationLabel: {
-    marginLeft: 6,
+    marginLeft: 6
   },
   rowItemValid: {
     marginVertical: 5,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   iconBtn: {
-    marginRight: 10,
+    marginRight: 10
   },
   remainingLabel: {
-    textAlign: 'right',
+    textAlign: 'right'
   },
   verticalSpacing: {
-    height: 15,
+    height: 15
   },
   bottomSection: {
-    marginBottom: 15,
+    marginBottom: 15
   },
   flex: {
-    flex: 1,
+    flex: 1
   },
   rowSpaceBetween: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   content: {
-    flex: 1,
+    flex: 1
   },
   title: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.OutfitSemiBold,
+    fontFamily: fonts.OutfitSemiBold
   },
   subtitle: {
     color: colors.primaryBlack,
-    marginTop: 10,
+    marginTop: 10
   },
   subTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
     fontFamily: fonts.OutfitRegular,
-    marginTop: 14,
+    marginTop: 14
   },
   cameraDisableContainer: {
     width: '100%',
     alignItems: 'center',
     paddingVertical: 24,
-    paddingHorizontal: 24,
+    paddingHorizontal: 24
   },
   gap16: {
-    height: 16,
+    height: 16
   },
   gap40: {
-    height: 40,
+    height: 40
   },
   gap8: {
-    height: 8,
+    height: 8
   },
   modalsubTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
     fontFamily: fonts.OutfitRegular,
-    marginTop: 8,
+    marginTop: 8
   },
   loginTitle: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.OutfitSemiBold,
+    fontFamily: fonts.OutfitSemiBold
   },
   forgetPasswordLabel: {
     fontSize: 12,
     color: colors.boldText,
     fontFamily: fonts.OutfitSemiBold,
-    marginTop: 8,
-  },
+    marginTop: 8
+  }
 });
 
 export default ADBLoginWithPasswordComponent;
