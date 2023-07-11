@@ -113,7 +113,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
         {({ submitForm, values }) => (
           <>
             <View style={styles.content}>
-              <View style={styles.rowInput}>
+              <View>
                 <ADBInputField
                   name="username"
                   type="custom"
@@ -191,7 +191,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 25,
-    paddingTop: 20,
     marginBottom: 15,
   },
   rowInput: {

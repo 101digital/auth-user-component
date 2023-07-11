@@ -92,7 +92,6 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 25,
     paddingHorizontal: 22,
   },
   bottomSection: {
@@ -115,7 +114,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginTop: 15,
   },
 });
 

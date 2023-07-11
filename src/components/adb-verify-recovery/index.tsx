@@ -41,21 +41,19 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
           return (
             <>
               <View style={styles.content}>
-                <View style={styles.rowInput}>
-                  <ADBInputField
-                    type='custom'
-                    inputType={InputTypeEnum.MATERIAL}
-                    name="recoveryCode"
-                    maxLength={8}
-                    returnKeyType="done"
-                    placeholder={i18n.t('login_component.recovery_code') ?? 'Recovery code'}
-                    autoCapitalize="none"
-                    keyboardType={'default'}
-                    placeholderHint={i18n.t('login_component.recovery_code_hint') ?? 'ADB12345678'}
-                    errors={errors}
-                    touched={touched}
-                  />
-                </View>
+                <ADBInputField
+                  type='custom'
+                  inputType={InputTypeEnum.MATERIAL}
+                  name="recoveryCode"
+                  maxLength={8}
+                  returnKeyType="done"
+                  placeholder={i18n.t('login_component.recovery_code') ?? 'Recovery code'}
+                  autoCapitalize="none"
+                  keyboardType={'default'}
+                  placeholderHint={i18n.t('login_component.recovery_code_hint') ?? 'ADB12345678'}
+                  errors={errors}
+                  touched={touched}
+                />
               </View>
               <View
               >
@@ -79,7 +77,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 25,
-    paddingTop: 20,
   },
   rowInput: {
     marginTop: 15,
