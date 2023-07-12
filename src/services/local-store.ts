@@ -133,7 +133,7 @@ class AuthComponentStore {
     }
   };
 
-  validateBiometric = async (isUpdating?: boolean) => {
+  validateBiometric = async (isUpdating?: boolean, startLoader?: any ) => {
     try {
       const loginHintToken = await SInfo.getItem(BIO_TOKEN, {
         ...sensitiveInfoOptions,
@@ -148,6 +148,9 @@ class AuthComponentStore {
       });
       if (!loginHintToken) {
         return biometricChangeErrorCode;
+      }
+      if(startLoader) {
+        startLoader(true);
       }
       const authorizeReponse = await AuthServices.instance().authorizePushOnly(loginHintToken);
       if (isUpdating && authorizeReponse) {
