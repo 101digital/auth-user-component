@@ -329,7 +329,7 @@ const ADBUserDetailsScreenComponent = ({
                   editable={false}
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={onPressReligionInput}
-                  onPressIn={onPressReligionInput}
+                  onInputPress={onPressReligionInput}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
@@ -343,7 +343,7 @@ const ADBUserDetailsScreenComponent = ({
                   editable={false}
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={onPressMaritialStatus}
-                  onPressIn={onPressMaritialStatus}
+                  onInputPress={onPressMaritialStatus}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
@@ -437,7 +437,7 @@ const ADBUserDetailsScreenComponent = ({
                   editable={false}
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={() => getCityList(values.postcode)}
-                  onPressIn={() => getCityList(values.postcode)}
+                  onInputPress={() => getCityList(values.postcode)}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
@@ -466,7 +466,7 @@ const ADBUserDetailsScreenComponent = ({
                   placeholder={i18n.t('user_details.employment_type')}
                   editable={false}
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
-                  onPressIn={onPressImploymentType}
+                  onInputPress={onPressImploymentType}
                   onClickSuffixIcon={onPressImploymentType}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
@@ -488,7 +488,7 @@ const ADBUserDetailsScreenComponent = ({
                       hideUnderLine={true}
                       placeholder={i18n.t('user_details.employment_sector')}
                       editable={false}
-                      onPressIn={onPressImploymentSector}
+                      onInputPress={onPressImploymentSector}
                       onClickSuffixIcon={onPressImploymentSector}
                       multiline={values.employmentSector.length > 50}
                       style={{
@@ -549,7 +549,7 @@ const ADBUserDetailsScreenComponent = ({
                       hideUnderLine={true}
                       placeholder={i18n.t('user_details.occupation')}
                       editable={false}
-                      onPressIn={onPressOccupation}
+                      onInputPress={onPressOccupation}
                       onClickSuffixIcon={onPressOccupation}
                       suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                       type='custom'
