@@ -573,11 +573,9 @@ const ADBUserDetailsScreenComponent = ({
                 <ADBInputField
                   name={'annualIncome'}
                   hideUnderLine={true}
-                  prefixText={values.annualIncome.length > 0 ? i18n?.t(
+                  prefixText={i18n?.t(
                         "account_origination.employment_details.currency"
-                      )+ ' ' ?? "RM " : i18n?.t(
-                        "account_origination.employment_details.currency"
-                      )+' 0.00' ?? "RM"+' 0.00'}
+                      )+ ' ' ?? "RM "}
                   placeholder={i18n.t('user_details.annualIncome')}
                   type='custom'
                   inputType={InputTypeEnum.MATERIAL}
@@ -588,7 +586,7 @@ const ADBUserDetailsScreenComponent = ({
                         values.annualIncome,
                         'blur'
                       );
-                      setFieldValue("annualIncome", currencyFormated === '0.00'? '' :currencyFormated);
+                      setFieldValue("annualIncome", currencyFormated);
                     }
                     setCheckEdit('');
                   }}
