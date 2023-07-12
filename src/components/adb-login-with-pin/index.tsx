@@ -89,7 +89,10 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   };
 
   const onValidateBiometric = async () => {
-    const authorizeResponse = await authComponentStore.validateBiometric();
+    const authorizeResponse = await authComponentStore.validateBiometric(
+            false,
+            setIsLoading
+          );
     if (authorizeResponse) {
       if (
         authorizeResponse.resumeUrl &&
@@ -99,6 +102,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
         saveResumeURL(authorizeResponse.resumeUrl);
       } else if (authorizeResponse.error && authorizeResponse.error.code) {
+        setIsLoading(false);
         setBiometricAttempt(biometricAttempt + 1);
         if (authorizeResponse.error.code === 'PASSWORD_LOCKED_OUT') {
           onShowLockDownModal();
@@ -106,6 +110,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           setIsSignedIn(false);
         }
       } else {
+        setIsLoading(false);
         setBiometricAttempt(biometricAttempt + 1);
         setIsSignedIn(false);
       }
