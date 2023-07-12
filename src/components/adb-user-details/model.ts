@@ -42,7 +42,7 @@ export class UserDetailsData {
       profile?.employmentDetails?.[0]?.sector ?? '',
       profile?.employmentDetails?.[0]?.companyName ?? '',
       profile?.employmentDetails?.[0]?.occupation ?? '',
-      newAnnualIncome?.currencyFormated ? newAnnualIncome?.currencyFormated === '0.00' ? '' : newAnnualIncome?.currencyFormated : '',
+      newAnnualIncome?.currencyFormated ?? '',
     );
   }
 }
