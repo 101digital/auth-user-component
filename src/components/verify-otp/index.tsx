@@ -147,7 +147,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
                 setIsShowingResendButton(true);
               }}
               formatTime={(sec: number) => `${fancyTimeFormat(sec)}s`}
-              endText={'Resend'}
+              endText={i18n.t('verify_otp.resend_btn_title') ?? 'Resend OTP'}
               style={{
                 endTextStyle: styles.sendAnotherLabel,
                 runningTextStyle: styles.durationLabel,

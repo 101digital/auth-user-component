@@ -188,10 +188,6 @@ const styles = StyleSheet.create({
   errorWrapper: {
     alignItems: 'center',
   },
-  errorText: {
-    color: '#020000',
-    marginLeft: 7,
-  },
   imagePlaceHolderContainer: {
     alignItems: 'center',
     justifyContent: 'space-around',
