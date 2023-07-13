@@ -122,6 +122,18 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     checkBiometricStatus();
   }, []);
 
+  const getIncorrectPinErrorMessage = () => {
+    if(retryCount === 1) {
+      return i18n?.t('login_component.lbl_incorrect_pin_2_attempts') ??
+            'Incorrect PIN. Please try again. You have 2 remaining attempts left.'
+    }
+    else if(retryCount === 2) {
+      return i18n?.t('login_component.lbl_incorrect_pin_1_attempt') ??
+            'PIN is incorrect. You have 1 remaining attempts.'
+    }
+    return '';
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -140,10 +152,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           onValidateBiometric={onValidateBiometric}
           isBiometricEnable={biometricAttempt < 3 && biometricStatus}
           showError={isNotMatched}
-          errorMessage={(
-            i18n?.t('login_component.lbl_incorrect_pin') ??
-            'PIN is incorrect. You have %s remaining attempts.'
-          ).replace('%s', 3 - retryCount)}
+          errorMessage={getIncorrectPinErrorMessage()}
           isProcessing={isLoading}
           clearError={()=>{}}
         />

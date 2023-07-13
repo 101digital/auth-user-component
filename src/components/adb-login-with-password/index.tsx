@@ -101,6 +101,7 @@ const ADBLoginWithPasswordComponent = ({
                   name={'password'}
                   secureTextEntry={!isVisiblePassword}
                   placeholder={'Password'}
+                  placeholderHint={i18n.t('login_component.enter_password') ?? 'Enter password'}
                   onChange={() => setShowIncorrectPassword(false)}
                   suffixIcon={
                     <TouchableOpacity
@@ -123,7 +124,7 @@ const ADBLoginWithPasswordComponent = ({
                 <TouchableOpacity onPress={onResetPassword} testID="forgot-password-button">
                   <Text style={styles.forgetPasswordLabel}>{`${i18n.t(
                     'login_component.btn_forgot_password'
-                  ) ?? 'Forgot password'}?`}</Text>
+                  ) ?? 'Forgot password'}`}</Text>
                 </TouchableOpacity>
               </View>
               <ADBButton

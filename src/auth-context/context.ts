@@ -579,6 +579,7 @@ export const useAuthContextValue = (): AuthContextData => {
       }
     } catch (error) {
       setIsVerifyLogin(false);
+      setErrorVerifySignIn(error as Error);
     }
     return false;
   }, []);
