@@ -549,12 +549,16 @@ export const useAuthContextValue = (): AuthContextData => {
         );
         setIsRecoveringUserPassword(false);
         if (response && response.id) {
+          setFlowId(response.id);
           if (response._embedded.devices?.length > 0) {
             const smsDevice = response._embedded.devices.find(
               (dvc: Devices) => dvc.type === 'SMS' && dvc.status === 'ACTIVE'
             );
             if (smsDevice) {
               setUserMobileNumberHint(smsDevice.phone);
+            }
+            if (response.selectedDevice?.id) {
+              setSelectedDeviceId(response.selectedDevice.id);
             }
           }
         }
