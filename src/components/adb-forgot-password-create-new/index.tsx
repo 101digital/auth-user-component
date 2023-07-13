@@ -200,11 +200,11 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                 <View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
                     ) : checkSpecialCharacter(values.createNew) ? (
-                      <CheckIcon size={18} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
                     ) : (
-                      <NonCheckIcon size={18} />
+                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -214,11 +214,11 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   </View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
                     ) : checkAtLeast1upperandLower(values.createNew) ? (
-                      <CheckIcon size={18} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
                     ) : (
-                      <NonCheckIcon size={18} />
+                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -228,11 +228,11 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   </View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
                     ) : checkAtLeast1digit(values.createNew) ? (
-                      <CheckIcon size={18} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
                     ) : (
-                      <NonCheckIcon size={18} />
+                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -241,11 +241,11 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   </View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
                     ) : checkIs8Character(values.createNew) ? (
-                      <CheckIcon size={18} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
                     ) : (
-                      <NonCheckIcon size={18} />
+                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -255,13 +255,13 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   </View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <CheckIcon size={18} color={colors.lightSubtitle} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
                     ) : values.confirmNew !== values.createNew ||
                       values.confirmNew.trim() === '' ||
                       values.createNew.trim() === '' ? (
-                      <NonCheckIcon size={18} />
+                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
                     ) : (
-                      <CheckIcon size={18} />
+                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -306,9 +306,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   subTitle12: {
-    color: colors.primaryBlack,
+    color: colors.lightSubtitle,
     fontSize: 12,
-    fontFamily: fonts.regular,
+    fontWeight: '400',
+    lineHeight: 16,
+    fontFamily: fonts.OutfitRegular,
   },
   subTitle16: {
     color: colors.primaryBlack,
@@ -337,7 +339,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 6,
   },
   width: {
     width: 6,
@@ -356,5 +358,11 @@ const styles = StyleSheet.create({
   },
   alignCenter: {
     textAlign: 'center',
+  },
+  checkIconStyle: {
+    paddingTop:3,
+  },
+  crossIconStyle: {
+    paddingTop:2,
   },
 });
