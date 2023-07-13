@@ -130,12 +130,12 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   name={'createNew'}
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
-                  isFocusError={isDisabledSubmit}
+                  isFocusError={dirty && isDisabledSubmit}
                   onBlur={() => {
                     setFieldTouched('createNew');
                   }}
                   placeholder={
-                    i18n.t('change_password.lbl_title_create_new_password') ?? 'Create new password'
+                    i18n.t('password.createPassword') ?? 'Create password'
                   }
                   placeholderHint={i18n.t('password.password_hint') ?? 'Enter password'}
                   secureTextEntry={showNewPass}
@@ -164,7 +164,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                 <ADBInputField
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
-                  isFocusError={isDisabledSubmit}
+                  isFocusError={dirty && isDisabledSubmit}
                   name={'confirmNew'}
                   placeholderHint={
                     i18n.t('password.confirm_password_hint') ?? 'Enter same password'
@@ -173,7 +173,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                     setFieldTouched('confirmNew');
                   }}
                   placeholder={
-                    i18n.t('change_password.lbl_title_confirm_password') ?? 'Confirm new password'
+                    i18n.t('password.confirmPassword') ?? 'Confirm password'
                   }
                   secureTextEntry={showConfirmPass}
                   autoCapitalize="none"

@@ -149,7 +149,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   style={styles.flex}
                   testID="login-forgot-password-button"
                 >
-                  <Text style={styles.forgotPasswordTitle}>{`${'Forgot password'}?`}</Text>
+                  <Text style={styles.forgotPasswordTitle}>{i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'}</Text>
                 </TouchableOpacity>
               </View>
             </View>
