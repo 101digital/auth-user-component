@@ -1,11 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  NativeModules,
-  Platform,
-} from 'react-native';
+import { StyleSheet, View, Text, NativeModules, Platform } from 'react-native';
 import {
   ADBButton,
   ImageIcon,
@@ -21,7 +15,7 @@ import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { colors } from '../../assets';
 import { AuthServices } from 'react-native-auth-component';
-import { AeonIcon } from "@/assets/icons";
+import { AeonIcon } from '@/assets/icons';
 
 type ADBLoginWithPINProps = {
   onFailedVerified: () => void;
@@ -45,9 +39,9 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
 
   const checkBiometricStatus = async () => {
     const isEnabled = await authComponentStore.getIsEnableBiometric();
-    if(isEnabled && JSON.parse(isEnabled)) {
+    if (isEnabled && JSON.parse(isEnabled)) {
       setBiometricStatus(true);
-    }else{
+    } else {
       setBiometricStatus(false);
     }
   };
@@ -68,7 +62,10 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
         onFailedVerified();
       }
     } else {
-      if (authorizeResponse?.status === 'FAILED') {
+      if (authorizeResponse.message === 'Network Error') {
+        setIsLoading(false);
+        otpRef.current?.clearInput();
+      } else if (authorizeResponse?.status === 'FAILED') {
         setIsLoading(false);
         setIsNotMatched(false);
         setRetryCount(0);
@@ -89,10 +86,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   };
 
   const onValidateBiometric = async () => {
-    const authorizeResponse = await authComponentStore.validateBiometric(
-            false,
-            setIsLoading
-          );
+    const authorizeResponse = await authComponentStore.validateBiometric(false, setIsLoading);
     if (authorizeResponse) {
       if (
         authorizeResponse.resumeUrl &&
@@ -123,16 +117,19 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
   }, []);
 
   const getIncorrectPinErrorMessage = () => {
-    if(retryCount === 1) {
-      return i18n?.t('login_component.lbl_incorrect_pin_2_attempts') ??
-            'Incorrect PIN. Please try again. You have 2 remaining attempts left.'
-    }
-    else if(retryCount === 2) {
-      return i18n?.t('login_component.lbl_incorrect_pin_1_attempt') ??
-            'PIN is incorrect. You have 1 remaining attempts.'
+    if (retryCount === 1) {
+      return (
+        i18n?.t('login_component.lbl_incorrect_pin_2_attempts') ??
+        'Incorrect PIN. Please try again. You have 2 remaining attempts left.'
+      );
+    } else if (retryCount === 2) {
+      return (
+        i18n?.t('login_component.lbl_incorrect_pin_1_attempt') ??
+        'PIN is incorrect. You have 1 remaining attempts.'
+      );
     }
     return '';
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -154,9 +151,9 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           showError={isNotMatched}
           errorMessage={getIncorrectPinErrorMessage()}
           isProcessing={isLoading}
-          clearError={()=>{}}
+          clearError={() => {}}
         />
-        <View style={styles.bottomSpacing}/>
+        <View style={styles.bottomSpacing} />
       </View>
     </View>
   );
@@ -166,7 +163,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 22,
-    backgroundColor:colors.lightWhite
+    backgroundColor: colors.lightWhite,
   },
   header: {
     alignItems: 'center',
@@ -204,7 +201,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   bottomSpacing: {
-    height: Platform.OS === 'ios' ? 10 : 20
+    height: Platform.OS === 'ios' ? 10 : 20,
   },
   imagePlaceHolderWrapper: {
     height: 80,
