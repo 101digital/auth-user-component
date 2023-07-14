@@ -1,5 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Text, Platform, Keyboard, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Platform,
+  Keyboard,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import {
   ADBButton,
   ADBInputField,
@@ -19,7 +27,7 @@ import remoteConfig from '@react-native-firebase/remote-config';
 import { AccountOriginationService } from 'account-origination-component/src/service/onboarding-service';
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 import { colors } from 'account-origination-component/src/assets';
-import ADBBottomSheet, { BSOption }  from 'account-origination-component/src/components/bottomSheet';
+import ADBBottomSheet, { BSOption } from 'account-origination-component/src/components/bottomSheet';
 
 type ADBUserDetailsScreenComponentProps = {
   onSuccess: () => void;
@@ -48,8 +56,9 @@ const ADBUserDetailsScreenComponent = ({
   const [isUnEmployed, setIsUnEmployed] = useState<boolean>(
     profile?.employmentDetails?.[0]?.employmentType === 'Unemployed'
   );
-  const [isOutsideLabourForce, setIsOutsizeLabourForce] =
-    useState<boolean>(profile?.employmentDetails?.[0]?.employmentType === "Outside Labour Force");
+  const [isOutsideLabourForce, setIsOutsizeLabourForce] = useState<boolean>(
+    profile?.employmentDetails?.[0]?.employmentType === 'Outside Labour Force'
+  );
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [checkEdit, setCheckEdit] = useState<string>('');
 
@@ -198,32 +207,25 @@ const ADBUserDetailsScreenComponent = ({
       : bsData.items.filter((i: BSOption) => i.value !== 'Not Applicable')
     : [];
 
-    useEffect(() => {
-      const keyboardDidShowListener = Keyboard.addListener(
-        "keyboardDidShow",
-        (e) => {
-          const height =
-            e.endCoordinates.height - (Platform.OS === "android" ? 50 : 0);
-          setKeyboardHeight(height);
-        }
-      );
-  
-      const keyboardDidHideListener = Keyboard.addListener(
-        "keyboardDidHide",
-        () => {
-          setKeyboardHeight(0);
-        }
-      );
-      return () => {
-        keyboardDidHideListener.remove();
-        keyboardDidShowListener.remove();
-      };
-    }, []);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+      const height = e.endCoordinates.height - (Platform.OS === 'android' ? 50 : 0);
+      setKeyboardHeight(height);
+    });
 
-    const handleBlur = (value: string) => {
-      onPressCity(value);
-      setCheckEdit('');
-    }
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  const handleBlur = (value: string) => {
+    onPressCity(value);
+    setCheckEdit('');
+  };
 
   return (
     <View style={styles.container}>
@@ -251,9 +253,11 @@ const ADBUserDetailsScreenComponent = ({
               {
                 ...profile?.employmentDetails?.[0],
                 employmentType: values.employmentType,
-                sector: isUnEmployed ? 'Not Application' : values.employmentSector,
+                sector: isUnEmployed ? 'Not Applicable' : values.employmentSector,
                 companyName: isUnEmployed ? '' : values.employerName,
-                occupation: isUnEmployed ? '' : values.occupation,
+                occupation: isUnEmployed
+                  ? i18n.t('saving_account_detail_screen.other_outside_labour_force')
+                  : values.occupation,
               },
             ],
             creditDetails: [
@@ -278,12 +282,12 @@ const ADBUserDetailsScreenComponent = ({
               `${values.annualIncome}`.length > 0 &&
               currencyFormated !== `${values.annualIncome}`
             ) {
-              setFieldValue("annualIncome", currencyFormated === '0.00'? '' :currencyFormated);
+              setFieldValue('annualIncome', currencyFormated === '0.00' ? '' : currencyFormated);
             } else if (values.annualIncome[0] === '.') {
               setFieldValue('annualIncome', '0.');
             }
           }
-          
+
           return (
             <>
               <KeyboardAwareScrollView
@@ -302,7 +306,7 @@ const ADBUserDetailsScreenComponent = ({
                   name={'nickName'}
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.preferred_name')}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'nickName'}
                   value={values.nickName}
@@ -311,12 +315,10 @@ const ADBUserDetailsScreenComponent = ({
                   }}
                   suffixIcon={
                     checkEdit !== 'nickName' && (
-                      <TouchableOpacity 
-                        onPress={() => setCheckEdit('nickName')}
-                      >
+                      <TouchableOpacity onPress={() => setCheckEdit('nickName')}>
                         <TextEditIcon size={21} />
                       </TouchableOpacity>
-                    )  
+                    )
                   }
                   errors={errors}
                   touched={touched}
@@ -330,7 +332,7 @@ const ADBUserDetailsScreenComponent = ({
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={onPressReligionInput}
                   onInputPress={onPressReligionInput}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
                   touched={touched}
@@ -344,7 +346,7 @@ const ADBUserDetailsScreenComponent = ({
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={onPressMaritialStatus}
                   onInputPress={onPressMaritialStatus}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
                   touched={touched}
@@ -356,7 +358,7 @@ const ADBUserDetailsScreenComponent = ({
                   name={'line1'}
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.line1')}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'line1'}
                   value={values.line1}
@@ -365,12 +367,10 @@ const ADBUserDetailsScreenComponent = ({
                   }}
                   suffixIcon={
                     checkEdit !== 'line1' && (
-                      <TouchableOpacity 
-                        onPress={() => setCheckEdit('line1')}
-                      >
+                      <TouchableOpacity onPress={() => setCheckEdit('line1')}>
                         <TextEditIcon size={21} />
                       </TouchableOpacity>
-                    )  
+                    )
                   }
                   errors={errors}
                   touched={touched}
@@ -380,7 +380,7 @@ const ADBUserDetailsScreenComponent = ({
                   name={'line2'}
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.line2')}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'line2'}
                   value={values.line2}
@@ -389,12 +389,10 @@ const ADBUserDetailsScreenComponent = ({
                   }}
                   suffixIcon={
                     checkEdit !== 'line2' && (
-                      <TouchableOpacity 
-                        onPress={() => setCheckEdit('line2')}
-                      >
+                      <TouchableOpacity onPress={() => setCheckEdit('line2')}>
                         <TextEditIcon size={21} />
                       </TouchableOpacity>
-                    )  
+                    )
                   }
                   errors={errors}
                   touched={touched}
@@ -410,21 +408,19 @@ const ADBUserDetailsScreenComponent = ({
                     setListCity([]);
                     setListState([]);
                   }}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'postcode'}
                   value={values.postcode}
                   suffixIcon={
                     checkEdit !== 'postcode' && (
-                      <TouchableOpacity 
-                        onPress={() => setCheckEdit('postcode')}
-                      >
+                      <TouchableOpacity onPress={() => setCheckEdit('postcode')}>
                         <TextEditIcon size={21} />
                       </TouchableOpacity>
-                    )  
+                    )
                   }
-                  autoComplete={"off"}
-                  keyboardType={"numeric"}
+                  autoComplete={'off'}
+                  keyboardType={'numeric'}
                   returnKeyType="done"
                   errors={errors}
                   touched={touched}
@@ -438,7 +434,7 @@ const ADBUserDetailsScreenComponent = ({
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onClickSuffixIcon={() => getCityList(values.postcode)}
                   onInputPress={() => getCityList(values.postcode)}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
                   touched={touched}
@@ -450,7 +446,7 @@ const ADBUserDetailsScreenComponent = ({
                   placeholder={i18n.t('user_details.state')}
                   editable={false}
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
                   touched={touched}
@@ -468,7 +464,7 @@ const ADBUserDetailsScreenComponent = ({
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   onInputPress={onPressImploymentType}
                   onClickSuffixIcon={onPressImploymentType}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
                   touched={touched}
@@ -476,7 +472,9 @@ const ADBUserDetailsScreenComponent = ({
 
                 {isUnEmployed || isOutsideLabourForce ? (
                   <View style={styles.rowInfoFixed}>
-                    <Text style={styles.rowInfoName}>{i18n.t('user_details.employment_sector')}</Text>
+                    <Text style={styles.rowInfoName}>
+                      {i18n.t('user_details.employment_sector')}
+                    </Text>
                     <Text style={styles.rowInfoValue}>{i18n.t('user_details.not_applicable')}</Text>
                   </View>
                 ) : (
@@ -495,12 +493,12 @@ const ADBUserDetailsScreenComponent = ({
                         inputContainerStyle:
                           values.employmentSector.length > 50
                             ? {
-                                height: "auto",
+                                height: 'auto',
                               }
                             : {},
                       }}
                       suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
-                      type='custom'
+                      type="custom"
                       inputType={InputTypeEnum.MATERIAL}
                       errors={errors}
                       touched={touched}
@@ -512,37 +510,33 @@ const ADBUserDetailsScreenComponent = ({
                   <View />
                 ) : (
                   <View>
-                    {
-                      !isOutsideLabourForce && (
-                        <>
-                         <View style={styles.verticalSpacing} />
-                          <ADBInputField
-                            name={'employerName'}
-                            hideUnderLine={true}
-                            placeholder={i18n.t('user_details.employer_name')}
-                            type='custom'
-                            inputType={InputTypeEnum.MATERIAL}
-                            editable={checkEdit === 'employerName'}
-                            value={values.employerName}
-                            onBlur={() => {
-                              setCheckEdit('');
-                            }}
-                            suffixIcon={
-                              checkEdit !== 'employerName' && (
-                                <TouchableOpacity 
-                                  onPress={() => setCheckEdit('employerName')}
-                                >
-                                  <TextEditIcon size={21} />
-                                </TouchableOpacity>
-                              )  
-                            }
-                            errors={errors}
-                            touched={touched}
-                          />    
-                        </>
-                      )
-                    }
-                    
+                    {!isOutsideLabourForce && (
+                      <>
+                        <View style={styles.verticalSpacing} />
+                        <ADBInputField
+                          name={'employerName'}
+                          hideUnderLine={true}
+                          placeholder={i18n.t('user_details.employer_name')}
+                          type="custom"
+                          inputType={InputTypeEnum.MATERIAL}
+                          editable={checkEdit === 'employerName'}
+                          value={values.employerName}
+                          onBlur={() => {
+                            setCheckEdit('');
+                          }}
+                          suffixIcon={
+                            checkEdit !== 'employerName' && (
+                              <TouchableOpacity onPress={() => setCheckEdit('employerName')}>
+                                <TextEditIcon size={21} />
+                              </TouchableOpacity>
+                            )
+                          }
+                          errors={errors}
+                          touched={touched}
+                        />
+                      </>
+                    )}
+
                     <View style={styles.verticalSpacing} />
                     <ADBInputField
                       name={'occupation'}
@@ -552,14 +546,14 @@ const ADBUserDetailsScreenComponent = ({
                       onInputPress={onPressOccupation}
                       onClickSuffixIcon={onPressOccupation}
                       suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
-                      type='custom'
+                      type="custom"
                       inputType={InputTypeEnum.MATERIAL}
                       multiline={values.employmentSector.length > 50}
                       style={{
                         inputContainerStyle:
                           values.employmentSector.length > 50
                             ? {
-                                height: "auto",
+                                height: 'auto',
                               }
                             : {},
                       }}
@@ -573,11 +567,11 @@ const ADBUserDetailsScreenComponent = ({
                 <ADBInputField
                   name={'annualIncome'}
                   hideUnderLine={true}
-                  prefixText={i18n?.t(
-                        "account_origination.employment_details.currency"
-                      )+ ' ' ?? "RM "}
+                  prefixText={
+                    i18n?.t('account_origination.employment_details.currency') + ' ' ?? 'RM '
+                  }
                   placeholder={i18n.t('user_details.annualIncome')}
-                  type='custom'
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'annualIncome'}
                   onBlur={() => {
@@ -586,21 +580,19 @@ const ADBUserDetailsScreenComponent = ({
                         values.annualIncome,
                         'blur'
                       );
-                      setFieldValue("annualIncome", currencyFormated);
+                      setFieldValue('annualIncome', currencyFormated);
                     }
                     setCheckEdit('');
                   }}
                   suffixIcon={
                     checkEdit !== 'annualIncome' && (
-                      <TouchableOpacity 
-                        onPress={() => setCheckEdit('annualIncome')}
-                      >
+                      <TouchableOpacity onPress={() => setCheckEdit('annualIncome')}>
                         <TextEditIcon size={21} />
                       </TouchableOpacity>
-                    )  
+                    )
                   }
-                  autoComplete={"off"}
-                  keyboardType={"numeric"}
+                  autoComplete={'off'}
+                  keyboardType={'numeric'}
                   returnKeyType="done"
                   errors={errors}
                   touched={touched}
@@ -628,7 +620,12 @@ const ADBUserDetailsScreenComponent = ({
                   isShowBottomSheet={isShowBottomSheet}
                   isLoadingValues={isLoadingValues}
                   bsContainerStyle={{
-                    minHeight: bsData.name === "employmentSector" || bsData.name === "occupation" ? height / 1.1: bsData.name === "employmentType"? height / 1.5 : 450,
+                    minHeight:
+                      bsData.name === 'employmentSector' || bsData.name === 'occupation'
+                        ? height / 1.1
+                        : bsData.name === 'employmentType'
+                        ? height / 1.5
+                        : 450,
                     backgroundColor: defaultColors.mainBackgroundColor,
                   }}
                   onChangeValue={setSelectedBSValue}
@@ -648,17 +645,27 @@ const ADBUserDetailsScreenComponent = ({
                       } else if (value === 'Outside Labour Force') {
                         setIsUnEmployed(false);
                         setIsOutsizeLabourForce(true);
-                        setFieldValue('occupation',  profile?.employmentDetails?.[0]?.employmentType === value ? profile?.employmentDetails?.[0]?.occupation :'');
+                        setFieldValue(
+                          'occupation',
+                          profile?.employmentDetails?.[0]?.employmentType === value
+                            ? profile?.employmentDetails?.[0]?.occupation
+                            : ''
+                        );
                       } else {
                         setIsUnEmployed(false);
                         setIsOutsizeLabourForce(false);
                         setFieldValue('employmentSector', '');
-                        setFieldValue('occupation', profile?.employmentDetails?.[0]?.employmentType === value ? profile?.employmentDetails?.[0]?.occupation :'');
+                        setFieldValue(
+                          'occupation',
+                          profile?.employmentDetails?.[0]?.employmentType === value
+                            ? profile?.employmentDetails?.[0]?.occupation
+                            : ''
+                        );
                       }
                     }
                     setTimeout(() => {
-                        formikRef.current?.validateForm();
-                    }, 500)
+                      formikRef.current?.validateForm();
+                    }, 500);
                   }}
                   selectedValue={selectedBSValue}
                   selectedBSSubValue={selectedBSSubValue}
@@ -787,7 +794,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     backgroundColor: defaultColors.neutral,
     paddingHorizontal: 16,
-    borderRadius: 12
+    borderRadius: 12,
   },
   rowInfoTitle: {
     color: '#1B1B1B',

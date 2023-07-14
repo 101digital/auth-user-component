@@ -632,6 +632,9 @@ export class AuthServices {
         return responseAuth.data;
       }
     } catch (error) {
+      if (error?.message === 'Network Error') {
+        return error;
+      }
       return false;
     }
   };
