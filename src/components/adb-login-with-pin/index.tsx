@@ -23,10 +23,11 @@ type ADBLoginWithPINProps = {
   onError: (err: Error) => void;
   isSkipSMSOTP?: boolean;
   onShowLockDownModal: () => void;
+  onNetworkError: () => void;
 };
 
 const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
-  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal } = prop;
+  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal, onNetworkError } = prop;
   const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
   const { i18n } = useContext(ThemeContext);
   const otpRef = useRef<OTPFieldRef>();
@@ -64,6 +65,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     } else {
       if (authorizeResponse.message === 'Network Error') {
         setIsLoading(false);
+        onNetworkError();
         otpRef.current?.clearInput();
       } else if (authorizeResponse?.status === 'FAILED') {
         setIsLoading(false);
