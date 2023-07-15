@@ -253,7 +253,7 @@ const ADBUserDetailsScreenComponent = ({
               {
                 ...profile?.employmentDetails?.[0],
                 employmentType: values.employmentType,
-                sector: isUnEmployed ? 'Not Applicable' : values.employmentSector,
+                sector: isUnEmployed ? 'Not applicable' : values.employmentSector,
                 companyName: isUnEmployed ? '' : values.employerName,
                 occupation: isUnEmployed
                   ? i18n.t('saving_account_detail_screen.other_outside_labour_force')
