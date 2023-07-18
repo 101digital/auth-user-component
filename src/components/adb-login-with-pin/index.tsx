@@ -23,10 +23,12 @@ type ADBLoginWithPINProps = {
   onError: (err: Error) => void;
   isSkipSMSOTP?: boolean;
   onShowLockDownModal: () => void;
+  onNetworkError: () => void;
+  handleBinding: () => void;
 };
 
 const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
-  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal } = prop;
+  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal, onNetworkError, handleBinding } = prop;
   const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
   const { i18n } = useContext(ThemeContext);
   const otpRef = useRef<OTPFieldRef>();
@@ -64,6 +66,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     } else {
       if (authorizeResponse.message === 'Network Error') {
         setIsLoading(false);
+        onNetworkError();
         otpRef.current?.clearInput();
       } else if (authorizeResponse?.status === 'FAILED') {
         setIsLoading(false);
@@ -77,10 +80,12 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           setIsSignedIn(false);
         }
       } else if (authorizeResponse.authSession && authorizeResponse?.resumeUrl) {
+        handleBinding();
         PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
         AuthServices.instance().setSessionId(authorizeResponse.authSession.id);
         saveResumeURL(authorizeResponse?.resumeUrl);
         onSuccessVerified();
+        setIsLoading(false);
       }
     }
   };
