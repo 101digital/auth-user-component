@@ -224,7 +224,6 @@ const ADBUserDetailsScreenComponent = ({
 
   const handleBlur = (value: string) => {
     onPressCity(value);
-    setCheckEdit('');
   };
 
   return (
@@ -311,7 +310,9 @@ const ADBUserDetailsScreenComponent = ({
                   editable={checkEdit === 'nickName'}
                   value={values.nickName}
                   onBlur={() => {
-                    setCheckEdit('');
+                    if (checkEdit === 'nickName') {
+                      setCheckEdit('');
+                    }
                   }}
                   suffixIcon={
                     checkEdit !== 'nickName' && (
@@ -363,7 +364,9 @@ const ADBUserDetailsScreenComponent = ({
                   editable={checkEdit === 'line1'}
                   value={values.line1}
                   onBlur={() => {
-                    setCheckEdit('');
+                    if (checkEdit === 'line1') {
+                      setCheckEdit('');
+                    }
                   }}
                   suffixIcon={
                     checkEdit !== 'line1' && (
@@ -385,7 +388,9 @@ const ADBUserDetailsScreenComponent = ({
                   editable={checkEdit === 'line2'}
                   value={values.line2}
                   onBlur={() => {
-                    setCheckEdit('');
+                    if (checkEdit === 'line2') {
+                      setCheckEdit('');
+                    }
                   }}
                   suffixIcon={
                     checkEdit !== 'line2' && (
@@ -403,7 +408,12 @@ const ADBUserDetailsScreenComponent = ({
                   hideUnderLine={true}
                   maxLength={5}
                   placeholder={i18n.t('user_details.postcode')}
-                  onBlur={() => handleBlur(values.postcode)}
+                  onBlur={() => {
+                    handleBlur(values.postcode)
+                    if (checkEdit === 'postcode') {
+                      setCheckEdit('');
+                    }
+                  }}
                   onFocus={() => {
                     setListCity([]);
                     setListState([]);
@@ -522,7 +532,9 @@ const ADBUserDetailsScreenComponent = ({
                           editable={checkEdit === 'employerName'}
                           value={values.employerName}
                           onBlur={() => {
-                            setCheckEdit('');
+                            if (checkEdit === 'employerName') {
+                              setCheckEdit('');
+                            }
                           }}
                           suffixIcon={
                             checkEdit !== 'employerName' && (
@@ -582,7 +594,10 @@ const ADBUserDetailsScreenComponent = ({
                       );
                       setFieldValue('annualIncome', currencyFormated);
                     }
-                    setCheckEdit('');
+
+                    if (checkEdit === 'annualIncome') {
+                      setCheckEdit('');
+                    }
                   }}
                   suffixIcon={
                     checkEdit !== 'annualIncome' && (
