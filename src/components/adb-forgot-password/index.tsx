@@ -6,7 +6,7 @@ import { AuthContext } from '../../auth-context';
 import { Formik, FormikProps, isObject } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
-import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
+import { ADBButton, ADBInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
@@ -79,6 +79,8 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     autoCapitalize="none"
                     keyboardType={'email-address'}
                     placeholderHint={i18n.t('login_component.example_email') ?? 'example@email.com'}
+                    placeholderTextColor={defaultColors.black500}
+                    placeHolderHintTextColor={defaultColors.gray400}
                     testID='input-email'
                     errors={errors}
                     touched={touched}
@@ -94,6 +96,8 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     returnKeyType="done"
                     keyboardType={'ascii-capable'}
                     placeholderHint={i18n.t('id_number.enter_your_id_number') ?? 'Enter your ID number'}
+                    placeholderTextColor={defaultColors.black500}
+                    placeHolderHintTextColor={defaultColors.gray400}
                     testID='input-id'
                     errors={errors}
                     touched={touched}

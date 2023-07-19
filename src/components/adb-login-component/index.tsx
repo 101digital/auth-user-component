@@ -21,6 +21,7 @@ import {
   EyesClosedIcon,
   EyesIcon,
   ThemeContext,
+  defaultColors,
 } from 'react-native-theme-component';
 import { OTP_REQUIRED, PASSWORD_LOCKED_OUT, SINGLE_FACTOR_COMPLETED } from '../../utils/index';
 import { RegistrationContext } from 'react-native-register-component';
@@ -50,7 +51,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { adbLoginSingleFactor, adbLogin, errorSignIn } = useContext(AuthContext);
   const { verifyExistedUserByEmail } = useContext(RegistrationContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
-
+  
   useEffect(() => {
     if (errorSignIn) {
       onLoginFailed();
@@ -120,6 +121,8 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   inputType={InputTypeEnum.MATERIAL}
                   returnKeyType="done"
                   placeholder={'Email'}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   autoCapitalize="none"
                   testID="login-user-name-input"
                   placeholderHint={i18n.t('login_component.example_email') ?? 'example@email.com'}
@@ -132,6 +135,8 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   inputType={InputTypeEnum.MATERIAL}
                   returnKeyType="done"
                   secureTextEntry={!isVisiblePassword}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   placeholder={'Password'}
                   autoCapitalize="none"
                   placeholderHint={i18n.t('login_component.enter_password') ?? 'Enter password'}

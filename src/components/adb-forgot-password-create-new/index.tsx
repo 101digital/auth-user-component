@@ -10,6 +10,7 @@ import {
   CrossIcon,
   ADBButton,
   NonCheckIcon,
+  defaultColors,
 } from 'react-native-theme-component';
 import { ADBChangePasswordData, ADBChangePasswordSchema } from './modal';
 import { PasswordMask } from './password-mask';
@@ -134,6 +135,8 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   onBlur={() => {
                     setFieldTouched('createNew');
                   }}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   placeholder={
                     i18n.t('password.createPassword') ?? 'Create password'
                   }
@@ -166,6 +169,8 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   inputType={InputTypeEnum.MATERIAL}
                   isFocusError={dirty && isDisabledSubmit}
                   name={'confirmNew'}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   placeholderHint={
                     i18n.t('password.confirm_password_hint') ?? 'Enter same password'
                   }
