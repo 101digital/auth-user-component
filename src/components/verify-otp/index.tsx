@@ -1,6 +1,6 @@
 import { VerifyOTPComponentProps } from './types';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Text, View, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, View, Keyboard, KeyboardAvoidingView, Platform, DeviceEventEmitter } from 'react-native';
 import useMergeStyles from './styles';
 import {
   ADBButton,
@@ -55,6 +55,14 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
     }
   }, [attemptCount]);
 
+  useEffect(() => {
+    if(errorVerifySignIn) {
+      if(errorVerifySignIn.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
+      }
+    }
+  }, [errorVerifySignIn]);
+
   const onValidateOTP = async () => {
     clearError && clearError();
     const isSuccess = await verifyOTP(value);
@@ -85,14 +93,16 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
 
   const getErrorMessage = () => {
     const errorCode = errorVerifySignIn?.response?.status;
-    switch (errorCode.toString()) {
-      case ResponseStatus.BAD_REQUEST:
-      case ResponseStatus.UNAUTHORIZED:
-        return i18n.t('errors.login.otp_not_matched') ?? 'Your OTP does not match.';
-      case ResponseStatus.TOO_MANY_REQUEST:
-        return i18n.t('errors.login.too_many_request') ?? 'Too many request.';
-      default:
-        return i18n.t('errors.common.server') ?? 'Internal Server Error';
+    if(errorCode) {
+      switch (errorCode.toString()) {
+        case ResponseStatus.BAD_REQUEST:
+        case ResponseStatus.UNAUTHORIZED:
+          return i18n.t('errors.login.otp_not_matched') ?? 'Your OTP does not match.';
+        case ResponseStatus.TOO_MANY_REQUEST:
+          return i18n.t('errors.login.too_many_request') ?? 'Too many request.';
+        default:
+          return i18n.t('errors.common.server') ?? 'Internal Server Error';
+      }
     }
   };
 
@@ -122,14 +132,14 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
             ref={otpRef}
             cellCount={6}
             disabled={isVerifyLogin}
-            isError={!!errorVerifySignIn}
+            isError={!!(errorVerifySignIn?.response?.status)}
             isUnMasked={true}
             onChanged={setValue}
             style={{
               focusCellContainerStyle: { borderBottomColor: '#1EBCE8' },
             }}
           />
-          {errorVerifySignIn && (
+          {errorVerifySignIn && errorVerifySignIn?.response?.status && (
             <View style={styles.errorWrapper}>
               <View style={styles.rowCenter}>
                 <AlertCircleIcon size={16} />

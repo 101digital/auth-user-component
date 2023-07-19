@@ -66,7 +66,7 @@ export interface AuthContextData {
   errorUserVerify?: Error;
   errorRequestResetPassword?: Error;
   clearUserVerificationData: () => void;
-  registerDevice: (token: string, platform: 'IOS' | 'Android') => Promise<boolean>;
+  registerDevice: (token: string, platform: 'IOS' | 'Android', onNetworkError: any) => Promise<boolean>;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
   updateUserInfo: (
@@ -95,7 +95,7 @@ export interface AuthContextData {
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
   verifyPassword: (password: string) => Promise<boolean>;
   adbGetAccessToken: (username: string, password: string) => Promise<void>;
-  pairingDevice: () => Promise<void>;
+  pairingDevice: (onNetworkError?: any) => Promise<void>;
   adbAuthorizePushOnly: () => Promise<boolean>;
   obtainNewAccessToken: () => Promise<boolean>;
   saveResumeURL: (url: string) => void;
@@ -169,7 +169,7 @@ export const authDefaultValue: AuthContextData = {
   setIsValidatedSubsequenceLogin: () => undefined,
   verifyPassword: async () => false,
   adbGetAccessToken: async () => undefined,
-  pairingDevice: async () => undefined,
+  pairingDevice: async (onNetworkError?: any) => undefined,
   adbAuthorizePushOnly: async () => false,
   obtainNewAccessToken: async () => false,
   saveResumeURL: () => false,
@@ -668,16 +668,16 @@ export const useAuthContextValue = (): AuthContextData => {
   );
 
   const registerDevice = useCallback(
-    async (token: string, platform: 'IOS' | 'Android') => {
+    async (token: string, platform: 'IOS' | 'Android', onNetworkError?: any) => {
       try {
         if (_profile) {
           setIsDeviceRegistering(true);
-          await AuthServices.instance().registerDevice(token, platform, _profile.userId);
+          await AuthServices.instance().registerDevice(token, platform, _profile.userId, onNetworkError);
           setIsDeviceRegistered(true);
           return true;
         } else {
           const { data } = await AuthServices.instance().fetchProfile();
-          await AuthServices.instance().registerDevice(token, platform, data.userId);
+          await AuthServices.instance().registerDevice(token, platform, data.userId, onNetworkError);
           setProfile({ ...data });
           return true;
         }
@@ -726,11 +726,11 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const pairingDevice = useCallback(async () => {
+  const pairingDevice = useCallback(async (onNetworkError?: any) => {
     try {
       const code = AuthServices.instance().getPairingCode();
       if (!code) {
-        const { pairingCode } = await AuthServices.instance().getLoginhintTokenAndPairingCode();
+        const { pairingCode } = await AuthServices.instance().getLoginhintTokenAndPairingCode(onNetworkError);
         PingOnesdkModule.pairDevice(pairingCode);
       } else {
         PingOnesdkModule.pairDevice(code);
