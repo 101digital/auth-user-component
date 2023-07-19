@@ -18,7 +18,7 @@ export interface IForgotPassword {
 const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPassword) => {
   const { onValidationSuccess, onErrorValidateID } = props;
   const { i18n } = useContext(ThemeContext);
-  const [errorModal, setErrorModal] = useState(false);;
+  const [errorModal, setErrorModal] = useState(false);
   const { validateUserForgotPassword, isRecoveringUserPassword } = useContext(AuthContext);
   const formikRef = useRef<FormikProps<InputIdData>>(null);
 
