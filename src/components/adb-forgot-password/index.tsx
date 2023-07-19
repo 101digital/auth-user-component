@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { Keyboard, Platform, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
 import { AuthContext } from '../../auth-context';
@@ -17,8 +17,6 @@ export interface IForgotPassword {
 
 const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPassword) => {
   const { onValidationSuccess, onErrorValidateID } = props;
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === 'dark'
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);;
   const { validateUserForgotPassword, isRecoveringUserPassword } = useContext(AuthContext);
@@ -81,8 +79,8 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     autoCapitalize="none"
                     keyboardType={'email-address'}
                     placeholderHint={i18n.t('login_component.example_email') ?? 'example@email.com'}
-                    placeholderTextColor={isDarkMode ? defaultColors.black500 : defaultColors.black500}
-                    placeHolderHintTextColor={isDarkMode ? defaultColors.gray400 : defaultColors.gray400}
+                    placeholderTextColor={defaultColors.black500}
+                    placeHolderHintTextColor={defaultColors.gray400}
                     testID='input-email'
                     errors={errors}
                     touched={touched}
@@ -98,8 +96,8 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     returnKeyType="done"
                     keyboardType={'ascii-capable'}
                     placeholderHint={i18n.t('id_number.enter_your_id_number') ?? 'Enter your ID number'}
-                    placeholderTextColor={isDarkMode ? defaultColors.black500 : defaultColors.black500}
-                    placeHolderHintTextColor={isDarkMode ? defaultColors.gray400 : defaultColors.gray400}
+                    placeholderTextColor={defaultColors.black500}
+                    placeHolderHintTextColor={defaultColors.gray400}
                     testID='input-id'
                     errors={errors}
                     touched={touched}

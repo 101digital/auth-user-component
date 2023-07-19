@@ -7,7 +7,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  useColorScheme,
 } from 'react-native';
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
@@ -49,8 +48,6 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === 'dark';
   const { adbLoginSingleFactor, adbLogin, errorSignIn } = useContext(AuthContext);
   const { verifyExistedUserByEmail } = useContext(RegistrationContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
@@ -124,8 +121,8 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   inputType={InputTypeEnum.MATERIAL}
                   returnKeyType="done"
                   placeholder={'Email'}
-                  placeholderTextColor={isDarkMode ? defaultColors.black500 : defaultColors.black500}
-                  placeHolderHintTextColor={isDarkMode ? defaultColors.gray400 : defaultColors.gray400}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   autoCapitalize="none"
                   testID="login-user-name-input"
                   placeholderHint={i18n.t('login_component.example_email') ?? 'example@email.com'}
@@ -138,8 +135,8 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   inputType={InputTypeEnum.MATERIAL}
                   returnKeyType="done"
                   secureTextEntry={!isVisiblePassword}
-                  placeholderTextColor={isDarkMode ? defaultColors.black500 : defaultColors.black500}
-                  placeHolderHintTextColor={isDarkMode ? defaultColors.gray400 : defaultColors.gray400}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   placeholder={'Password'}
                   autoCapitalize="none"
                   placeholderHint={i18n.t('login_component.enter_password') ?? 'Enter password'}
