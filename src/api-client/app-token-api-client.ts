@@ -1,5 +1,6 @@
 import { AuthServices } from '../services/auth-services';
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import { DeviceEventEmitter } from 'react-native';
 
 let isRefreshed = false;
 let isRefreshing = false;
@@ -57,6 +58,9 @@ export const createAppTokenApiClient = (baseURL: string) => {
   const onResponseSuccess = (response: AxiosResponse) => response;
 
   const onResponseError = async (axiosError: AxiosError) => {
+    if(axiosError.message === 'Network Error') {
+      DeviceEventEmitter.emit('network_error');
+    }
     if (!options.shouldIntercept(axiosError)) {
       return Promise.reject(axiosError);
     }
