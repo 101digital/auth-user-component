@@ -97,6 +97,10 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
       ) {
         PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
         saveResumeURL(authorizeResponse.resumeUrl);
+      } else if (authorizeResponse.message === 'Network Error') {
+        setIsLoading(false);
+        onNetworkError();
+        otpRef.current?.clearInput();
       } else if (authorizeResponse.error && authorizeResponse.error.code) {
         setIsLoading(false);
         setBiometricAttempt(biometricAttempt + 1);
@@ -104,7 +108,9 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           onShowLockDownModal();
         } else if (authorizeResponse.error.code === 'BIOMETRIC_CHANGE') {
           setIsSignedIn(false);
-        }
+        } else if (authorizeResponse.error.code === 'NO_USABLE_DEVICES') {
+          setIsSignedIn(false);
+        } 
       } else {
         setIsLoading(false);
         setBiometricAttempt(biometricAttempt + 1);

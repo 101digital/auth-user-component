@@ -451,7 +451,12 @@ export class AuthServices {
           Authorization: `${publicAppToken}`,
         },
       }
-    );
+    ).catch((error: Error)=>{
+      if(error.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
+      }
+      return error;
+    });
     return response.data;
   };
 
@@ -654,6 +659,7 @@ export class AuthServices {
       }
     } catch (error) {
       if (error?.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
         return error;
       }
       return false;
