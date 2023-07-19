@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { fonts } from '../../assets/fonts';
 import { Formik } from 'formik';
 import {
@@ -10,6 +10,7 @@ import {
   CrossIcon,
   ADBButton,
   NonCheckIcon,
+  defaultColors,
 } from 'react-native-theme-component';
 import { ADBChangePasswordData, ADBChangePasswordSchema } from './modal';
 import { PasswordMask } from './password-mask';
@@ -33,6 +34,8 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
   const [showNewPass, setShowNewPass] = useState(true);
   const [showConfirmPass, setShowConfirmPass] = useState(true);
   const [errorModal, setErrorModal] = useState(false);
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark'
   const formikRef = useRef(null);
   const { onPressContinue, onPasswordSameHistory, forgotPasswordObj, onError } = prop;
   const tickIcon = <CheckIcon size={17} />;
@@ -134,6 +137,8 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   onBlur={() => {
                     setFieldTouched('createNew');
                   }}
+                  placeholderTextColor={isDarkMode ? defaultColors.black500 : defaultColors.black500}
+                  placeHolderHintTextColor={isDarkMode ? defaultColors.gray400 : defaultColors.gray400}
                   placeholder={
                     i18n.t('password.createPassword') ?? 'Create password'
                   }
@@ -166,6 +171,8 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   inputType={InputTypeEnum.MATERIAL}
                   isFocusError={dirty && isDisabledSubmit}
                   name={'confirmNew'}
+                  placeholderTextColor={isDarkMode ? defaultColors.black500 : defaultColors.black500}
+                  placeHolderHintTextColor={isDarkMode ? defaultColors.gray400 : defaultColors.gray400}
                   placeholderHint={
                     i18n.t('password.confirm_password_hint') ?? 'Enter same password'
                   }
