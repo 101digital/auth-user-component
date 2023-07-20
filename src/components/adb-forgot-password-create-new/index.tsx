@@ -102,8 +102,9 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
         onPasswordSameHistory();
         return;
       }
+      onError();
     }
-    onError();
+    
   };
 
   return (

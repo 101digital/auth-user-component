@@ -451,12 +451,7 @@ export class AuthServices {
           Authorization: `${publicAppToken}`,
         },
       }
-    ).catch((error: Error)=>{
-      if(error.message === 'Network Error') {
-        DeviceEventEmitter.emit('network_error');
-      }
-      return error;
-    });
+    );
     return response.data;
   };
 
@@ -493,7 +488,12 @@ export class AuthServices {
         'access-control-allow-origin': '*',
         'Content-Type': 'application/vnd.pingidentity.device.select+json',
       },
-    });
+    }).catch((error: Error)=>{
+      if(error.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
+      }
+      return error;
+    });;
     return response.data;
   };
 

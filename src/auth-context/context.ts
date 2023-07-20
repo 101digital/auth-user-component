@@ -11,7 +11,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useMemo, useState } from 'react';
 import { AuthServices } from '../services/auth-services';
 import _ from 'lodash';
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules, DeviceEventEmitter } from 'react-native';
 import { SINGLE_FACTOR_ACR_VALUE, SINGLE_FACTOR_SCOPE } from '../utils';
 
 export interface AuthContextData {
@@ -533,6 +533,9 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsRecoveringUserPassword(false);
       return response;
     } catch (error) {
+      if(error?.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
+      }
       setIsRecoveringUserPassword(false);
       return error?.response?.data?.errors;
     }
@@ -565,6 +568,9 @@ export const useAuthContextValue = (): AuthContextData => {
         return response;
       } catch (error) {
         setIsRecoveringUserPassword(false);
+        if(error?.message === 'Network Error') {
+          DeviceEventEmitter.emit('network_error');
+        }
         return error?.response?.data;
       }
     },

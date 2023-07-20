@@ -48,10 +48,12 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
     }
 
     const response = await validateUserForgotPassword(_email, _nric);
-    if (response && isObject(response) && response.resendCode) {
-      onValidationSuccess(response.resendCode);
-    } else if (response.message !== 'Network Error') {
-      setErrorModal(true);
+    if(response) {
+      if (isObject(response) && response.resendCode) {
+        onValidationSuccess(response.resendCode);
+      } else {
+        setErrorModal(true);
+      }
     }
   };
 
