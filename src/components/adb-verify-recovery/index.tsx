@@ -3,7 +3,7 @@ import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
 import { Formik, FormikProps } from 'formik';
-import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
+import { ADBButton, ADBInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 
@@ -53,6 +53,8 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
                   placeholderHint={i18n.t('login_component.recovery_code_hint') ?? 'ADB12345678'}
                   errors={errors}
                   touched={touched}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                 />
               </View>
               <View

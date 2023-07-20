@@ -6,7 +6,8 @@ import {
   ADBButton,
   EyesClosedIcon,
   EyesIcon,
-  useThemeColors
+  useThemeColors,
+  defaultColors
 } from 'react-native-theme-component';
 import { Formik } from 'formik';
 import { colors, fonts } from '../../assets';
@@ -102,6 +103,8 @@ const ADBLoginWithPasswordComponent = ({
                   secureTextEntry={!isVisiblePassword}
                   placeholder={'Password'}
                   placeholderHint={i18n.t('login_component.enter_password') ?? 'Enter password'}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   onChange={() => setShowIncorrectPassword(false)}
                   suffixIcon={
                     <TouchableOpacity

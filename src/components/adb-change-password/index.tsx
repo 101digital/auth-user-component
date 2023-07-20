@@ -15,6 +15,7 @@ import {
   AlertCircleBigIcon,
   NonCheckRightIcon,
   ADBAlertModal,
+  defaultColors,
 } from 'react-native-theme-component';
 import { ADBChangePasswordData, ADBChangePasswordSchema } from './modal';
 import { PasswordMask } from './password-mask';
@@ -154,6 +155,8 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   }
                   errors={errors}
                   touched={touched}
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   placeholderHint={i18n.t('change_password.plh_current_password') ?? 'Enter password'}
                 />
                 <View style={styles.height32} />
@@ -183,6 +186,8 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                       isVisible={showNewPass}
                     />
                   }
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   errors={errors}
                   touched={touched}
                 />
@@ -209,6 +214,8 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                       isVisible={showConfirmPass}
                     />
                   }
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   errors={errors}
                   touched={touched}
                 />
