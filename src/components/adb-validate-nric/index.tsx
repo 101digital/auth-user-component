@@ -1,7 +1,7 @@
 import { InputIdData, InputIdSchema } from './model';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Keyboard, Platform } from 'react-native';
-import { ADBButton, ADBInputField, ThemeContext } from 'react-native-theme-component';
+import { ADBButton, ADBInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
 import { Formik, FormikProps } from 'formik';
 import { AuthContext } from '../../auth-context';
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
@@ -68,6 +68,8 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                   placeholderHint={
                     i18n.t('id_number.enter_your_id_number') ?? 'Enter your ID number'
                   }
+                  placeholderTextColor={defaultColors.black500}
+                  placeHolderHintTextColor={defaultColors.gray400}
                   errors={errors}
                   touched={touched}
                 />
