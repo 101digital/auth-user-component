@@ -37,7 +37,7 @@ export class SignInData {
 
 export interface ILogin {
   onLoginSuccess: () => void;
-  onLoginFailed: () => void;
+  onLoginFailed: (error: Error) => void;
   onForgotPassword: () => void;
   onLoginRestrict: (status: string) => void;
   isSkipOTPMode?: boolean;
@@ -54,7 +54,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   
   useEffect(() => {
     if (errorSignIn) {
-      onLoginFailed();
+      onLoginFailed(errorSignIn);
     }
   }, [errorSignIn]);
 
@@ -100,7 +100,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
       }
     }
     setIsLoading(false);
-    onLoginRestrict(responseVerified?.status);
+    onLoginRestrict(responseVerified?.status ?? (('existed' in responseVerified) ? (responseVerified.existed ? 'exist':'not_exist') : ''));
     return;
   };
 

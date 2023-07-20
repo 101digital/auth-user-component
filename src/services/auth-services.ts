@@ -6,7 +6,7 @@ import { AuthComponentConfig, PKCE, Profile } from '../types';
 import { authorize } from 'react-native-app-auth';
 import { PASSPORT } from '../types';
 import pkceChallenge from 'react-native-pkce-challenge';
-import { Platform } from 'react-native';
+import { Platform, DeviceEventEmitter } from 'react-native';
 
 export class AuthServices {
   private static _instance: AuthServices = new AuthServices();
@@ -222,13 +222,21 @@ export class AuthServices {
     };
   };
 
-  public getLoginhintTokenAndPairingCode = async () => {
+  public getLoginhintTokenAndPairingCode = async (onNetworkError: any) => {
     const { identityPingUrl, accessToken, sessionId } = this._configs || {};
     const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
       headers: {
         Authorization: `${accessToken}`,
         'x-session-id': sessionId,
       },
+    }).catch((error: Error)=>{
+      if(error.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
+      }
+      if(onNetworkError) {
+        onNetworkError();
+      }
+      return error;
     });
 
     const { pairingCode, token } = responseTokenHint.data.data[0];
@@ -292,7 +300,12 @@ export class AuthServices {
       headers: {
         Authorization: `${accessToken}`,
       },
-    });
+    }).catch((error: Error)=>{
+      if(error.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
+      }
+      return error;
+    });;
     const { data } = response.data;
     const organisationUser = data?.memberships?.filter((el: any) => el.organisationName);
     const memberShip = organisationUser?.length > 0 ? organisationUser[0] : data?.memberships[0];
@@ -475,11 +488,16 @@ export class AuthServices {
         'access-control-allow-origin': '*',
         'Content-Type': 'application/vnd.pingidentity.device.select+json',
       },
-    });
+    }).catch((error: Error)=>{
+      if(error.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
+      }
+      return error;
+    });;
     return response.data;
   };
 
-  registerDevice = async (token: string, platform: 'IOS' | 'Android', userId: string) => {
+  registerDevice = async (token: string, platform: 'IOS' | 'Android', userId: string, onNetworkError?: any) => {
     const { notificationBaseUrl, accessToken, notificationAppId, notificationEntityId } =
       this._configs!;
     const body = {
@@ -497,6 +515,14 @@ export class AuthServices {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
+    }).catch((error: Error)=>{
+      if(error.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
+      }
+      if(onNetworkError) {
+        onNetworkError();
+      }
+      return error;
     });
     return response.data;
   };
@@ -633,6 +659,7 @@ export class AuthServices {
       }
     } catch (error) {
       if (error?.message === 'Network Error') {
+        DeviceEventEmitter.emit('network_error');
         return error;
       }
       return false;

@@ -91,12 +91,21 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     if (response.request?.headers?.[ONE_TIME_TOKEN_KEY]) {
       AuthServices.instance().storeOTT('');
     }
-
+    if(response.message === 'Network Error') {
+      DeviceEventEmitter.emit('network_error');
+    }
     return response;
   };
 
+  const onResponseFailed = (error: AxiosError) => {
+    if(error.message === 'Network Error') {
+      DeviceEventEmitter.emit('network_error');
+    }
+    return error;
+  };
+
   instance.interceptors.request.use(onRequest);
-  instance.interceptors.response.use(onResponseSuccess);
+  instance.interceptors.response.use(onResponseSuccess, onResponseFailed);
 
   return instance;
 };

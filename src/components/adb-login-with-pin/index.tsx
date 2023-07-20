@@ -23,10 +23,11 @@ type ADBLoginWithPINProps = {
   onError: (err: Error) => void;
   isSkipSMSOTP?: boolean;
   onShowLockDownModal: () => void;
+  onNetworkError: () => void;
 };
 
 const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
-  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal } = prop;
+  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal, onNetworkError } = prop;
   const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
   const { i18n } = useContext(ThemeContext);
   const otpRef = useRef<OTPFieldRef>();
@@ -64,6 +65,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
     } else {
       if (authorizeResponse.message === 'Network Error') {
         setIsLoading(false);
+        onNetworkError();
         otpRef.current?.clearInput();
       } else if (authorizeResponse?.status === 'FAILED') {
         setIsLoading(false);
@@ -95,6 +97,10 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
       ) {
         PingOnesdkModule.setCurrentSessionId(authorizeResponse.authSession.id);
         saveResumeURL(authorizeResponse.resumeUrl);
+      } else if (authorizeResponse.message === 'Network Error') {
+        setIsLoading(false);
+        onNetworkError();
+        otpRef.current?.clearInput();
       } else if (authorizeResponse.error && authorizeResponse.error.code) {
         setIsLoading(false);
         setBiometricAttempt(biometricAttempt + 1);
@@ -102,7 +108,9 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           onShowLockDownModal();
         } else if (authorizeResponse.error.code === 'BIOMETRIC_CHANGE') {
           setIsSignedIn(false);
-        }
+        } else if (authorizeResponse.error.code === 'NO_USABLE_DEVICES') {
+          setIsSignedIn(false);
+        } 
       } else {
         setIsLoading(false);
         setBiometricAttempt(biometricAttempt + 1);
