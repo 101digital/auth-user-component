@@ -723,6 +723,9 @@ export const useAuthContextValue = (): AuthContextData => {
         setIsUpdatingProfile(false);
         return true;
       } catch (error) {
+        if(error?.message === 'Network Error') {
+          DeviceEventEmitter.emit('network_error');
+        }
         onError && onError(error as Error);
         setIsUpdatingProfile(false);
         setErrorUpdateProfile(error as Error);
