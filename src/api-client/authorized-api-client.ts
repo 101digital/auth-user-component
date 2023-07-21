@@ -101,7 +101,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     if(error.message === 'Network Error') {
       DeviceEventEmitter.emit('network_error');
     }
-    return error;
+    throw error;
   };
 
   instance.interceptors.request.use(onRequest);
