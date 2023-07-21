@@ -515,14 +515,6 @@ export class AuthServices {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-    }).catch((error: Error)=>{
-      if(error.message === 'Network Error') {
-        DeviceEventEmitter.emit('network_error');
-      }
-      if(onNetworkError) {
-        onNetworkError();
-      }
-      return error;
     });
     return response.data;
   };

@@ -678,16 +678,22 @@ export const useAuthContextValue = (): AuthContextData => {
       try {
         if (_profile) {
           setIsDeviceRegistering(true);
-          await AuthServices.instance().registerDevice(token, platform, _profile.userId, onNetworkError);
+          await AuthServices.instance().registerDevice(token, platform, _profile.userId);
           setIsDeviceRegistered(true);
           return true;
         } else {
           const { data } = await AuthServices.instance().fetchProfile();
-          await AuthServices.instance().registerDevice(token, platform, data.userId, onNetworkError);
+          await AuthServices.instance().registerDevice(token, platform, data.userId);
           setProfile({ ...data });
           return true;
         }
       } catch (error) {
+        if(error.message === 'Network Error') {
+          DeviceEventEmitter.emit('network_error');
+        }
+        if(onNetworkError) {
+          onNetworkError();
+        }
         setIsDeviceRegistering(false);
         return false;
       } finally {
