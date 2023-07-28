@@ -28,6 +28,7 @@ import { AccountOriginationService } from 'account-origination-component/src/ser
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 import { colors } from 'account-origination-component/src/assets';
 import ADBBottomSheet, { BSOption } from 'account-origination-component/src/components/bottomSheet';
+import {amountFormat} from "@/helpers/amount-input";
 
 type ADBUserDetailsScreenComponentProps = {
   onSuccess: () => void;
@@ -275,16 +276,9 @@ const ADBUserDetailsScreenComponent = ({
       >
         {({ submitForm, dirty, errors, isValid, values, setFieldValue, touched }) => {
           if (`${values.annualIncome}`.length > 0) {
-            const { currencyFormated } = useADBCurrencyFormat(`${values.annualIncome}`);
-            if (
-              currencyFormated &&
-              `${values.annualIncome}`.length > 0 &&
-              currencyFormated !== `${values.annualIncome}`
-            ) {
-              setFieldValue('annualIncome', currencyFormated === '0.00' ? '' : currencyFormated);
-            } else if (values.annualIncome[0] === '.') {
-              setFieldValue('annualIncome', '0.');
-            }
+            amountFormat(values?.annualIncome, (num:string) => {
+              setFieldValue('annualIncome', num);
+            })
           }
 
           return (
