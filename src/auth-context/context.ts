@@ -113,6 +113,7 @@ export interface AuthContextData {
   setCurrentVerificationMethod: (method: VerificationMethod) => void;
   isReselectingDevice: boolean;
   clearErrorVerifySignIn: () => void;
+  clearErrorSignIn: () => void;
   getNotificationBadge: () => void;
   badgeNumber: number;
   getNotifications: (pageNumber: number) => void;
@@ -183,6 +184,7 @@ export const authDefaultValue: AuthContextData = {
   reSelectDevice: async () => undefined,
   isReselectingDevice: false,
   clearErrorVerifySignIn: () => false,
+  clearErrorSignIn: () => false,
   getNotificationBadge: async () => false,
   badgeNumber: 0,
   getNotifications: async () => false,
@@ -247,6 +249,9 @@ export const useAuthContextValue = (): AuthContextData => {
 
   const clearErrorVerifySignIn = () => {
     setErrorVerifySignIn(undefined);
+  };
+  const clearErrorSignIn = () => {
+    setErrorSignIn(undefined);
   };
 
   const checkIsLogged = async () => {
@@ -942,6 +947,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setCurrentVerificationMethod,
       isReselectingDevice: _isReselectingDevice,
       clearErrorVerifySignIn,
+      clearErrorSignIn,
       getNotificationBadge,
       badgeNumber: _badgeNumber,
       getNotifications,
