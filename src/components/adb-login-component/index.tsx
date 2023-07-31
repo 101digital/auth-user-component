@@ -48,13 +48,14 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { adbLoginSingleFactor, adbLogin, errorSignIn } = useContext(AuthContext);
+  const { adbLoginSingleFactor, adbLogin, errorSignIn, clearErrorSignIn } = useContext(AuthContext);
   const { verifyExistedUserByEmail } = useContext(RegistrationContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
   
   useEffect(() => {
     if (errorSignIn) {
       onLoginFailed(errorSignIn);
+      clearErrorSignIn();
     }
   }, [errorSignIn]);
 
