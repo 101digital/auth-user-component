@@ -93,6 +93,8 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     }
     if(response.message === 'Network Error') {
       DeviceEventEmitter.emit('network_error');
+    } else if (error.message === 'Request failed with status code 401') {
+      DeviceEventEmitter.emit('authcomponent.session.expired');
     }
     return response;
   };
@@ -100,6 +102,8 @@ export const createAuthorizedApiClient = (baseURL: string) => {
   const onResponseFailed = (error: AxiosError) => {
     if(error.message === 'Network Error') {
       DeviceEventEmitter.emit('network_error');
+    } else if (error.message === 'Request failed with status code 401') {
+      DeviceEventEmitter.emit('authcomponent.session.expired');
     }
     throw error;
   };
