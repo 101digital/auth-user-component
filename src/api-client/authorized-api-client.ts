@@ -93,7 +93,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     }
     if(response.message === 'Network Error') {
       DeviceEventEmitter.emit('network_error');
-    } else if (error.message === 'Request failed with status code 401') {
+    } else if (response.message === 'Request failed with status code 401') {
       DeviceEventEmitter.emit('authcomponent.session.expired');
     }
     return response;
