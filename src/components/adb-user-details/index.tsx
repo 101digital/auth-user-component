@@ -216,6 +216,7 @@ const ADBUserDetailsScreenComponent = ({
 
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       setKeyboardHeight(0);
+      setCheckEdit('');
     });
     return () => {
       keyboardDidHideListener.remove();
@@ -288,6 +289,7 @@ const ADBUserDetailsScreenComponent = ({
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 keyboardOpeningTime={Number.MAX_SAFE_INTEGER}
+                keyboardDismissMode='interactive'
                 extraScrollHeight={50}
                 enableResetScrollToCoords={false}
               >
@@ -309,12 +311,12 @@ const ADBUserDetailsScreenComponent = ({
                     }
                   }}
                   suffixIcon={
-                    checkEdit !== 'nickName' && (
-                      <TouchableOpacity onPress={() => setCheckEdit('nickName')}>
-                        <TextEditIcon size={21} />
-                      </TouchableOpacity>
+                    checkEdit !== "nickName" && (
+                      <TextEditIcon size={21} />
                     )
                   }
+                  onClickSuffixIcon={() => setCheckEdit("nickName")}
+                  onInputPress={() => setCheckEdit("nickName")}                  
                   errors={errors}
                   touched={touched}
                 />
@@ -363,12 +365,12 @@ const ADBUserDetailsScreenComponent = ({
                     }
                   }}
                   suffixIcon={
-                    checkEdit !== 'line1' && (
-                      <TouchableOpacity onPress={() => setCheckEdit('line1')}>
-                        <TextEditIcon size={21} />
-                      </TouchableOpacity>
+                    checkEdit !== "line1" && (
+                      <TextEditIcon size={21} />
                     )
                   }
+                  onClickSuffixIcon={() => setCheckEdit("line1")}
+                  onInputPress={() => setCheckEdit("line1")}           
                   errors={errors}
                   touched={touched}
                 />
@@ -387,12 +389,12 @@ const ADBUserDetailsScreenComponent = ({
                     }
                   }}
                   suffixIcon={
-                    checkEdit !== 'line2' && (
-                      <TouchableOpacity onPress={() => setCheckEdit('line2')}>
-                        <TextEditIcon size={21} />
-                      </TouchableOpacity>
+                    checkEdit !== "line2" && (
+                      <TextEditIcon size={21} />
                     )
                   }
+                  onClickSuffixIcon={() => setCheckEdit("line2")}
+                  onInputPress={() => setCheckEdit("line2")}
                   errors={errors}
                   touched={touched}
                 />
@@ -417,12 +419,12 @@ const ADBUserDetailsScreenComponent = ({
                   editable={checkEdit === 'postcode'}
                   value={values.postcode}
                   suffixIcon={
-                    checkEdit !== 'postcode' && (
-                      <TouchableOpacity onPress={() => setCheckEdit('postcode')}>
-                        <TextEditIcon size={21} />
-                      </TouchableOpacity>
+                    checkEdit !== "postcode" && (
+                      <TextEditIcon size={21} />
                     )
                   }
+                  onClickSuffixIcon={() => setCheckEdit("postcode")}
+                  onInputPress={() => setCheckEdit("postcode")}
                   autoComplete={'off'}
                   keyboardType={'numeric'}
                   returnKeyType="done"
@@ -594,12 +596,12 @@ const ADBUserDetailsScreenComponent = ({
                     }
                   }}
                   suffixIcon={
-                    checkEdit !== 'annualIncome' && (
-                      <TouchableOpacity onPress={() => setCheckEdit('annualIncome')}>
-                        <TextEditIcon size={21} />
-                      </TouchableOpacity>
+                    checkEdit !== "annualIncome" && (
+                      <TextEditIcon size={21} />
                     )
                   }
+                  onClickSuffixIcon={() => setCheckEdit("annualIncome")}
+                  onInputPress={() => setCheckEdit("annualIncome")}
                   autoComplete={'off'}
                   keyboardType={'numeric'}
                   returnKeyType="done"
