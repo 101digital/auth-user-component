@@ -28,7 +28,7 @@ import { AccountOriginationService } from 'account-origination-component/src/ser
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 import { colors } from 'account-origination-component/src/assets';
 import ADBBottomSheet, { BSOption } from 'account-origination-component/src/components/bottomSheet';
-import {amountFormat} from "@/helpers/amount-input";
+import { amountFormat } from '@/helpers/amount-input';
 
 type ADBUserDetailsScreenComponentProps = {
   onSuccess: () => void;
@@ -277,9 +277,9 @@ const ADBUserDetailsScreenComponent = ({
       >
         {({ submitForm, dirty, errors, isValid, values, setFieldValue, touched }) => {
           if (`${values.annualIncome}`.length > 0) {
-            amountFormat(values?.annualIncome, (num:string) => {
+            amountFormat(values?.annualIncome, (num: string) => {
               setFieldValue('annualIncome', num);
-            })
+            });
           }
 
           return (
@@ -289,7 +289,7 @@ const ADBUserDetailsScreenComponent = ({
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 keyboardOpeningTime={Number.MAX_SAFE_INTEGER}
-                keyboardDismissMode='interactive'
+                keyboardDismissMode="interactive"
                 extraScrollHeight={50}
                 enableResetScrollToCoords={false}
               >
@@ -300,7 +300,7 @@ const ADBUserDetailsScreenComponent = ({
                 <ADBInputField
                   name={'nickName'}
                   hideUnderLine={true}
-                  placeholder={i18n.t('user_details.preferred_name')}
+                  placeholder={i18n.t('user_name.preferredName')}
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'nickName'}
@@ -310,13 +310,9 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={
-                    checkEdit !== "nickName" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("nickName")}
-                  onInputPress={() => setCheckEdit("nickName")}                  
+                  suffixIcon={checkEdit !== 'nickName' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('nickName')}
+                  onInputPress={() => setCheckEdit('nickName')}
                   errors={errors}
                   touched={touched}
                 />
@@ -364,13 +360,9 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={
-                    checkEdit !== "line1" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("line1")}
-                  onInputPress={() => setCheckEdit("line1")}           
+                  suffixIcon={checkEdit !== 'line1' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('line1')}
+                  onInputPress={() => setCheckEdit('line1')}
                   errors={errors}
                   touched={touched}
                 />
@@ -388,13 +380,9 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={
-                    checkEdit !== "line2" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("line2")}
-                  onInputPress={() => setCheckEdit("line2")}
+                  suffixIcon={checkEdit !== 'line2' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('line2')}
+                  onInputPress={() => setCheckEdit('line2')}
                   errors={errors}
                   touched={touched}
                 />
@@ -405,7 +393,7 @@ const ADBUserDetailsScreenComponent = ({
                   maxLength={5}
                   placeholder={i18n.t('user_details.postcode')}
                   onBlur={() => {
-                    handleBlur(values.postcode)
+                    handleBlur(values.postcode);
                     if (checkEdit === 'postcode') {
                       setCheckEdit('');
                     }
@@ -418,13 +406,9 @@ const ADBUserDetailsScreenComponent = ({
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'postcode'}
                   value={values.postcode}
-                  suffixIcon={
-                    checkEdit !== "postcode" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("postcode")}
-                  onInputPress={() => setCheckEdit("postcode")}
+                  suffixIcon={checkEdit !== 'postcode' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('postcode')}
+                  onInputPress={() => setCheckEdit('postcode')}
                   autoComplete={'off'}
                   keyboardType={'numeric'}
                   returnKeyType="done"
@@ -595,13 +579,9 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={
-                    checkEdit !== "annualIncome" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("annualIncome")}
-                  onInputPress={() => setCheckEdit("annualIncome")}
+                  suffixIcon={checkEdit !== 'annualIncome' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('annualIncome')}
+                  onInputPress={() => setCheckEdit('annualIncome')}
                   autoComplete={'off'}
                   keyboardType={'numeric'}
                   returnKeyType="done"
