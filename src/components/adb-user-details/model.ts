@@ -58,7 +58,7 @@ export const validationSchema = (
       nickName: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error'))
-        .max(22, "Preferred name can't be longer than 22 characters")
+        .max(22, i18n.t('user_name.maximum_character_err', { num: '22' }))
         .matches(/^[a-zA-Z ]+$/, i18n.t('user_name.invalid_preferredname')),
       religion: Yup.string()
         .trim()
@@ -91,7 +91,7 @@ export const validationSchema = (
       nickName: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error'))
-        .max(22, "Preferred name can't be longer than 22 characters")
+        .max(22, i18n.t('user_name.maximum_character_err', { num: '22' }))
         .matches(/^[a-zA-Z ]+$/, i18n.t('user_name.invalid_preferredname')),
       religion: Yup.string()
         .trim()
@@ -127,7 +127,7 @@ export const validationSchema = (
       nickName: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error'))
-        .max(22, "Preferred name can't be longer than 22 characters")
+        .max(22, i18n.t('user_name.maximum_character_err', { num: '22' }))
         .matches(/^[a-zA-Z ]+$/, i18n.t('user_name.invalid_preferredname')),
       religion: Yup.string()
         .trim()
