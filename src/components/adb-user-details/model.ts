@@ -19,15 +19,16 @@ export class UserDetailsData {
     readonly annualIncome: string
   ) {}
 
-
   static empty(profile?: Profile): UserDetailsData {
+    const newAnnualIncome =
+      profile && profile.creditDetails && profile.creditDetails.length > 0
+        ? useADBCurrencyFormat(`${profile.creditDetails[0].annualIncome}`, 'blur')
+        : '';
 
-    const newAnnualIncome = profile && profile.creditDetails && profile.creditDetails.length > 0 ?  useADBCurrencyFormat(`${profile.creditDetails[0].annualIncome}`, 'blur') : '';
-    
     const profileAddress =
-            profile?.addresses && profile?.addresses.length > 0 && profile.addresses.find(
-              (a: any) => a.addressType === 'Mailing Address'
-            );
+      profile?.addresses &&
+      profile?.addresses.length > 0 &&
+      profile.addresses.find((a: any) => a.addressType === 'Mailing Address');
 
     return new UserDetailsData(
       profile?.nickName ?? '',
@@ -42,19 +43,23 @@ export class UserDetailsData {
       profile?.employmentDetails?.[0]?.sector ?? '',
       profile?.employmentDetails?.[0]?.companyName ?? '',
       profile?.employmentDetails?.[0]?.occupation ?? '',
-      newAnnualIncome?.currencyFormated ?? '',
+      newAnnualIncome?.currencyFormated ?? ''
     );
   }
 }
-  
 
-export const validationSchema = (isUnEmployed: boolean, isOutsideLabourForce: boolean, i18n: any) => {
-  if(isUnEmployed) {
+export const validationSchema = (
+  isUnEmployed: boolean,
+  isOutsideLabourForce: boolean,
+  i18n: any
+) => {
+  if (isUnEmployed) {
     return Yup.object().shape({
       nickName: Yup.string()
         .trim()
-        .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-        .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+        .required(i18n.t('common.lbl_required_error'))
+        .max(22, "Preferred name can't be longer than 22 characters")
+        .matches(/^[a-zA-Z ]+$/, i18n.t('user_name.invalid_preferredname')),
       religion: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
@@ -79,14 +84,15 @@ export const validationSchema = (isUnEmployed: boolean, isOutsideLabourForce: bo
       annualIncome: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-        .matches(/^[0-9,.]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+        .matches(/^[0-9,.]+$/, i18n.t('common.invalid_value') ?? 'Invalid value'),
     });
-  } else if(isOutsideLabourForce) {
+  } else if (isOutsideLabourForce) {
     return Yup.object().shape({
       nickName: Yup.string()
         .trim()
-        .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-        .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+        .required(i18n.t('common.lbl_required_error'))
+        .max(22, "Preferred name can't be longer than 22 characters")
+        .matches(/^[a-zA-Z ]+$/, i18n.t('user_name.invalid_preferredname')),
       religion: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
@@ -111,17 +117,18 @@ export const validationSchema = (isUnEmployed: boolean, isOutsideLabourForce: bo
       annualIncome: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-        .matches(/^[0-9,.]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+        .matches(/^[0-9,.]+$/, i18n.t('common.invalid_value') ?? 'Invalid value'),
       occupation: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
     });
   } else {
     return Yup.object().shape({
-        nickName: Yup.string()
+      nickName: Yup.string()
         .trim()
-        .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-        .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+        .required(i18n.t('common.lbl_required_error'))
+        .max(22, "Preferred name can't be longer than 22 characters")
+        .matches(/^[a-zA-Z ]+$/, i18n.t('user_name.invalid_preferredname')),
       religion: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
@@ -149,17 +156,16 @@ export const validationSchema = (isUnEmployed: boolean, isOutsideLabourForce: bo
       employerName: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-        .matches(/^[0-9a-zA-Z_ .-]+$/,i18n.t('user_name.invalid_name') ?? 'Invalid name'),
+        .matches(/^[0-9a-zA-Z_ .-]+$/, i18n.t('user_name.invalid_name') ?? 'Invalid name'),
       occupation: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
       annualIncome: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
-        .matches(/^[0-9,.]+$/,i18n.t('common.invalid_value') ?? 'Invalid value'),
+        .matches(/^[0-9,.]+$/, i18n.t('common.invalid_value') ?? 'Invalid value'),
     });
   }
-}
+};
 
-
-  export const personalDetailsSchema = validationSchema;
+export const personalDetailsSchema = validationSchema;
