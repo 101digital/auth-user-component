@@ -224,20 +224,22 @@ export class AuthServices {
 
   public getLoginhintTokenAndPairingCode = async (onNetworkError: any) => {
     const { identityPingUrl, accessToken, sessionId } = this._configs || {};
-    const responseTokenHint = await axios.get(`${identityPingUrl}/users/loginhint`, {
-      headers: {
-        Authorization: `${accessToken}`,
-        'x-session-id': sessionId,
-      },
-    }).catch((error: Error)=>{
-      if(error.message === 'Network Error') {
-        DeviceEventEmitter.emit('network_error');
-      }
-      if(onNetworkError) {
-        onNetworkError();
-      }
-      return error;
-    });
+    const responseTokenHint = await axios
+      .get(`${identityPingUrl}/users/loginhint`, {
+        headers: {
+          Authorization: `${accessToken}`,
+          'x-session-id': sessionId,
+        },
+      })
+      .catch((error: Error) => {
+        if (error.message === 'Network Error') {
+          DeviceEventEmitter.emit('network_error');
+        }
+        if (onNetworkError) {
+          onNetworkError();
+        }
+        return error;
+      });
 
     const { pairingCode, token } = responseTokenHint.data.data[0];
     this.setLoginHintToken(token);
@@ -296,16 +298,18 @@ export class AuthServices {
 
   public fetchProfile = async () => {
     const { membershipBaseUrl, accessToken } = this._configs!;
-    const response = await axios.get(`${membershipBaseUrl}/users/me`, {
-      headers: {
-        Authorization: `${accessToken}`,
-      },
-    }).catch((error: Error)=>{
-      if(error.message === 'Network Error') {
-        DeviceEventEmitter.emit('network_error');
-      }
-      return error;
-    });;
+    const response = await axios
+      .get(`${membershipBaseUrl}/users/me`, {
+        headers: {
+          Authorization: `${accessToken}`,
+        },
+      })
+      .catch((error: Error) => {
+        if (error.message === 'Network Error') {
+          DeviceEventEmitter.emit('network_error');
+        }
+        return error;
+      });
     const { data } = response.data;
     const organisationUser = data?.memberships?.filter((el: any) => el.organisationName);
     const memberShip = organisationUser?.length > 0 ? organisationUser[0] : data?.memberships[0];
@@ -483,21 +487,28 @@ export class AuthServices {
       },
     };
 
-    const response = await axios.post(`${authBaseUrl}/flows/${flowId}`, body, {
-      headers: {
-        'access-control-allow-origin': '*',
-        'Content-Type': 'application/vnd.pingidentity.device.select+json',
-      },
-    }).catch((error: Error)=>{
-      if(error.message === 'Network Error') {
-        DeviceEventEmitter.emit('network_error');
-      }
-      return error;
-    });;
+    const response = await axios
+      .post(`${authBaseUrl}/flows/${flowId}`, body, {
+        headers: {
+          'access-control-allow-origin': '*',
+          'Content-Type': 'application/vnd.pingidentity.device.select+json',
+        },
+      })
+      .catch((error: Error) => {
+        if (error.message === 'Network Error') {
+          DeviceEventEmitter.emit('network_error');
+        }
+        return error;
+      });
     return response.data;
   };
 
-  registerDevice = async (token: string, platform: 'IOS' | 'Android', userId: string, onNetworkError?: any) => {
+  registerDevice = async (
+    token: string,
+    platform: 'IOS' | 'Android',
+    userId: string,
+    onNetworkError?: any
+  ) => {
     const { notificationBaseUrl, accessToken, notificationAppId, notificationEntityId } =
       this._configs!;
     const body = {
@@ -598,8 +609,8 @@ export class AuthServices {
     const updateInfoPayload = {
       fullName: fullName,
       nickName: nickname,
-      firstName: fullName,
-      lastName: fullName,
+      firstName: fullName.length > 100 ? fullName.slice(0, 99) : fullName,
+      lastName: fullName.length > 100 ? fullName.slice(0, 99) : fullName,
     };
 
     if (idType === PASSPORT) {
