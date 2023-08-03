@@ -28,7 +28,8 @@ import { AccountOriginationService } from 'account-origination-component/src/ser
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 import { colors } from 'account-origination-component/src/assets';
 import ADBBottomSheet, { BSOption } from 'account-origination-component/src/components/bottomSheet';
-import { amountFormat } from '@/helpers/amount-input';
+import {amountFormat} from "@/helpers/amount-input";
+import { uniqBy } from 'lodash';
 
 type ADBUserDetailsScreenComponentProps = {
   onSuccess: () => void;
@@ -62,6 +63,7 @@ const ADBUserDetailsScreenComponent = ({
   );
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [checkEdit, setCheckEdit] = useState<string>('');
+  const [viewingBSField, setViewingBSField] = useState<any>();
 
   const getOccupationList = async () => {
     setIsLoadingValues(true);
@@ -136,61 +138,92 @@ const ADBUserDetailsScreenComponent = ({
       getStateList(selectedCity.parentLocationId);
     }
   };
+  
+  const showBSCityList = (listCity: any[]) => {
+    if (listCity.length > 0) {
+      setIsShowBottomSheet(true);
 
-  const onPressCity = (postCode: string) => {
-    getCityList(postCode);
-  };
-
-  const getCityList = async (postCode: string) => {
-    setIsLoadingValues(true);
-    try {
       const bsData = {
         items: [],
-        title: 'City',
+        title: "City",
         isHaveSearchBox: true,
-        name: 'city',
-        searchBoxPlaceholder: 'Search',
-        type: 'OptionsList',
+        name: "city",
+        searchBoxPlaceholder: "Search",
+        type: "OptionsList",
       };
 
-      const response = await onboardingService.getCities(postCode);
+      bsData.items = uniqBy(listCity, "id").map((c) => ({
+        id: c.id,
+        value: c.locationName,
+        type: "String",
+      }));
 
-      if (response.data && formikRef.current) {
-        if (response.data.length === 1) {
-          formikRef.current.setFieldValue('city', response.data[0].locationName);
-          getStateList(response.data[0].parentLocationId);
-        } else if (response.data.length > 1) {
-          setIsShowBottomSheet(true);
-          bsData.items = response.data.map((c: any) => ({
-            id: c.id,
-            value: c.locationName,
-            key: c.countryId,
-            type: 'String',
-          }));
-        } else {
-          formikRef.current.setFieldError('postcode', 'Invalid post code');
-        }
-        setListCity(response.data);
-        setBSData(bsData);
-      }
-    } catch {
-    } finally {
-      setIsLoadingValues(false);
+      setBSData(bsData);
+      setIsShowBottomSheet(true);
     }
   };
 
-  const getStateList = async (id: string) => {
-    if (id && formikRef.current) {
+  const showBSStateList = (listStates: any[]) => {
+    if (listStates.length > 0) {
+      setIsShowBottomSheet(true);
+
+      const bsData = {
+        items: [],
+        title: "State",
+        isHaveSearchBox: true,
+        name: "state",
+        searchBoxPlaceholder: "Search",
+        type: "OptionsList",
+      };
+
+      bsData.items = uniqBy(listStates, "id").map((c) => ({
+        id: c.id,
+        value: c.locationName,
+        type: "String",
+      }));
+
+      setBSData(bsData);
+      setIsShowBottomSheet(true);
+    }
+  };
+
+  const onPressCity = () => {
+    showBSCityList(listCity);
+    setViewingBSField('city')
+  };
+
+  const onPressState = () => {
+    showBSStateList(listState);
+    setViewingBSField('state')
+  };
+
+  const getStateList = async (parentLocationId: string | string[]) => {
+    if (parentLocationId && formikRef.current) {
       try {
         const response = await onboardingService.getStates();
         if (response.data) {
-          const statesBaseOnCity = response.data.filter((s: any) => s.id === id);
-          if (statesBaseOnCity.length === 1) {
-            formikRef.current.setFieldValue('state', statesBaseOnCity[0].locationName);
+          let statesBaseOnCity = [];
+          if (typeof parentLocationId === "string") {
+            statesBaseOnCity = response.data.filter(
+              (s: any) => s.id === parentLocationId
+            );
+            formikRef.current.setFieldValue(
+              "state",
+              statesBaseOnCity[0].locationName
+            );
+            console.log('statesBaseOnCity', statesBaseOnCity);
+            setListState(statesBaseOnCity);
+          } else {
+            statesBaseOnCity = response.data.filter((s: any) =>
+              parentLocationId.some((id) => id === s.id)
+            );
+            setListState(statesBaseOnCity);
+            showBSStateList(statesBaseOnCity);
           }
-          setListState(statesBaseOnCity);
         }
-      } catch {}
+      } catch {
+        setIsShowBottomSheet(false);
+      }
     }
   };
 
@@ -224,8 +257,56 @@ const ADBUserDetailsScreenComponent = ({
     };
   }, []);
 
-  const handleBlur = (value: string) => {
-    onPressCity(value);
+
+  const getCityList = async (postCode: string) => {
+    setIsLoadingValues(true);
+    try {
+      const bsData = {
+        items: [],
+        title: "City",
+        isHaveSearchBox: true,
+        name: "city",
+        searchBoxPlaceholder: "Search",
+        type: "OptionsList",
+      };
+
+      const response = await onboardingService.getCities(postCode);
+      if (response.data && formikRef.current) {
+        let parentLocationIds = [];
+        if (response.data.length >= 1) {
+          parentLocationIds = response.data.map((d) => d.parentLocationId);
+          const filteredData = uniqBy(response.data, "locationName");
+          
+          bsData.items = filteredData.map((c) => ({
+            id: c.id,
+            value: c.locationName,
+            key: c.countryId,
+            type: "String",
+          }));
+
+          if (bsData.items.length > 1) {
+            setBSData(bsData);
+            setIsShowBottomSheet(true);
+            setListCity(filteredData);
+          } else {
+            formikRef.current.setFieldValue("city", bsData.items[0].value);
+            getStateList(
+              parentLocationIds.length > 1
+                ? parentLocationIds
+                : parentLocationIds[0]
+            );
+            setListCity(filteredData);
+            setBSData(bsData);
+          }
+        } else {
+          formikRef.current.setFieldError("postcode", "Invalid post code");
+        }
+      }
+    } catch {
+      setIsShowBottomSheet(false);
+    } finally {
+      setIsLoadingValues(false);
+    }
   };
 
   return (
@@ -277,10 +358,15 @@ const ADBUserDetailsScreenComponent = ({
       >
         {({ submitForm, dirty, errors, isValid, values, setFieldValue, touched }) => {
           if (`${values.annualIncome}`.length > 0) {
-            amountFormat(values?.annualIncome, (num: string) => {
+            amountFormat(values?.annualIncome, (num:string) => {
               setFieldValue('annualIncome', num);
-            });
+            })
           }
+          const renderSelectedValue = selectedBSValue ? selectedBSValue : {
+            id: viewingBSField,
+            value: values[`${viewingBSField}`]
+          }
+
 
           return (
             <>
@@ -289,7 +375,7 @@ const ADBUserDetailsScreenComponent = ({
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 keyboardOpeningTime={Number.MAX_SAFE_INTEGER}
-                keyboardDismissMode="interactive"
+                keyboardDismissMode='interactive'
                 extraScrollHeight={50}
                 enableResetScrollToCoords={false}
               >
@@ -310,9 +396,13 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={checkEdit !== 'nickName' && <TextEditIcon size={21} />}
-                  onClickSuffixIcon={() => setCheckEdit('nickName')}
-                  onInputPress={() => setCheckEdit('nickName')}
+                  suffixIcon={
+                    checkEdit !== "nickName" && (
+                      <TextEditIcon size={21} />
+                    )
+                  }
+                  onClickSuffixIcon={() => setCheckEdit("nickName")}
+                  onInputPress={() => setCheckEdit("nickName")}                  
                   errors={errors}
                   touched={touched}
                 />
@@ -360,9 +450,13 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={checkEdit !== 'line1' && <TextEditIcon size={21} />}
-                  onClickSuffixIcon={() => setCheckEdit('line1')}
-                  onInputPress={() => setCheckEdit('line1')}
+                  suffixIcon={
+                    checkEdit !== "line1" && (
+                      <TextEditIcon size={21} />
+                    )
+                  }
+                  onClickSuffixIcon={() => setCheckEdit("line1")}
+                  onInputPress={() => setCheckEdit("line1")}           
                   errors={errors}
                   touched={touched}
                 />
@@ -380,9 +474,13 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={checkEdit !== 'line2' && <TextEditIcon size={21} />}
-                  onClickSuffixIcon={() => setCheckEdit('line2')}
-                  onInputPress={() => setCheckEdit('line2')}
+                  suffixIcon={
+                    checkEdit !== "line2" && (
+                      <TextEditIcon size={21} />
+                    )
+                  }
+                  onClickSuffixIcon={() => setCheckEdit("line2")}
+                  onInputPress={() => setCheckEdit("line2")}
                   errors={errors}
                   touched={touched}
                 />
@@ -393,7 +491,7 @@ const ADBUserDetailsScreenComponent = ({
                   maxLength={5}
                   placeholder={i18n.t('user_details.postcode')}
                   onBlur={() => {
-                    handleBlur(values.postcode);
+                    getCityList(values.postcode)
                     if (checkEdit === 'postcode') {
                       setCheckEdit('');
                     }
@@ -401,14 +499,20 @@ const ADBUserDetailsScreenComponent = ({
                   onFocus={() => {
                     setListCity([]);
                     setListState([]);
+                    formikRef.current?.setFieldValue("city", "");
+                    formikRef.current?.setFieldValue("state", "");
                   }}
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'postcode'}
                   value={values.postcode}
-                  suffixIcon={checkEdit !== 'postcode' && <TextEditIcon size={21} />}
-                  onClickSuffixIcon={() => setCheckEdit('postcode')}
-                  onInputPress={() => setCheckEdit('postcode')}
+                  suffixIcon={
+                    checkEdit !== "postcode" && (
+                      <TextEditIcon size={21} />
+                    )
+                  }
+                  onClickSuffixIcon={() => setCheckEdit("postcode")}
+                  onInputPress={() => setCheckEdit("postcode")}
                   autoComplete={'off'}
                   keyboardType={'numeric'}
                   returnKeyType="done"
@@ -422,8 +526,8 @@ const ADBUserDetailsScreenComponent = ({
                   placeholder={i18n.t('user_details.city')}
                   editable={false}
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
-                  onClickSuffixIcon={() => getCityList(values.postcode)}
-                  onInputPress={() => getCityList(values.postcode)}
+                  onClickSuffixIcon={onPressCity}
+                  onInputPress={onPressCity}
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   errors={errors}
@@ -434,6 +538,8 @@ const ADBUserDetailsScreenComponent = ({
                   name={'state'}
                   hideUnderLine={true}
                   placeholder={i18n.t('user_details.state')}
+                  onClickSuffixIcon={onPressState}
+                  onInputPress={onPressState}
                   editable={false}
                   suffixIcon={<ArrowDownIcon color={colors.primary} width={21} height={21} />}
                   type="custom"
@@ -579,9 +685,13 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={checkEdit !== 'annualIncome' && <TextEditIcon size={21} />}
-                  onClickSuffixIcon={() => setCheckEdit('annualIncome')}
-                  onInputPress={() => setCheckEdit('annualIncome')}
+                  suffixIcon={
+                    checkEdit !== "annualIncome" && (
+                      <TextEditIcon size={21} />
+                    )
+                  }
+                  onClickSuffixIcon={() => setCheckEdit("annualIncome")}
+                  onInputPress={() => setCheckEdit("annualIncome")}
                   autoComplete={'off'}
                   keyboardType={'numeric'}
                   returnKeyType="done"
@@ -654,11 +764,13 @@ const ADBUserDetailsScreenComponent = ({
                         );
                       }
                     }
+                    setSelectedBSValue(undefined);
                     setTimeout(() => {
                       formikRef.current?.validateForm();
                     }, 500);
                   }}
-                  selectedValue={selectedBSValue}
+                  isCompareByValue={true}
+                  selectedValue={renderSelectedValue}
                   selectedBSSubValue={selectedBSSubValue}
                   onChangeSubValue={setSelectedBSSubValue}
                 />
