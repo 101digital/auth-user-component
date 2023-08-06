@@ -64,6 +64,7 @@ const ADBUserDetailsScreenComponent = ({
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
   const [checkEdit, setCheckEdit] = useState<string>('');
   const [viewingBSField, setViewingBSField] = useState<any>();
+  const [isSkipFetchState, setIsSkipFetchState] = useState<boolean>(false);
 
   const getOccupationList = async () => {
     setIsLoadingValues(true);
@@ -198,6 +199,9 @@ const ADBUserDetailsScreenComponent = ({
   };
 
   const getStateList = async (parentLocationId: string | string[]) => {
+    if(isSkipFetchState) { 
+      return;
+    }
     if (parentLocationId && formikRef.current) {
       try {
         const response = await onboardingService.getStates();
@@ -211,12 +215,12 @@ const ADBUserDetailsScreenComponent = ({
               "state",
               statesBaseOnCity[0].locationName
             );
-            console.log('statesBaseOnCity', statesBaseOnCity);
             setListState(statesBaseOnCity);
           } else {
             statesBaseOnCity = response.data.filter((s: any) =>
               parentLocationId.some((id) => id === s.id)
             );
+            setIsSkipFetchState(true);
             setListState(statesBaseOnCity);
             showBSStateList(statesBaseOnCity);
           }
@@ -491,12 +495,13 @@ const ADBUserDetailsScreenComponent = ({
                   maxLength={5}
                   placeholder={i18n.t('user_details.postcode')}
                   onBlur={() => {
-                    getCityList(values.postcode)
+                    getCityList(values.postcode);
                     if (checkEdit === 'postcode') {
                       setCheckEdit('');
                     }
                   }}
                   onFocus={() => {
+                    setIsSkipFetchState(false);
                     setListCity([]);
                     setListState([]);
                     formikRef.current?.setFieldValue("city", "");
