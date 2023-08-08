@@ -28,7 +28,7 @@ import { AccountOriginationService } from 'account-origination-component/src/ser
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
 import { colors } from 'account-origination-component/src/assets';
 import ADBBottomSheet, { BSOption } from 'account-origination-component/src/components/bottomSheet';
-import {amountFormat} from "@/helpers/amount-input";
+import { amountFormat } from '@/helpers/amount-input';
 import { uniqBy } from 'lodash';
 
 type ADBUserDetailsScreenComponentProps = {
@@ -139,24 +139,24 @@ const ADBUserDetailsScreenComponent = ({
       getStateList(selectedCity.parentLocationId);
     }
   };
-  
+
   const showBSCityList = (listCity: any[]) => {
     if (listCity.length > 0) {
       setIsShowBottomSheet(true);
 
       const bsData = {
         items: [],
-        title: "City",
+        title: 'City',
         isHaveSearchBox: true,
-        name: "city",
-        searchBoxPlaceholder: "Search",
-        type: "OptionsList",
+        name: 'city',
+        searchBoxPlaceholder: 'Search',
+        type: 'OptionsList',
       };
 
-      bsData.items = uniqBy(listCity, "id").map((c) => ({
+      bsData.items = uniqBy(listCity, 'id').map((c) => ({
         id: c.id,
         value: c.locationName,
-        type: "String",
+        type: 'String',
       }));
 
       setBSData(bsData);
@@ -170,17 +170,17 @@ const ADBUserDetailsScreenComponent = ({
 
       const bsData = {
         items: [],
-        title: "State",
+        title: 'State',
         isHaveSearchBox: true,
-        name: "state",
-        searchBoxPlaceholder: "Search",
-        type: "OptionsList",
+        name: 'state',
+        searchBoxPlaceholder: 'Search',
+        type: 'OptionsList',
       };
 
-      bsData.items = uniqBy(listStates, "id").map((c) => ({
+      bsData.items = uniqBy(listStates, 'id').map((c) => ({
         id: c.id,
         value: c.locationName,
-        type: "String",
+        type: 'String',
       }));
 
       setBSData(bsData);
@@ -190,16 +190,16 @@ const ADBUserDetailsScreenComponent = ({
 
   const onPressCity = () => {
     showBSCityList(listCity);
-    setViewingBSField('city')
+    setViewingBSField('city');
   };
 
   const onPressState = () => {
     showBSStateList(listState);
-    setViewingBSField('state')
+    setViewingBSField('state');
   };
 
   const getStateList = async (parentLocationId: string | string[]) => {
-    if(isSkipFetchState) { 
+    if (isSkipFetchState) {
       return;
     }
     if (parentLocationId && formikRef.current) {
@@ -207,14 +207,9 @@ const ADBUserDetailsScreenComponent = ({
         const response = await onboardingService.getStates();
         if (response.data) {
           let statesBaseOnCity = [];
-          if (typeof parentLocationId === "string") {
-            statesBaseOnCity = response.data.filter(
-              (s: any) => s.id === parentLocationId
-            );
-            formikRef.current.setFieldValue(
-              "state",
-              statesBaseOnCity[0].locationName
-            );
+          if (typeof parentLocationId === 'string') {
+            statesBaseOnCity = response.data.filter((s: any) => s.id === parentLocationId);
+            formikRef.current.setFieldValue('state', statesBaseOnCity[0].locationName);
             setListState(statesBaseOnCity);
           } else {
             statesBaseOnCity = response.data.filter((s: any) =>
@@ -246,6 +241,7 @@ const ADBUserDetailsScreenComponent = ({
     : [];
 
   useEffect(() => {
+    formikRef.current?.setFieldTouched('nickName', true);
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
       const height = e.endCoordinates.height - (Platform.OS === 'android' ? 50 : 0);
       setKeyboardHeight(height);
@@ -261,17 +257,16 @@ const ADBUserDetailsScreenComponent = ({
     };
   }, []);
 
-
   const getCityList = async (postCode: string) => {
     setIsLoadingValues(true);
     try {
       const bsData = {
         items: [],
-        title: "City",
+        title: 'City',
         isHaveSearchBox: true,
-        name: "city",
-        searchBoxPlaceholder: "Search",
-        type: "OptionsList",
+        name: 'city',
+        searchBoxPlaceholder: 'Search',
+        type: 'OptionsList',
       };
 
       const response = await onboardingService.getCities(postCode);
@@ -279,13 +274,13 @@ const ADBUserDetailsScreenComponent = ({
         let parentLocationIds = [];
         if (response.data.length >= 1) {
           parentLocationIds = response.data.map((d) => d.parentLocationId);
-          const filteredData = uniqBy(response.data, "locationName");
-          
+          const filteredData = uniqBy(response.data, 'locationName');
+
           bsData.items = filteredData.map((c) => ({
             id: c.id,
             value: c.locationName,
             key: c.countryId,
-            type: "String",
+            type: 'String',
           }));
 
           if (bsData.items.length > 1) {
@@ -293,17 +288,13 @@ const ADBUserDetailsScreenComponent = ({
             setIsShowBottomSheet(true);
             setListCity(filteredData);
           } else {
-            formikRef.current.setFieldValue("city", bsData.items[0].value);
-            getStateList(
-              parentLocationIds.length > 1
-                ? parentLocationIds
-                : parentLocationIds[0]
-            );
+            formikRef.current.setFieldValue('city', bsData.items[0].value);
+            getStateList(parentLocationIds.length > 1 ? parentLocationIds : parentLocationIds[0]);
             setListCity(filteredData);
             setBSData(bsData);
           }
         } else {
-          formikRef.current.setFieldError("postcode", "Invalid post code");
+          formikRef.current.setFieldError('postcode', 'Invalid post code');
         }
       }
     } catch {
@@ -360,17 +351,18 @@ const ADBUserDetailsScreenComponent = ({
           }
         }}
       >
-        {({ submitForm, dirty, errors, isValid, values, setFieldValue, touched }) => {
+        {({ submitForm, dirty, errors, isValid, values, setFieldValue, touched, handleChange }) => {
           if (`${values.annualIncome}`.length > 0) {
-            amountFormat(values?.annualIncome, (num:string) => {
+            amountFormat(values?.annualIncome, (num: string) => {
               setFieldValue('annualIncome', num);
-            })
+            });
           }
-          const renderSelectedValue = selectedBSValue ? selectedBSValue : {
-            id: viewingBSField,
-            value: values[`${viewingBSField}`]
-          }
-
+          const renderSelectedValue = selectedBSValue
+            ? selectedBSValue
+            : {
+                id: viewingBSField,
+                value: values[`${viewingBSField}`],
+              };
 
           return (
             <>
@@ -379,7 +371,7 @@ const ADBUserDetailsScreenComponent = ({
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 keyboardOpeningTime={Number.MAX_SAFE_INTEGER}
-                keyboardDismissMode='interactive'
+                keyboardDismissMode="interactive"
                 extraScrollHeight={50}
                 enableResetScrollToCoords={false}
               >
@@ -399,14 +391,14 @@ const ADBUserDetailsScreenComponent = ({
                     if (checkEdit === 'nickName') {
                       setCheckEdit('');
                     }
+                    setFieldValue('nickName', values.nickName.trim());
                   }}
-                  suffixIcon={
-                    checkEdit !== "nickName" && (
-                      <TextEditIcon size={21} />
-                    )
+                  onChangeText={(e) =>
+                    e[0] !== ' ' && handleChange('nickName')(e.replace(/\s+/g, ' '))
                   }
-                  onClickSuffixIcon={() => setCheckEdit("nickName")}
-                  onInputPress={() => setCheckEdit("nickName")}                  
+                  suffixIcon={checkEdit !== 'nickName' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('nickName')}
+                  onInputPress={() => setCheckEdit('nickName')}
                   errors={errors}
                   touched={touched}
                 />
@@ -454,13 +446,9 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={
-                    checkEdit !== "line1" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("line1")}
-                  onInputPress={() => setCheckEdit("line1")}           
+                  suffixIcon={checkEdit !== 'line1' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('line1')}
+                  onInputPress={() => setCheckEdit('line1')}
                   errors={errors}
                   touched={touched}
                 />
@@ -478,13 +466,9 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={
-                    checkEdit !== "line2" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("line2")}
-                  onInputPress={() => setCheckEdit("line2")}
+                  suffixIcon={checkEdit !== 'line2' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('line2')}
+                  onInputPress={() => setCheckEdit('line2')}
                   errors={errors}
                   touched={touched}
                 />
@@ -504,20 +488,16 @@ const ADBUserDetailsScreenComponent = ({
                     setIsSkipFetchState(false);
                     setListCity([]);
                     setListState([]);
-                    formikRef.current?.setFieldValue("city", "");
-                    formikRef.current?.setFieldValue("state", "");
+                    formikRef.current?.setFieldValue('city', '');
+                    formikRef.current?.setFieldValue('state', '');
                   }}
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   editable={checkEdit === 'postcode'}
                   value={values.postcode}
-                  suffixIcon={
-                    checkEdit !== "postcode" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("postcode")}
-                  onInputPress={() => setCheckEdit("postcode")}
+                  suffixIcon={checkEdit !== 'postcode' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('postcode')}
+                  onInputPress={() => setCheckEdit('postcode')}
                   autoComplete={'off'}
                   keyboardType={'numeric'}
                   returnKeyType="done"
@@ -690,13 +670,9 @@ const ADBUserDetailsScreenComponent = ({
                       setCheckEdit('');
                     }
                   }}
-                  suffixIcon={
-                    checkEdit !== "annualIncome" && (
-                      <TextEditIcon size={21} />
-                    )
-                  }
-                  onClickSuffixIcon={() => setCheckEdit("annualIncome")}
-                  onInputPress={() => setCheckEdit("annualIncome")}
+                  suffixIcon={checkEdit !== 'annualIncome' && <TextEditIcon size={21} />}
+                  onClickSuffixIcon={() => setCheckEdit('annualIncome')}
+                  onInputPress={() => setCheckEdit('annualIncome')}
                   autoComplete={'off'}
                   keyboardType={'numeric'}
                   returnKeyType="done"
@@ -708,7 +684,7 @@ const ADBUserDetailsScreenComponent = ({
                 <ADBButton
                   label={'Save'}
                   onPress={submitForm}
-                  disabled={!isValid}
+                  disabled={!isValid || values.nickName.length === 0}
                   isLoading={isUpdatingProfile}
                 />
                 <View style={styles.verticalSpacing} />
