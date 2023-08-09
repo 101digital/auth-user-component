@@ -401,6 +401,7 @@ const ADBUserDetailsScreenComponent = ({
                   onInputPress={() => setCheckEdit('nickName')}
                   errors={errors}
                   touched={touched}
+                  maxLength={22}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
