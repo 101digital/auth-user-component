@@ -402,6 +402,11 @@ const ADBUserDetailsScreenComponent = ({
                   errors={errors}
                   touched={touched}
                   maxLength={22}
+                  style={{
+                    errorContainerStyle: {
+                      width: '95%',
+                    },
+                  }}
                 />
                 <View style={styles.verticalSpacing} />
                 <ADBInputField
