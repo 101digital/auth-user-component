@@ -17,6 +17,7 @@ import CookieManager from '@react-native-cookies/cookies';
 import { useIsFocused } from '@react-navigation/native';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { hasNotch } from 'react-native-device-info';
 
 type ADBLoginWithPasswordProps = {
   onSuccessVerified: () => void;
@@ -136,6 +137,7 @@ const ADBLoginWithPasswordComponent = ({
                 label={'Continue'}
                 onPress={() => onSubmit(values?.password)}
                 testId="continue-button"
+                containerStyles={{marginBottom: hasNotch() ? 0 : 20}}
               />
             </>
           );
