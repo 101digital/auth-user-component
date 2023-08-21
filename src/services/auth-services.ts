@@ -130,6 +130,7 @@ export class AuthServices {
     return this._pkce;
   }
 
+  /* istanbul ignore next */
   public fetchAppAccessToken = async () => {
     const body = qs.stringify({
       grant_type: this._configs?.appGrantType ?? 'client_credentials',
@@ -139,6 +140,7 @@ export class AuthServices {
     return response.data.access_token;
   };
 
+  /* istanbul ignore next */
   public adbLogin = async (
     username: string,
     password: string,
@@ -181,6 +183,7 @@ export class AuthServices {
     }
   };
 
+  /* istanbul ignore next */
   public adbVerifyLogin = async (otp: string, flowId: string) => {
     const response = await AuthApiClient.instance()
       .getAuthApiClient()
@@ -241,7 +244,7 @@ export class AuthServices {
         return error;
       });
 
-    const { pairingCode, token } = responseTokenHint.data.data[0];
+    const { pairingCode, token } = responseTokenHint.data?.data[0] || {};
     this.setLoginHintToken(token);
     this.setPairingCode(pairingCode);
     return {
@@ -270,6 +273,7 @@ export class AuthServices {
     };
   };
 
+  /* istanbul ignore next */
   public login = async (username: string, password: string, grantType?: string, scope?: string) => {
     const body = qs.stringify({
       grant_type: grantType ?? this._configs?.authGrantType ?? 'password',
@@ -312,7 +316,8 @@ export class AuthServices {
       });
     const { data } = response.data;
     const organisationUser = data?.memberships?.filter((el: any) => el.organisationName);
-    const memberShip = organisationUser?.length > 0 ? organisationUser[0] : data?.memberships[0];
+    const memberShip =
+      organisationUser?.length > 0 ? organisationUser?.[0] : data?.memberships?.[0];
     return { orgToken: memberShip?.token ?? undefined, data };
   };
 

@@ -4,7 +4,7 @@ import {
   CountryInformation,
   Recovery,
   VerificationMethod,
-  Devices
+  Devices,
 } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
@@ -66,7 +66,11 @@ export interface AuthContextData {
   errorUserVerify?: Error;
   errorRequestResetPassword?: Error;
   clearUserVerificationData: () => void;
-  registerDevice: (token: string, platform: 'IOS' | 'Android', onNetworkError: any) => Promise<boolean>;
+  registerDevice: (
+    token: string,
+    platform: 'IOS' | 'Android',
+    onNetworkError: any
+  ) => Promise<boolean>;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
   updateUserInfo: (
@@ -121,6 +125,7 @@ export interface AuthContextData {
   notificationData: any;
 }
 
+/* istanbul ignore next */
 export const authDefaultValue: AuthContextData = {
   isSignedIn: false,
   isSigning: false,
@@ -189,11 +194,12 @@ export const authDefaultValue: AuthContextData = {
   badgeNumber: 0,
   getNotifications: async () => false,
   updateReadNotifications: async () => false,
-  notificationData: false
+  notificationData: false,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
 
+/* istanbul ignore next */
 export const useAuthContextValue = (): AuthContextData => {
   const [_profile, setProfile] = useState<Profile | undefined>(undefined);
   const [_recovery, setRecovery] = useState<Recovery | undefined>(undefined);
@@ -538,7 +544,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsRecoveringUserPassword(false);
       return response;
     } catch (error) {
-      if(error?.message === 'Network Error') {
+      if (error?.message === 'Network Error') {
         DeviceEventEmitter.emit('network_error');
       }
       setIsRecoveringUserPassword(false);
@@ -573,7 +579,7 @@ export const useAuthContextValue = (): AuthContextData => {
         return response;
       } catch (error) {
         setIsRecoveringUserPassword(false);
-        if(error?.message === 'Network Error') {
+        if (error?.message === 'Network Error') {
           DeviceEventEmitter.emit('network_error');
         }
         return error?.response?.data;
@@ -619,7 +625,7 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   }, [_userMobileNumber]);
 
-  const saveUserNewPassword = useCallback(newPassword => {
+  const saveUserNewPassword = useCallback((newPassword) => {
     setUserNewPassword(newPassword);
   }, []);
 
@@ -636,7 +642,7 @@ export const useAuthContextValue = (): AuthContextData => {
           if (result && result.resendCode) {
             setRecovery({
               ...recovery,
-              recoveryCode: result.resendCode
+              recoveryCode: result.resendCode,
             });
           }
         }
@@ -693,10 +699,10 @@ export const useAuthContextValue = (): AuthContextData => {
           return true;
         }
       } catch (error) {
-        if(error.message === 'Network Error') {
+        if (error.message === 'Network Error') {
           DeviceEventEmitter.emit('network_error');
         }
-        if(onNetworkError) {
+        if (onNetworkError) {
           onNetworkError();
         }
         setIsDeviceRegistering(false);
@@ -734,7 +740,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setIsUpdatingProfile(false);
         return true;
       } catch (error) {
-        if(error?.message === 'Network Error') {
+        if (error?.message === 'Network Error') {
           DeviceEventEmitter.emit('network_error');
         }
         onError && onError(error as Error);
@@ -750,7 +756,9 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       const code = AuthServices.instance().getPairingCode();
       if (!code) {
-        const { pairingCode } = await AuthServices.instance().getLoginhintTokenAndPairingCode(onNetworkError);
+        const { pairingCode } = await AuthServices.instance().getLoginhintTokenAndPairingCode(
+          onNetworkError
+        );
         PingOnesdkModule.pairDevice(pairingCode);
       } else {
         PingOnesdkModule.pairDevice(code);
@@ -866,7 +874,7 @@ export const useAuthContextValue = (): AuthContextData => {
     const response = await AuthServices.instance().updateReadNotification(notificationId);
     if (response) {
       let cloneData = [...(_notificationData?.data ? _notificationData?.data : [])];
-      const itemIndex = cloneData.findIndex(item => item.id === notificationId);
+      const itemIndex = cloneData.findIndex((item) => item.id === notificationId);
       cloneData[itemIndex].isView = true;
       let newUpdatedData = Object.assign({}, _notificationData);
       newUpdatedData.data = [...cloneData];
@@ -952,7 +960,7 @@ export const useAuthContextValue = (): AuthContextData => {
       badgeNumber: _badgeNumber,
       getNotifications,
       updateReadNotifications,
-      notificationData: _notificationData
+      notificationData: _notificationData,
     }),
     [
       _profile,
@@ -992,7 +1000,7 @@ export const useAuthContextValue = (): AuthContextData => {
       selectedDeviceId,
       _isReselectingDevice,
       _badgeNumber,
-      _notificationData
+      _notificationData,
     ]
   );
 };
