@@ -1,2 +1,7 @@
 node_modules
 .idea/
+
+jest_html_reporters.html
+jest-html-reporters-attach/
+
+coverage
