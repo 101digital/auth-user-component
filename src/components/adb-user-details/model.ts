@@ -16,7 +16,18 @@ export class UserDetailsData {
     readonly employmentSector: string,
     readonly employerName: string,
     readonly occupation: string,
-    readonly annualIncome: string
+    readonly annualIncome: string,
+    readonly fullName: string,
+    readonly idNumber: string,
+    readonly mobileNumber: string,
+    readonly email: string,
+    readonly residentialAddress: string,
+    readonly accountOpeningPurpose: { [key: string]: boolean },
+    readonly accountSourceOfFunds: { [key: string]: boolean },
+    readonly accountSourceOfWealth: { [key: string]: boolean },
+    readonly otherAccountOpeningPurpose: string,
+    readonly otherSourceOfFunds: string,
+    readonly otherSourceOfWealth: string
   ) {}
 
   static empty(profile?: Profile): UserDetailsData {
@@ -29,6 +40,46 @@ export class UserDetailsData {
       profile?.addresses &&
       profile?.addresses.length > 0 &&
       profile.addresses.find((a: any) => a.addressType === 'Mailing Address');
+
+    let personalContactNo = profile?.contacts?.find(
+      (contacts: any) => contacts.contactType === 'MOBILE_PHONE'
+    );
+    if (!personalContactNo?.contactValue) {
+      personalContactNo = {
+        contactValue: profile?.mobileNumber || '',
+        contactType: 'MOBILE_PHONE',
+      };
+    }
+
+    let personalEmail = profile?.contacts?.find(
+      (contacts: any) => contacts.contactType === 'EMAIL'
+    );
+    if (!personalEmail?.contactValue) {
+      personalEmail = { contactValue: profile?.email || '', contactType: 'EMAIL' };
+    }
+
+    const residentialAddress = profile?.addresses?.find(
+      (addresses: any) => addresses.addressType === 'Residential'
+    );
+    const fullAddress = residentialAddress
+      ? residentialAddress?.line1 ||
+        '' + ', ' + residentialAddress?.line2 ||
+        '' +
+          ', ' +
+          residentialAddress?.postcode +
+          ', ' +
+          residentialAddress?.city +
+          ', ' +
+          residentialAddress?.state
+      : profileAddress?.line1 +
+        ', ' +
+        profileAddress?.line2 +
+        ', ' +
+        profileAddress?.postcode +
+        ', ' +
+        profileAddress?.city +
+        ', ' +
+        profileAddress?.state;
 
     return new UserDetailsData(
       profile?.nickName ?? '',
@@ -43,7 +94,18 @@ export class UserDetailsData {
       profile?.employmentDetails?.[0]?.sector ?? '',
       profile?.employmentDetails?.[0]?.companyName ?? '',
       profile?.employmentDetails?.[0]?.occupation ?? '',
-      newAnnualIncome?.currencyFormated ?? ''
+      newAnnualIncome?.currencyFormated ?? '',
+      profile?.fullName ?? '',
+      profile?.kycDetails?.idNumber ?? '',
+      personalContactNo?.contactValue ?? '',
+      personalEmail?.contactValue ?? '',
+      fullAddress ?? '',
+      {},
+      {},
+      {},
+      '',
+      '',
+      ''
     );
   }
 }
