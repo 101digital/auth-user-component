@@ -6,7 +6,7 @@ import * as yup from 'yup';
 import Input from './components/Input';
 import Button from './components/Button';
 import { colors as defaultColors } from '../../assets/colors';
-import { useAuth, useUser } from 'react-native-auth-component';
+import { useAuth } from 'react-native-auth-component';
 import { loginSchema } from './ValidationSchema';
 
 type LoginComponentProps = {
@@ -17,7 +17,6 @@ type LoginComponentProps = {
 
 const LoginComponent: React.FC<LoginComponentProps> = ({ loginSuccess, colors = defaultColors, title }) => {
   const { login } = useAuth();
-  const { fetchUserDetails } = useUser();
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const { control, handleSubmit, setError, formState: { errors } } = useForm({
@@ -28,7 +27,6 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ loginSuccess, colors = 
     try {
       const response = await login(email, password);
       if (response === true) {
-        await fetchUserDetails();
         loginSuccess();
       } else {
         setLoginError('Login failed. Please check your credentials.');
