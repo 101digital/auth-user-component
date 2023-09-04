@@ -1,12 +1,11 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { DeviceEventEmitter, Platform } from 'react-native';
-import { AuthServices } from '../services/auth-services';
+import { authService } from '../AuthService';
 import DeviceInfo from 'react-native-device-info';
-import { ONE_TIME_TOKEN_KEY } from '../types';
+import { getSecureData } from '../../utils/keychainStorage';
 
 type TokenData = {
   accessToken?: string;
-  orgToken?: string;
   refreshToken?: string;
 };
 let failedQueue: any = [];
@@ -24,13 +23,8 @@ const shouldIntercept = (error: AxiosError) => {
 const attachTokenToRequest = (
   request: AxiosRequestConfig,
   token?: string,
-  orgToken?: string,
-  withOrgToken?: boolean
 ) => {
   request.headers.Authorization = token;
-  if (withOrgToken) {
-    request.headers['org-token'] = orgToken;
-  }
 };
 
 const forceLogout = async () => {
@@ -48,49 +42,39 @@ export const createAuthorizedApiClient = (baseURL: string) => {
     baseURL,
   });
 
-  const processQueue = (error: any, accessToken?: string, orgToken?: string) => {
+  const processQueue = (error: any, accessToken?: string) => {
     failedQueue.forEach((prom: any) => {
       if (error) {
         prom.reject(error);
       } else {
-        prom.resolve({ accessToken, orgToken });
+        prom.resolve({ accessToken });
       }
     });
     failedQueue = [];
   };
 
   const onRequest = async (request: AxiosRequestConfig) => {
-    let authBearer = AuthServices.instance().getAccessToken();
-
-    if (request.headers[ONE_TIME_TOKEN_KEY]) {
-      authBearer = request.headers[ONE_TIME_TOKEN_KEY];
-      request.headers[ONE_TIME_TOKEN_KEY] = '';
-      delete request.headers[ONE_TIME_TOKEN_KEY];
-    }
-
+    let accessToken = await getSecureData('access_token');
     const httpClient = 'Axios';
     const platform = `${Platform.OS}/${DeviceInfo.getSystemVersion()}`;
     const security = 'U';
     const os = `${
       Platform.OS === 'ios' ? 'ios' : DeviceInfo.getBaseOsSync()
     }/${DeviceInfo.getSystemVersion()}`;
-    const localization = AuthServices.instance().getLocale();
+    const localization = authService.getLocale();
     const mobileAppNameAndVersion = `${DeviceInfo.getApplicationName()}/${DeviceInfo.getVersion()}`;
-    const mobilePingDeviceId = AuthServices.instance().getDeviceId();
 
-    if (authBearer) {
-      request.headers.Authorization = `${authBearer}`;
+    if (accessToken) {
+      request.headers.Authorization = `Bearer ${accessToken}`;
       request.headers[
         'user-agent'
-      ] = `${httpClient} (${platform} ; ${security} ; ${os} ; ${localization} ; ${mobileAppNameAndVersion} DeviceId:${mobilePingDeviceId})`;
+      ] = `${httpClient} (${platform} ; ${security} ; ${os} ; ${localization} ; ${mobileAppNameAndVersion} )`;
     }
     return request;
   };
 
   const onResponseSuccess = (response: AxiosResponse) => {
-    if (response.request?.headers?.[ONE_TIME_TOKEN_KEY]) {
-      AuthServices.instance().storeOTT('');
-    }
+
     if(response.message === 'Network Error') {
       DeviceEventEmitter.emit('network_error');
     } else if (response.message === 'Request failed with status code 401') {

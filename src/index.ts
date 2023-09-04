@@ -1,6 +1,6 @@
 import { DeviceEventEmitter } from 'react-native';
-import { AuthApiClient } from './api-client/auth-api-client';
-import { AuthServices } from './services/auth-services';
+import { authApiClient } from './services/api-clients/AuthApiClient';
+import { authService } from './services/AuthService';
 import { AuthComponentConfig } from './types';
 
 export class AuthComponent {
@@ -22,8 +22,9 @@ export class AuthComponent {
   public configure(configs: AuthComponentConfig) {
     return new Promise<void>((resolve) => {
       this._configs = configs;
-      AuthApiClient.instance().configure(configs);
-      AuthServices.instance().configure(configs);
+      // Configure the authApiClient and authService with the provided configs
+      authApiClient.configure(configs);
+      authService.configure(configs);
       resolve();
     });
   }
