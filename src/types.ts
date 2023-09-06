@@ -25,6 +25,8 @@ export interface CreditDetails {
   numberCreditCard?: number;
   numberLoan?: number;
   annualIncome?: number;
+  accountPurposeCode?: string;
+  sourceOfWealth?: string;
 }
 
 export interface EmploymentDetails {
@@ -146,6 +148,7 @@ export type AuthComponentConfig = {
   notificationAppId?: string;
   notificationEntityId?: string;
   ott?: string;
+  accountOriginationBaseUrl?: string;
 };
 
 export enum VerificationMethod {

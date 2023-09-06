@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,6 +7,7 @@ import {
   Keyboard,
   TouchableOpacity,
   Dimensions,
+  ScrollView
 } from 'react-native';
 import {
   ADBButton,
@@ -30,22 +31,104 @@ import { colors } from 'account-origination-component/src/assets';
 import ADBBottomSheet, { BSOption } from 'account-origination-component/src/components/bottomSheet';
 import { amountFormat } from '@/helpers/amount-input';
 import { uniqBy } from 'lodash';
+import { CircularCheckBox } from 'react-native-theme-component/index';
+import { CheckBoxStyles } from 'react-native-theme-component/src/checkbox';
+import SelectInputField from 'account-origination-component/src/components/sub-components/input-field/select';
+import ADBCustomerEDDModal from 'account-origination-component/src/components/adb-customer-edd/adb-customer-edd-modal';
+import moment from 'moment';
 
 type ADBUserDetailsScreenComponentProps = {
   onSuccess: () => void;
   onFailed: () => void;
+  oddReviewCycle?: boolean;
 };
 
 const { height } = Dimensions.get('screen');
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const onboardingService = AccountOriginationService.instance();
+
+export const OTHER_OPTION = 'Others';
+
+export interface IEddMetadata {
+  other: {
+    maxOtherTextLength: number;
+    otherOptionText: string;
+  };
+  sourceOfWealthOptions: string[];
+  sourceOfFundOptions: string[];
+  accountOpeningPurposes: string[];
+}
+
+const FALLBACK_REMOTE_CONFIG: IEddMetadata = {
+  sourceOfFundOptions: [
+    'Employment income',
+    'Inheritance',
+    'Gift',
+    'Financing/ loan',
+    'Pension',
+    'Allowance',
+    'Interest payments from financing/ loan arrangement',
+    'Ownership/ sale of share or other securities',
+    'Company profits/ dividends',
+    'Capital injection/ new funding',
+    'Government grant and subsidies',
+    'Contribution and donation',
+  ],
+  sourceOfWealthOptions: [
+    'Accumulated Wealth',
+    'Inheritance',
+    'Gift',
+    'Pension',
+    'Sale of asset',
+    'Sale of share or other',
+    'Investment',
+    'Company sale',
+    'Legal settlements/ claims/ insurance payouts',
+    'Maturity/ surrender of life policy',
+    'Retaining profit',
+    'Sinking fund',
+  ],
+  accountOpeningPurposes: ['Daily spending', 'Education', 'Financing', 'Investment', 'Salary'],
+  other: {
+    maxOtherTextLength: 40,
+    otherOptionText: 'Others',
+  },
+};
+
+const addOtherOptionToMetadata = (option: string[], otherOptionText: string) => {
+  return option.push(otherOptionText);
+};
 
 const ADBUserDetailsScreenComponent = ({
   onSuccess,
   onFailed,
+  oddReviewCycle,
 }: ADBUserDetailsScreenComponentProps) => {
+  const checkboxStyle: CheckBoxStyles = useMemo(() => {
+    return {
+      containerStyle: {
+        paddingHorizontal: 24,
+        paddingBottom: 15,
+      },
+      titleStyle: {
+        fontSize: 14,
+        fontFamily: fonts.OutfitRegular,
+        fontWeight: '400',
+        lineHeight: 20,
+      },
+    };
+  }, []);
+
   const { i18n } = useContext(ThemeContext);
-  const { profile, isUpdatingProfile, updateProfile } = useContext(AuthContext);
+  const {
+    profile,
+    isUpdatingProfile,
+    updateProfile,
+    updateODDReviewCycle,
+    getFramlODDApplicationStatus,
+  } = useContext(AuthContext);
   const [isLoadingValues, setIsLoadingValues] = useState<boolean>(false);
   const [isShowBottomSheet, setIsShowBottomSheet] = useState<boolean>(false);
   const [selectedBSValue, setSelectedBSValue] = useState<BSOption>();
@@ -65,6 +148,39 @@ const ADBUserDetailsScreenComponent = ({
   const [checkEdit, setCheckEdit] = useState<string>('');
   const [viewingBSField, setViewingBSField] = useState<any>();
   const [isSkipFetchState, setIsSkipFetchState] = useState<boolean>(false);
+  const [showPurposeOfAccountOpen, setShowPurposeOfAccountOpen] = useState<boolean>(false);
+  const [eddMetadata, setEddMetadata] = useState<IEddMetadata>(FALLBACK_REMOTE_CONFIG);
+  const [accountPurposePlaceholderVisible, setAccountPurposePlaceholderVisible] =
+    useState<boolean>(false);
+  const [showSourceOfFunds, setShowSourceOfFunds] = useState<boolean>(false);
+  const [sourceOfFundsPlaceholderVisible, setSourceOfFundsPlaceholderVisible] =
+    useState<boolean>(false);
+  const [showSourceOfWealth, setShowSourceOfWealth] = useState<boolean>(false);
+  const [sourceOfWealthPlaceholderVisible, setSourceOfWealthPlaceholderVisible] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    remoteConfig()
+      .fetchAndActivate()
+      .then((value) => {
+        try {
+          const metadata = remoteConfig().getValue('accountOriginationCustomerEddOptions');
+          if (metadata && metadata._value) {
+            const data = JSON.parse(metadata._value) as IEddMetadata;
+            if (!data.sourceOfFundOptions.length || !data.sourceOfWealthOptions.length) {
+              setEddMetadata(FALLBACK_REMOTE_CONFIG);
+            } else {
+              addOtherOptionToMetadata(data.sourceOfFundOptions, data.other.otherOptionText);
+              addOtherOptionToMetadata(data.sourceOfWealthOptions, data.other.otherOptionText);
+              addOtherOptionToMetadata(data.accountOpeningPurposes, data.other.otherOptionText);
+            }
+            setEddMetadata(data);
+          }
+        } catch (e) {
+          console.warn('source of funds and wealth warning : ', e);
+        }
+      });
+  }, []);
 
   const getOccupationList = async () => {
     setIsLoadingValues(true);
@@ -304,12 +420,107 @@ const ADBUserDetailsScreenComponent = ({
     }
   };
 
+  const selectedSourceOfFunds = useMemo(() => {
+    const sourceOfFunds = profile?.creditDetails?.find((item) =>
+      item.hasOwnProperty('sourceOfFund')
+    )?.sourceOfFund;
+    const sourceOfFundList = sourceOfFunds ? sourceOfFunds?.split(', ') : [];
+    const filteredSourceOfFundList = sourceOfFundList?.filter((source) =>
+      eddMetadata?.sourceOfFundOptions.includes(source)
+    );
+    const otherSourceOfFundList = sourceOfFundList?.filter(
+      (source) => !eddMetadata?.sourceOfFundOptions.includes(source)
+    );
+
+    const sourceOfFundObject: { [key: string]: boolean } = {};
+    filteredSourceOfFundList?.forEach((source) => {
+      sourceOfFundObject[source.trim()] = true;
+    });
+    if (otherSourceOfFundList && otherSourceOfFundList?.length > 0) {
+      sourceOfFundObject[OTHER_OPTION] = true;
+    }
+    const otherSourceOfFunds = otherSourceOfFundList?.[0] || '';
+    return { sourceOfFundObject, otherSourceOfFunds };
+  }, [eddMetadata]);
+
+  const selectedSourceOfWealth = useMemo(() => {
+    const sourceOfWealth = profile?.creditDetails?.find((item) =>
+      item.hasOwnProperty('sourceOfWealth')
+    )?.sourceOfWealth;
+    const sourceOfWealthList = sourceOfWealth ? sourceOfWealth?.split(', ') : [];
+    const filteredSourceOfWealthList = sourceOfWealthList?.filter((source) =>
+      eddMetadata?.sourceOfWealthOptions.includes(source)
+    );
+    const otherSourceOfWealthList = sourceOfWealthList?.filter(
+      (source) => !eddMetadata?.sourceOfWealthOptions.includes(source)
+    );
+
+    const sourceOfWealthObject: { [key: string]: boolean } = {};
+    filteredSourceOfWealthList?.forEach((source) => {
+      sourceOfWealthObject[source.trim()] = true;
+    });
+    if (otherSourceOfWealthList && otherSourceOfWealthList?.length > 0) {
+      sourceOfWealthObject[OTHER_OPTION] = true;
+    }
+    const otherSourceOfWealth = otherSourceOfWealthList?.[0] || '';
+    return { sourceOfWealthObject, otherSourceOfWealth };
+  }, [eddMetadata]);
+
+  const selectedAccountPurpose = useMemo(() => {
+    const accountPurposes = profile?.creditDetails?.find((item) =>
+      item.hasOwnProperty('accountPurposeCode')
+    )?.accountPurposeCode;
+    const accountPurposesList = accountPurposes ? accountPurposes?.split(', ') : [];
+    const filteredAccountPurposes = accountPurposesList?.filter((purpose) =>
+      eddMetadata?.accountOpeningPurposes.includes(purpose)
+    );
+    const otherAccountPurposesList = accountPurposesList?.filter(
+      (purpose) => !eddMetadata?.accountOpeningPurposes.includes(purpose)
+    );
+
+    const accountPurposesObject: { [key: string]: boolean } = {};
+    filteredAccountPurposes?.forEach((purpose) => {
+      accountPurposesObject[purpose.trim()] = true;
+    });
+    if (otherAccountPurposesList && otherAccountPurposesList?.length > 0) {
+      accountPurposesObject[OTHER_OPTION] = true;
+    }
+    const otherAccountPurposes = otherAccountPurposesList?.[0] || '';
+    return { accountPurposesObject, otherAccountPurposes };
+  }, [eddMetadata]);
+
+  const toString = (object: Record<string, boolean>, paddingOtherText: string) => {
+    const stringArr: string[] = [];
+    Object.keys(object).forEach((k) => {
+      if (k !== eddMetadata.other.otherOptionText) {
+        stringArr.push(k);
+      }
+    });
+    if (stringArr.length > 0) {
+      if (paddingOtherText) {
+        stringArr.push(paddingOtherText);
+      }
+      return stringArr.join(', ');
+    }
+    return stringArr.join('');
+  };
+
   return (
     <View style={styles.container}>
       <Formik
         innerRef={formikRef}
-        validationSchema={personalDetailsSchema(isUnEmployed, isOutsideLabourForce, i18n)}
-        initialValues={UserDetailsData.empty(profile)}
+        validationSchema={personalDetailsSchema(
+          isUnEmployed,
+          isOutsideLabourForce,
+          i18n,
+          oddReviewCycle
+        )}
+        initialValues={UserDetailsData.empty(
+          profile,
+          selectedSourceOfFunds,
+          selectedSourceOfWealth,
+          selectedAccountPurpose
+        )}
         onSubmit={async (values) => {
           const inputedValue = {
             nickName: values.nickName,
@@ -343,6 +554,47 @@ const ADBUserDetailsScreenComponent = ({
               },
             ],
           };
+
+          if (oddReviewCycle) {
+            const excludingStatuses = 'Completed,Rejected,Cancelled,Expired,Withdrawn';
+            const application = await getFramlODDApplicationStatus(
+              profile?.userId,
+              excludingStatuses
+            );
+            const ODDObject = {
+              submitType: 'Submit',
+              credit: {
+                applicant: {
+                  individual: {
+                    sourceOfFund: `${toString(
+                      values.accountSourceOfFunds,
+                      values.otherSourceOfFunds
+                    )}`,
+                    sourceOfWealth: `${toString(
+                      values.accountSourceOfWealth,
+                      values.otherSourceOfWealth
+                    )}`,
+                    accountPurposeCode: `${toString(
+                      values.accountOpeningPurpose,
+                      values.otherAccountOpeningPurpose
+                    )}`,
+                  },
+                },
+              },
+              customFields: [
+                {
+                  customKey: 'EDD_LAST_SUBMITTED',
+                  customValue: moment().utc(),
+                },
+              ],
+            };
+            if (application) {
+              const res = await updateODDReviewCycle(application.applicationId, ODDObject);
+              if (!res) {
+                return;
+              }
+            }
+          }
           const isSuccess = await updateProfile(profile?.userId, inputedValue);
           if (isSuccess) {
             onSuccess();
@@ -364,6 +616,28 @@ const ADBUserDetailsScreenComponent = ({
                 value: values[`${viewingBSField}`],
               };
 
+          if (values.accountOpeningPurpose) {
+            if (Object.keys(values.accountOpeningPurpose).length === 0) {
+              setAccountPurposePlaceholderVisible(false);
+            } else {
+              setAccountPurposePlaceholderVisible(true);
+            }
+          }
+          if (values.accountSourceOfFunds) {
+            if (Object.keys(values.accountSourceOfFunds).length === 0) {
+              setSourceOfFundsPlaceholderVisible(false);
+            } else {
+              setSourceOfFundsPlaceholderVisible(true);
+            }
+          }
+          if (values.accountSourceOfWealth) {
+            if (Object.keys(values.accountSourceOfWealth).length === 0) {
+              setSourceOfWealthPlaceholderVisible(false);
+            } else {
+              setSourceOfWealthPlaceholderVisible(true);
+            }
+          }
+
           return (
             <>
               <KeyboardAwareScrollView
@@ -379,6 +653,37 @@ const ADBUserDetailsScreenComponent = ({
                   {i18n.t('user_details.personal_details_section_title')}
                 </Text>
                 <View style={styles.verticalSpacing} />
+                {oddReviewCycle && (
+                  <>
+                    <View style={styles.rowInfoFixed}>
+                      <Text style={styles.rowInfoName}>{i18n.t('user_details.full_name')}</Text>
+                      <Text style={styles.rowInfoValue}>{values.fullName}</Text>
+                    </View>
+                    <View style={styles.verticalSpacing} />
+                    <View style={styles.rowInfoFixed}>
+                      <Text style={styles.rowInfoName}>{i18n.t('user_details.id_number')}</Text>
+                      <Text style={styles.rowInfoValue}>{values.idNumber}</Text>
+                    </View>
+                    <View style={styles.verticalSpacing} />
+                    <View style={styles.rowInfoFixed}>
+                      <Text style={styles.rowInfoName}>{i18n.t('user_details.mobile_number')}</Text>
+                      <Text style={styles.rowInfoValue}>{values.mobileNumber}</Text>
+                    </View>
+                    <View style={styles.verticalSpacing} />
+                    <View style={styles.rowInfoFixed}>
+                      <Text style={styles.rowInfoName}>{i18n.t('user_details.email')}</Text>
+                      <Text style={styles.rowInfoValue}>{values.email}</Text>
+                    </View>
+                    <View style={styles.verticalSpacing} />
+                    <View style={styles.rowInfoFixed}>
+                      <Text style={styles.rowInfoName}>
+                        {i18n.t('user_details.residential_address')}
+                      </Text>
+                      <Text style={styles.rowInfoValue}>{values.residentialAddress}</Text>
+                    </View>
+                    <View style={styles.verticalSpacing} />
+                  </>
+                )}
                 <ADBInputField
                   name={'nickName'}
                   hideUnderLine={true}
@@ -685,6 +990,134 @@ const ADBUserDetailsScreenComponent = ({
                   errors={errors}
                   touched={touched}
                 />
+                {oddReviewCycle && (
+                  <>
+                    <View style={styles.underline} />
+                    <Text style={styles.mainheading}>
+                      {i18n.t('user_details.account_opening_purpose')}
+                    </Text>
+
+                    <View style={styles.verticalSpacing} />
+                    <SelectInputField
+                      placeholder={i18n.t('user_details.purpose_acount_opening')}
+                      placeholderTextColor={defaultColors.gray400}
+                      editable={false}
+                      onPressInAndroid={() => setShowPurposeOfAccountOpen(true)}
+                      onPressIn={() => setShowPurposeOfAccountOpen(true)}
+                      suffixIcon={<ArrowDownIcon width={20} height={20} color={colors.primary} />}
+                      onRemove={(item) => {
+                        setFieldValue(`accountOpeningPurpose[${item}]`, undefined);
+                      }}
+                      validPlaceHolder={accountPurposePlaceholderVisible}
+                      name={'accountOpeningPurpose'}
+                      values={values.accountOpeningPurpose}
+                    />
+                    {values.accountOpeningPurpose[eddMetadata?.other.otherOptionText] && (
+                      <>
+                        <View style={styles.verticalSpacing20} />
+                        <ADBInputField
+                          maxLength={eddMetadata.other.maxOtherTextLength}
+                          name={'otherAccountOpeningPurpose'}
+                          placeholder={i18n.t('user_details.other_purpose') ?? 'Other purpose'}
+                          placeholderTextColor={defaultColors.gray400}
+                          type={'custom'}
+                          inputType={InputTypeEnum.MATERIAL}
+                          showCharCounter={true}
+                          returnKeyType="done"
+                          maxCharCounter={eddMetadata.other.maxOtherTextLength}
+                          style={{ counterStyle: { color: colors.black500 } }}
+                        />
+                      </>
+                    )}
+                    <View style={styles.verticalSpacing} />
+                    <SelectInputField
+                      placeholder={i18n.t('user_details.source_of_funds')}
+                      placeholderTextColor={defaultColors.gray400}
+                      editable={false}
+                      onPressInAndroid={() => setShowSourceOfFunds(true)}
+                      onPressIn={() => setShowSourceOfFunds(true)}
+                      suffixIcon={<ArrowDownIcon width={20} height={20} color={colors.primary} />}
+                      onRemove={(item) => {
+                        setFieldValue(`accountSourceOfFunds[${item}]`, undefined);
+                      }}
+                      validPlaceHolder={sourceOfFundsPlaceholderVisible}
+                      name={'accountSourceOfFunds'}
+                      values={values.accountSourceOfFunds}
+                    />
+                    {values.accountSourceOfFunds[eddMetadata?.other.otherOptionText] && (
+                      <>
+                        <View style={styles.verticalSpacing20} />
+                        <ADBInputField
+                          maxLength={eddMetadata.other.maxOtherTextLength}
+                          name={'otherSourceOfFunds'}
+                          placeholder={
+                            i18n.t('user_details.other_source_of_funds') ?? 'Other source of funds'
+                          }
+                          placeholderTextColor={defaultColors.gray400}
+                          type={'custom'}
+                          inputType={InputTypeEnum.MATERIAL}
+                          showCharCounter={true}
+                          returnKeyType="done"
+                          maxCharCounter={eddMetadata.other.maxOtherTextLength}
+                          style={{ counterStyle: { color: colors.black500 } }}
+                        />
+                      </>
+                    )}
+                    <View style={styles.verticalSpacing} />
+                    <SelectInputField
+                      placeholder={i18n.t('user_details.source_of_wealth')}
+                      placeholderTextColor={defaultColors.gray400}
+                      editable={false}
+                      onPressInAndroid={() => setShowSourceOfWealth(true)}
+                      onPressIn={() => setShowSourceOfWealth(true)}
+                      suffixIcon={<ArrowDownIcon width={20} height={20} color={colors.primary} />}
+                      onRemove={(item) => {
+                        setFieldValue(`accountSourceOfWealth[${item}]`, undefined);
+                      }}
+                      validPlaceHolder={sourceOfWealthPlaceholderVisible}
+                      name={'accountSourceOfWealth'}
+                      values={values.accountSourceOfWealth}
+                    />
+                    {values.accountSourceOfWealth[eddMetadata?.other.otherOptionText] && (
+                      <>
+                        <View style={styles.verticalSpacing20} />
+                        <ADBInputField
+                          maxLength={eddMetadata.other.maxOtherTextLength}
+                          name={'otherSourceOfWealth'}
+                          placeholder={
+                            i18n.t('user_details.other_source_of_wealth') ??
+                            'Other source of wealth'
+                          }
+                          placeholderTextColor={defaultColors.gray400}
+                          type={'custom'}
+                          inputType={InputTypeEnum.MATERIAL}
+                          showCharCounter={true}
+                          returnKeyType="done"
+                          maxCharCounter={eddMetadata.other.maxOtherTextLength}
+                          style={{ counterStyle: { color: colors.black500 } }}
+                        />
+                      </>
+                    )}
+                    <View>
+                      <View style={styles.row}>
+                        <Text style={styles.dot}>{'\u2022'}</Text>
+                        <Text style={styles.rowTitle}>
+                          {i18n.t('user_details.review_profile_disclaimer1')}{' '}
+                          <Text style={styles.clickable} onPress={() => {}}>
+                            {i18n.t('user_details.review_profile_disclaimer_clickable')}
+                          </Text>{' '}
+                          <Text>{i18n.t('user_details.review_profile_disclaimer2')}</Text>
+                        </Text>
+                      </View>
+                      <View style={styles.row}>
+                        <Text style={styles.dot}>{'\u2022'}</Text>
+                        <Text style={styles.rowTitle}>
+                          {i18n.t('user_details.review_profile_disclaimer3')}
+                        </Text>
+                      </View>
+                    </View>
+                  </>
+                )}
                 <View style={styles.verticalSpacing} />
                 <View style={styles.verticalSpacing} />
                 <ADBButton
@@ -762,6 +1195,104 @@ const ADBUserDetailsScreenComponent = ({
                   onChangeSubValue={setSelectedBSSubValue}
                 />
               )}
+                            <ADBCustomerEDDModal
+                isVisible={showPurposeOfAccountOpen}
+                title={
+                  i18n.t('user_details.purpose_acount_opening') ?? 'Purpose of account opening'
+                }
+                bottomSheetHeight={SCREEN_HEIGHT - 100}
+                onClose={() => setShowPurposeOfAccountOpen(false)}
+              >
+                <ScrollView style={{ marginTop: 20, marginBottom: 20 }}>
+                  {eddMetadata?.accountOpeningPurposes &&
+                    eddMetadata?.accountOpeningPurposes.map((item) => {
+                      return (
+                        <CircularCheckBox
+                          style={checkboxStyle}
+                          title={item}
+                          isSelected={!!values.accountOpeningPurpose[item]}
+                          onChanged={(value) => {
+                            setFieldValue(
+                              `accountOpeningPurpose[${item}]`,
+                              value ? value : undefined
+                            );
+                          }}
+                        />
+                      );
+                    })}
+                </ScrollView>
+                <View style={styles.accPurposeContinueBtnContainer}>
+                  <ADBButton
+                    label={i18n.t('edd.continue') ?? 'Continue'}
+                    onPress={() => setShowPurposeOfAccountOpen(false)}
+                    containerStyles={{ paddingVertical: 16 }}
+                  />
+                </View>
+              </ADBCustomerEDDModal>
+              <ADBCustomerEDDModal
+                isVisible={showSourceOfFunds}
+                title={i18n.t('user_details.source_of_funds') ?? 'Source of funds'}
+                bottomSheetHeight={SCREEN_HEIGHT - 100}
+                onClose={() => setShowSourceOfFunds(false)}
+              >
+                <ScrollView style={{ marginTop: 20, marginBottom: 20 }}>
+                  {eddMetadata?.sourceOfFundOptions &&
+                    eddMetadata?.sourceOfFundOptions.map((item) => {
+                      return (
+                        <CircularCheckBox
+                          style={checkboxStyle}
+                          title={item}
+                          isSelected={!!values.accountSourceOfFunds[item]}
+                          onChanged={(value) => {
+                            setFieldValue(
+                              `accountSourceOfFunds[${item}]`,
+                              value ? value : undefined
+                            );
+                          }}
+                        />
+                      );
+                    })}
+                </ScrollView>
+                <View style={styles.continueButtonContainer}>
+                  <ADBButton
+                    label={i18n.t('edd.continue') ?? 'Continue'}
+                    onPress={() => setShowSourceOfFunds(false)}
+                    containerStyles={{ paddingVertical: 16 }}
+                  />
+                </View>
+              </ADBCustomerEDDModal>
+              <ADBCustomerEDDModal
+                isVisible={showSourceOfWealth}
+                title={i18n.t('user_details.source_of_wealth') ?? 'Source of Wealth'}
+                bottomSheetHeight={SCREEN_HEIGHT - 100}
+                onClose={() => setShowSourceOfWealth(false)}
+              >
+                <ScrollView style={{ marginTop: 20, marginBottom: 20 }}>
+                  {eddMetadata?.sourceOfWealthOptions &&
+                    eddMetadata?.sourceOfWealthOptions.map((item) => {
+                      return (
+                        <CircularCheckBox
+                          style={checkboxStyle}
+                          title={item}
+                          isSelected={!!values.accountSourceOfWealth[item]}
+                          onChanged={(value) => {
+                            setFieldValue(
+                              `accountSourceOfWealth[${item}]`,
+                              value ? value : undefined
+                            );
+                          }}
+                        />
+                      );
+                    })}
+                </ScrollView>
+                <View style={styles.continueButtonContainer}>
+                  <ADBButton
+                    label={i18n.t('edd.continue') ?? 'Continue'}
+                    onPress={() => setShowSourceOfWealth(false)}
+                    containerStyles={{ paddingVertical: 16 }}
+                  />
+                </View>
+              </ADBCustomerEDDModal>
             </>
           );
         }}
@@ -905,6 +1436,38 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontWeight: '400',
     marginTop: 4,
+  },
+  continueButtonContainer: {
+    paddingHorizontal: 24,
+    marginBottom: 250 * (SCREEN_WIDTH / SCREEN_HEIGHT),
+  },
+  accPurposeContinueBtnContainer: {
+    paddingHorizontal: 24,
+    marginTop: 530 * (SCREEN_WIDTH / SCREEN_HEIGHT),
+  },
+  row: {
+    marginTop: 30,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingHorizontal: 2,
+  },
+  rowTitle: {
+    marginLeft: 8,
+    fontSize: 12,
+    fontFamily: fonts.OutfitRegular,
+    color: colors.black500,
+    lineHeight: 16,
+    fontWeight: '400',
+  },
+  dot: {
+    color: colors.black500,
+  },
+  clickable: {
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  verticalSpacing20: {
+    height: 20,
   },
 });
 

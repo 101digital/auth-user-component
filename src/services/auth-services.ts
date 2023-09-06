@@ -708,4 +708,29 @@ export class AuthServices {
     } catch (err) {}
     return false;
   };
+  updateODDReviewApplication = async (applicationId: string, data: any) => {
+    const { accountOriginationBaseUrl, accessToken } = this._configs!;
+    const response = await axios.patch(
+      `${accountOriginationBaseUrl}/applications/${applicationId}/statuses/EDD`,
+      data,
+      {
+        headers: {
+          Authorization: `${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  };
+  public getODDApplicationList = async (userId: string, excludeStatus: string) => {
+    const { accountOriginationBaseUrl, accessToken } = this._configs!;
+    const response = await axios.get(
+      `${accountOriginationBaseUrl}/applications?pageSize=10&pageNumber=1&userId=${userId}&excludeStatuses=${excludeStatus}productId=FramlODD`,
+      {
+        headers: {
+          Authorization: `${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  };
 }

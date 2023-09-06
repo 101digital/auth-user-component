@@ -119,6 +119,8 @@ export interface AuthContextData {
   getNotifications: (pageNumber: number) => void;
   updateReadNotifications: (notificationId: string) => void;
   notificationData: any;
+  getFramlODDApplicationStatus: (userId: string, excludeStatuses: string) => Promise<any>;
+  updateODDReviewCycle: (applicationId: string, data: any) => Promise<any>;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -189,7 +191,9 @@ export const authDefaultValue: AuthContextData = {
   badgeNumber: 0,
   getNotifications: async () => false,
   updateReadNotifications: async () => false,
-  notificationData: false
+  notificationData: false,
+  updateODDReviewCycle: async () => undefined,
+  getFramlODDApplicationStatus: async () => undefined,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -874,6 +878,60 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   };
 
+  const updateODDReviewCycle = useCallback(async (applicationId: string, data: any) => {
+    try {
+      setIsUpdatingProfile(true);
+      const response = await AuthServices.instance().updateODDReviewApplication(
+        applicationId,
+        data
+      );
+      if (response) {
+        return true;
+      }
+    } catch (error) {
+      return false;
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  }, []);
+
+  const getFramlODDApplicationStatus = useCallback(
+    async (userId: string, excludeStatuses: string): Promise<Record<string, any> | undefined> => {
+      try {
+        setIsUpdatingProfile(true);
+        const response = await AuthServices.instance().getODDApplicationList(
+          userId,
+          excludeStatuses
+        );
+        /**
+         * Find application with these condition:
+         * 1. application.productDetails.productId === 'FramlODD'
+         * 2. application.status === 'Review'
+         * 3. application.applicationStatuses with condition:
+         * 3.1. status.statusName === 'EDD'
+         * 3.2. status.statusValue === 'Pending Submission'
+         */
+        const application = response.data.find((application: any) => {
+          if (application.status === 'Review') {
+            const withStatisfyStatus = application.applicationStatuses.find((status: any) => {
+              return status.statusName === 'EDD' && status.statusValue === 'Pending Submission';
+            });
+            return withStatisfyStatus ? true : false;
+          }
+          return false;
+        });
+        if (application) {
+          return application;
+        }
+      } catch (e) {
+        throw new Error(e);
+      } finally {
+        setIsUpdatingProfile(false);
+      }
+    },
+    []
+  );
+
   return useMemo(
     () => ({
       reSelectDevice,
@@ -952,7 +1010,9 @@ export const useAuthContextValue = (): AuthContextData => {
       badgeNumber: _badgeNumber,
       getNotifications,
       updateReadNotifications,
-      notificationData: _notificationData
+      notificationData: _notificationData,
+      getFramlODDApplicationStatus,
+      updateODDReviewCycle,
     }),
     [
       _profile,

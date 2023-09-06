@@ -1,5 +1,6 @@
 import { useADBCurrencyFormat } from 'react-native-theme-component';
 import { Profile } from '../../types';
+import { OTHER_OPTION } from './';
 import * as Yup from 'yup';
 
 export class UserDetailsData {
@@ -16,10 +17,26 @@ export class UserDetailsData {
     readonly employmentSector: string,
     readonly employerName: string,
     readonly occupation: string,
-    readonly annualIncome: string
+    readonly annualIncome: string,
+    readonly fullName: string,
+    readonly idNumber: string,
+    readonly mobileNumber: string,
+    readonly email: string,
+    readonly residentialAddress: string,
+    readonly accountOpeningPurpose: { [key: string]: boolean },
+    readonly accountSourceOfFunds: { [key: string]: boolean },
+    readonly accountSourceOfWealth: { [key: string]: boolean },
+    readonly otherAccountOpeningPurpose: string,
+    readonly otherSourceOfFunds: string,
+    readonly otherSourceOfWealth: string
   ) {}
 
-  static empty(profile?: Profile): UserDetailsData {
+  static empty(
+    profile?: Profile,
+    sourceOfFunds: {},
+    sourceOfWealth: {},
+    selectedAccountPurpose: {}
+  ): UserDetailsData {
     const newAnnualIncome =
       profile && profile.creditDetails && profile.creditDetails.length > 0
         ? useADBCurrencyFormat(`${profile.creditDetails[0].annualIncome}`, 'blur')
@@ -29,6 +46,46 @@ export class UserDetailsData {
       profile?.addresses &&
       profile?.addresses.length > 0 &&
       profile.addresses.find((a: any) => a.addressType === 'Mailing Address');
+
+    let personalContactNo = profile?.contacts?.find(
+      (contacts: any) => contacts.contactType === 'MOBILE_PHONE'
+    );
+    if (!personalContactNo?.contactValue) {
+      personalContactNo = {
+        contactValue: profile?.mobileNumber || '',
+        contactType: 'MOBILE_PHONE',
+      };
+    }
+
+    let personalEmail = profile?.contacts?.find(
+      (contacts: any) => contacts.contactType === 'EMAIL'
+    );
+    if (!personalEmail?.contactValue) {
+      personalEmail = { contactValue: profile?.email || '', contactType: 'EMAIL' };
+    }
+
+    const residentialAddress = profile?.addresses?.find(
+      (addresses: any) => addresses.addressType === 'Residential'
+    );
+    const fullAddress = residentialAddress
+      ? residentialAddress?.line1 ||
+        '' + ', ' + residentialAddress?.line2 ||
+        '' +
+          ', ' +
+          residentialAddress?.postcode +
+          ', ' +
+          residentialAddress?.city +
+          ', ' +
+          residentialAddress?.state
+      : profileAddress?.line1 +
+        ', ' +
+        profileAddress?.line2 +
+        ', ' +
+        profileAddress?.postcode +
+        ', ' +
+        profileAddress?.city +
+        ', ' +
+        profileAddress?.state;
 
     return new UserDetailsData(
       profile?.nickName ?? '',
@@ -43,7 +100,18 @@ export class UserDetailsData {
       profile?.employmentDetails?.[0]?.sector ?? '',
       profile?.employmentDetails?.[0]?.companyName ?? '',
       profile?.employmentDetails?.[0]?.occupation ?? '',
-      newAnnualIncome?.currencyFormated ?? ''
+      newAnnualIncome?.currencyFormated ?? '',
+      profile?.fullName ?? '',
+      profile?.kycDetails?.idNumber ?? '',
+      personalContactNo?.contactValue ?? '',
+      personalEmail?.contactValue ?? '',
+      fullAddress ?? '',
+      selectedAccountPurpose.accountPurposesObject,
+      sourceOfFunds?.sourceOfFundObject,
+      sourceOfWealth?.sourceOfWealthObject,
+      selectedAccountPurpose.otherAccountPurposes,
+      sourceOfFunds.otherSourceOfFunds,
+      sourceOfWealth.otherSourceOfWealth
     );
   }
 }
@@ -51,7 +119,8 @@ export class UserDetailsData {
 export const validationSchema = (
   isUnEmployed: boolean,
   isOutsideLabourForce: boolean,
-  i18n: any
+  i18n: any,
+  oddReviewCycle?: boolean
 ) => {
   if (isUnEmployed) {
     return Yup.object().shape({
@@ -83,6 +152,42 @@ export const validationSchema = (
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
         .matches(/^[0-9,.]+$/, i18n.t('common.invalid_value') ?? 'Invalid value'),
+      accountOpeningPurpose: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      accountSourceOfFunds: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      accountSourceOfWealth: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      otherAccountOpeningPurpose: oddReviewCycle
+        ? Yup.string().when('accountOpeningPurpose', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
+      otherSourceOfFunds: oddReviewCycle
+        ? Yup.string().when('accountSourceOfFunds', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
+      otherSourceOfWealth: oddReviewCycle
+        ? Yup.string().when('accountSourceOfWealth', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
     });
   } else if (isOutsideLabourForce) {
     return Yup.object().shape({
@@ -117,6 +222,42 @@ export const validationSchema = (
       occupation: Yup.string()
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required'),
+      accountOpeningPurpose: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      accountSourceOfFunds: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      accountSourceOfWealth: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      otherAccountOpeningPurpose: oddReviewCycle
+        ? Yup.string().when('accountOpeningPurpose', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
+      otherSourceOfFunds: oddReviewCycle
+        ? Yup.string().when('accountSourceOfFunds', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
+      otherSourceOfWealth: oddReviewCycle
+        ? Yup.string().when('accountSourceOfWealth', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
     });
   } else {
     return Yup.object().shape({
@@ -158,6 +299,42 @@ export const validationSchema = (
         .trim()
         .required(i18n.t('common.lbl_required_error') ?? 'this field is required')
         .matches(/^[0-9,.]+$/, i18n.t('common.invalid_value') ?? 'Invalid value'),
+      accountOpeningPurpose: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      accountSourceOfFunds: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      accountSourceOfWealth: oddReviewCycle
+        ? Yup.object().test('require', 'This field is required', (value) => {
+            return Object.keys(value).length > 0;
+          })
+        : Yup.string().trim(),
+      otherAccountOpeningPurpose: oddReviewCycle
+        ? Yup.string().when('accountOpeningPurpose', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
+      otherSourceOfFunds: oddReviewCycle
+        ? Yup.string().when('accountSourceOfFunds', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
+      otherSourceOfWealth: oddReviewCycle
+        ? Yup.string().when('accountSourceOfWealth', {
+            is: (val: any) => val && val[OTHER_OPTION],
+            then: Yup.string().required('This field is required'),
+            otherwise: Yup.string(),
+          })
+        : Yup.string().trim(),
     });
   }
 };
