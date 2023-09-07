@@ -1,6 +1,5 @@
 // AuthService.ts
 import { authApiClient } from './api-clients/AuthApiClient';
-import { removeToken } from '../utils/keychainStorage';
 
 class AuthService {
   private static _instance: AuthService;

@@ -1,7 +1,7 @@
 // AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authService } from '../services/AuthService';
-import { getSecureData, setSecureData } from '../utils/keychainStorage';
+import { getSecureData, setSecureData, removeToken } from '@/utils/keychainStorage';
 
 // Define the user details interface
 interface UserDetails {
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   const logout = async () => {
     // Clear tokens from secure storage
     await setSecureData('access_token', '');
-
+    await removeToken('access_token')
     setUser(null);
   };
 

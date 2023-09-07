@@ -2,41 +2,19 @@ import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { DeviceEventEmitter, Platform } from 'react-native';
 import { authService } from '../AuthService';
 import DeviceInfo from 'react-native-device-info';
-import { getSecureData } from '../../utils/keychainStorage';
+import { getSecureData } from '@/utils/keychainStorage';
+import { useAuth } from 'react-native-auth-component';
 
-type TokenData = {
-  accessToken?: string;
-  refreshToken?: string;
-};
 let failedQueue: any = [];
-
-type OriginalRequest = AxiosRequestConfig & { retry?: boolean; queued?: boolean };
-
-const shouldIntercept = (error: AxiosError) => {
-  try {
-    return error.response?.status === 401 || error.response?.status === 403;
-  } catch (e) {
-    return false;
-  }
-};
-
-const attachTokenToRequest = (
-  request: AxiosRequestConfig,
-  token?: string,
-) => {
-  request.headers.Authorization = token;
-};
 
 const forceLogout = async () => {
   DeviceEventEmitter.emit('authcomponent.session.expired');
 };
 
 export const createAuthorizedApiClient = (baseURL: string) => {
-  const options = {
-    attachTokenToRequest,
-    shouldIntercept,
-    forceLogout,
-  };
+
+  const { logout } = useAuth();
+
 
   const instance = axios.create({
     baseURL,
@@ -88,6 +66,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
       DeviceEventEmitter.emit('network_error');
     } else if (error.message === 'Request failed with status code 401') {
       DeviceEventEmitter.emit('authcomponent.session.expired');
+        logout();
     }
     throw error;
   };
