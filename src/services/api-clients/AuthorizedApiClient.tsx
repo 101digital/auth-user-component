@@ -1,9 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
-import { DeviceEventEmitter, Platform } from 'react-native';
+import { DeviceEventEmitter, Platform, } from 'react-native';
 import { authService } from '../AuthService';
 import DeviceInfo from 'react-native-device-info';
-import { getSecureData } from '@/utils/keychainStorage';
-import { useAuth } from 'react-native-auth-component';
+import { getSecureData,removeToken } from '@/utils/keychainStorage';
 
 let failedQueue: any = [];
 
@@ -12,9 +11,6 @@ const forceLogout = async () => {
 };
 
 export const createAuthorizedApiClient = (baseURL: string) => {
-
-  const { logout } = useAuth();
-
 
   const instance = axios.create({
     baseURL,
@@ -57,7 +53,9 @@ export const createAuthorizedApiClient = (baseURL: string) => {
       DeviceEventEmitter.emit('network_error');
     } else if (response.message === 'Request failed with status code 401') {
       DeviceEventEmitter.emit('authcomponent.session.expired');
+      removeToken('access_token')
     }
+
     return response;
   };
 
@@ -66,7 +64,7 @@ export const createAuthorizedApiClient = (baseURL: string) => {
       DeviceEventEmitter.emit('network_error');
     } else if (error.message === 'Request failed with status code 401') {
       DeviceEventEmitter.emit('authcomponent.session.expired');
-        logout();
+      removeToken('access_token')
     }
     throw error;
   };
