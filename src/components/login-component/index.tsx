@@ -3,7 +3,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { colors as defaultColors } from '../../assets/colors';
+import { colors as defaultColors } from '@/assets/Colors';
 import { useAuth } from 'react-native-auth-component';
 import { loginSchema } from './ValidationSchema';
 import { Button,Input } from 'react-native-theme-component';
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: '50%',
-    color: 'blue',
+    color: defaultColors.Blue,
   },
   input: {
     width: '100%',
@@ -116,16 +116,16 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     width: '100%',
-    backgroundColor: 'blue',
+    backgroundColor: defaultColors.Blue,
   },
   buttonText: {
-    color: 'white',
+    color: defaultColors.White,
     textAlign: 'center',
     fontSize: 16,
     fontWeight: 'bold',
   },
   errorText: {
-    color: 'red',
+    color: defaultColors.Red,
     textAlign: 'left',
   },
 });
