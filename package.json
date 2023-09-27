@@ -1,5 +1,5 @@
 {
-  "name": "auth-user-component",
+  "name": "react-native-auth-component",
   "version": "1.1.181",
   "description": "A component for authentication flow by 101D",
   "repository": "https://github.com/101digital/auth-user-component.git",
