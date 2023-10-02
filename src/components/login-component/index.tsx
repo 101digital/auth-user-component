@@ -75,13 +75,20 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ loginSuccess, colors = 
           />
         )}
       />
-      <Button
+      {/*<Button
         title="Login"
         onPress={handleSubmit(onSubmit)}
         style={styles.button}
         textProps={styles.buttonText}
         colors={colors}
+      />*/}
+
+      <Button
+        label="Login"
+        onPress={handleSubmit(onSubmit)}
+        variant= 'primary'
       />
+
       {loginError && <Text style={styles.errorText}>{loginError}</Text>}
     </View>
   );
