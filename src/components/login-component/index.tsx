@@ -87,6 +87,12 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ loginSuccess, colors = 
         label="Login"
         onPress={handleSubmit(onSubmit)}
         variant= 'primary'
+        style={{
+           primaryContainerStyle: {
+             flex: 1,
+             marginHorizontal:20
+           }
+         }}
       />
 
       {loginError && <Text style={styles.errorText}>{loginError}</Text>}
