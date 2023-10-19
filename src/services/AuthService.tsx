@@ -31,7 +31,7 @@ class AuthService {
       // Step 1: Authorize
       const authApiClientInstance = authApiClient.getApiClient(); // Get the Axios instance
       const authResponse = await authApiClientInstance.get(
-        `/as/authorize?response_type=code&client_id=${appId}&scope=profilepsf&code_challenge=${codeChallenge}&code_challenge_method=S256&acr_values=Single_Factor&redirect_uri=${redirectUrl}&response_mode=pi.flow`
+        `/as/authorize?response_type=code&client_id=${appId}&scope=profilepsf&code_challenge=${codeChallenge}&code_challenge_method=S256&acr_values=Single_Factor&response_mode=pi.flow`
       );
 
       // get authResponse flowId
@@ -60,9 +60,8 @@ class AuthService {
       const tokenResponse = await authApiClientInstance.post('/as/token', {
         grant_type: 'authorization_code',
         code: authCode,
-        redirect_uri: redirectUrl,
         client_id: appId,
-        scope: 'profilepsf',
+        scope: 'openid profilepsf',
         code_verifier: codeVerifier,
       },{
         headers: {
