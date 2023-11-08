@@ -32,8 +32,6 @@
     "react-native-modal": "13.0.0",
     "react-native-svg": "12.4.2",
     "lodash": "^4.17.21",
-    "react-native-theme-component": "https://github.com/101digital/react-native-theme-component.git",
-    "react-native-register-component": "https://github.com/101digital/react-native-register-component.git",
     "@react-native-cookies/cookies": "^6.2.1",
     "react-native-sensitive-info": "6.0.0-alpha.9"
   },
