@@ -1,11 +1,12 @@
 // AuthService.ts
 import { authApiClient } from './api-clients/AuthApiClient';
+import { getSecureData } from '@/utils/keychainStorage';
+
 import axios from 'axios';
 
 export default class AuthService {
   private static _instance: AuthService;
   private _configs?: any;
-  private _accessToken?: string;
 
   private constructor() {}
 
@@ -80,7 +81,6 @@ export default class AuthService {
 
       // get tokenResponse access_token
       const { access_token } = tokenResponse.data;
-      this._accessToken = access_token;
       return { access_token };
     } catch (error) {
       throw new Error('Authentication failed', error);
@@ -90,6 +90,8 @@ export default class AuthService {
   public getEnterpriseData = async (keys: string[], locale: string) => {
     const { enterpriseDataServicesBaseUrl, apiBaseUrl } = this._configs || {};
     const listEDKeys = keys.map((k) => k.replace('EntData_', '')).join(',');
+
+    const access_token = await getSecureData('access_token');
 
     const url = `${apiBaseUrl}${enterpriseDataServicesBaseUrl}/data-groups`;
 
@@ -102,7 +104,7 @@ export default class AuthService {
           pageSize: keys.length,
         },
         headers: {
-          Authorization: `Bearer ${this._accessToken}`,
+          Authorization: `Bearer ${access_token}`,
         },
       });
       return response.data;
