@@ -1,10 +1,11 @@
 // AuthService.ts
 import { authApiClient } from './api-clients/AuthApiClient';
+import axios from 'axios';
 
-class AuthService {
+export default class AuthService {
   private static _instance: AuthService;
   private _configs?: any;
-
+  private _accessToken?: string;
 
   private constructor() {}
 
@@ -27,7 +28,7 @@ class AuthService {
 
   public async login(username: string, password: string) {
     try {
-      const { appId, codeChallenge,redirectUrl,codeVerifier } = this._configs || {};
+      const { appId, codeChallenge, redirectUrl, codeVerifier } = this._configs || {};
       // Step 1: Authorize
       const authApiClientInstance = authApiClient.getApiClient(); // Get the Axios instance
       const authResponse = await authApiClientInstance.get(
@@ -38,14 +39,18 @@ class AuthService {
       const flowId = authResponse.data.id;
 
       // Step 2: Login
-      const loginResponse = await authApiClientInstance.post(`/flows/${flowId}`, {
-        username: username,
-        password: password,
-      },{
-        headers: {
-          'Content-Type': 'application/vnd.pingidentity.usernamePassword.check+json',
+      const loginResponse = await authApiClientInstance.post(
+        `/flows/${flowId}`,
+        {
+          username: username,
+          password: password,
         },
-      });
+        {
+          headers: {
+            'Content-Type': 'application/vnd.pingidentity.usernamePassword.check+json',
+          },
+        }
+      );
 
       // get loginResponse resumeUrl
       const resumeUrl = loginResponse.data.resumeUrl;
@@ -57,25 +62,54 @@ class AuthService {
       const authCode = resumeResponse.data.authorizeResponse.code;
 
       // Step 4: Token
-      const tokenResponse = await authApiClientInstance.post('/as/token', {
-        grant_type: 'authorization_code',
-        code: authCode,
-        client_id: appId,
-        scope: 'openid profilepsf',
-        code_verifier: codeVerifier,
-      },{
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+      const tokenResponse = await authApiClientInstance.post(
+        '/as/token',
+        {
+          grant_type: 'authorization_code',
+          code: authCode,
+          client_id: appId,
+          scope: 'openid profilepsf',
+          code_verifier: codeVerifier,
         },
-      });
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
 
       // get tokenResponse access_token
       const { access_token } = tokenResponse.data;
+      this._accessToken = access_token;
       return { access_token };
     } catch (error) {
       throw new Error('Authentication failed', error);
     }
   }
+
+  public getEnterpriseData = async (keys: string[], locale: string) => {
+    const { enterpriseDataServicesBaseUrl, apiBaseUrl } = this._configs || {};
+    const listEDKeys = keys.map((k) => k.replace('EntData_', '')).join(',');
+
+    const url = `${apiBaseUrl}${enterpriseDataServicesBaseUrl}/data-groups`;
+
+    try {
+      const response = await axios.get(url, {
+        params: {
+          detailsLevel: 'FULL',
+          dataGroupCodes: listEDKeys,
+          language: locale,
+          pageSize: keys.length,
+        },
+        headers: {
+          Authorization: `Bearer ${this._accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (e) {
+      console.log('e', e);
+    }
+  };
 }
 
 export const authService = AuthService.instance;
