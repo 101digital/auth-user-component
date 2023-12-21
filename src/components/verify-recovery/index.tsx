@@ -3,9 +3,9 @@ import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../assets';
 import { fonts } from '../../assets/fonts';
 import { Formik, FormikProps } from 'formik';
-import { ADBButton, ADBInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
+import { ASButton, ASInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
-import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { InputTypeEnum } from 'react-native-theme-component/src/input-field';
 
 export interface IRecovery {
   onContinue: (recoveryCode: string) => void;
@@ -21,7 +21,7 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
     Keyboard.dismiss();
     const { recoveryCode } = values;
     const _recoveryCode = recoveryCode.trim();
-    if(_recoveryCode.match(/^[^0-9a-zA-Z]+$/)) {
+    if (_recoveryCode.match(/^[^0-9a-zA-Z]+$/)) {
       onError();
       return;
     }
@@ -41,8 +41,8 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
           return (
             <>
               <View style={styles.content}>
-                <ADBInputField
-                  type='custom'
+                <ASInputField
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   name="recoveryCode"
                   maxLength={8}
@@ -50,16 +50,15 @@ const ADVerifyRecoveryCodeComponent: React.FC<IRecovery> = (props: IRecovery) =>
                   placeholder={i18n.t('login_component.recovery_code') ?? 'Recovery code'}
                   autoCapitalize="none"
                   keyboardType={'default'}
-                  placeholderHint={i18n.t('login_component.recovery_code_hint') ?? 'ADB12345678'}
+                  placeholderHint={i18n.t('login_component.recovery_code_hint') ?? 'AS12345678'}
                   errors={errors}
                   touched={touched}
                   placeholderTextColor={defaultColors.black500}
                   placeHolderHintTextColor={defaultColors.gray400}
                 />
               </View>
-              <View
-              >
-                <ADBButton
+              <View>
+                <ASButton
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}
                   onPress={submitForm}
                   disabled={values.recoveryCode.length == 0}

@@ -21,6 +21,8 @@ export class AuthApiClient {
   public configure(configs: AuthComponentConfig) {
     if (!this._axiosInstance) {
       const { authBaseUrl, appPublicId, appPublicSecret } = configs;
+      console.log('configure -> appPublicId', appPublicId);
+      console.log('configure -> appPublicSecret', appPublicSecret);
       this._axiosInstance = axios.create({
         baseURL: authBaseUrl,
         headers: {

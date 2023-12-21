@@ -122,6 +122,8 @@ export type AuthComponentConfig = {
   membershipBaseUrl: string;
   appGrantType?: string; // using for get app token
   appScope?: string; // using for get app token
+  authScopeMultiFactor?: string; // using for get app token
+  authScopeSingleFactor?: string; // using for get app token
   authGrantType?: string; // using for login
   authScope?: string; // using for login,
   redirectUrl?: string; // required for oauth2
@@ -145,7 +147,9 @@ export type AuthComponentConfig = {
   jwtPushNotification?: string;
   notificationAppId?: string;
   notificationEntityId?: string;
+  enterpriseDataServicesBaseUrl?: string;
   ott?: string;
+  defaultCurrecyCode?: string;
 };
 
 export enum VerificationMethod {
@@ -153,6 +157,20 @@ export enum VerificationMethod {
   BIO = 'BIOMETRIC',
   PIN = 'PIN',
   PASSWORD = 'PASSWORD',
+}
+
+export type UserPreferences = {
+  id: string;
+  userId: string;
+  appId: string;
+  languageCode: string;
+  currencyCode: string;
+  timezoneCode: number;
+  dateFormat: string;
+  timeFormat: string;
+  currencyFormat: string;
+  lengthUnit: string;
+  weightUnit: string;
 }
 
 export enum BiometricMethod {
@@ -189,7 +207,6 @@ export enum ResponseStatus {
 export enum AccountStatus {
   Prospect = 'Prospect',
 }
-
 
 export const ONE_TIME_TOKEN_KEY = 'original-token';
 export const IAM_ID_TOKEN_KEY = 'iam-id-token';

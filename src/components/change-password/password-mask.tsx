@@ -6,8 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { colors } from 'account-origination-component/src/assets';
-import { EyesClosedIcon, EyesIcon } from 'react-native-theme-component';
+import { EyesClosedIcon, EyesIcon, useThemeColors } from 'react-native-theme-component';
 
 interface ComponentProps {
   isVisible: boolean;
@@ -17,12 +16,14 @@ interface ComponentProps {
 export type PasswordMaskProps = ComponentProps & TouchableOpacityProps;
 
 export const PasswordMask = ({ isVisible, style, ...restProps }: PasswordMaskProps) => {
+  const themeColors = useThemeColors();
+
   return (
     <TouchableOpacity activeOpacity={0.8} style={[styles.container, style]} {...restProps}>
       {isVisible ? (
-        <EyesClosedIcon color={colors.primary} size={24} />
+        <EyesClosedIcon color={themeColors.primaryColor} size={24} />
       ) : (
-        <EyesIcon color={colors.primary} size={24} />
+        <EyesIcon color={themeColors.primaryColor} size={24} />
       )}
     </TouchableOpacity>
   );

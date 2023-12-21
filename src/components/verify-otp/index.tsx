@@ -1,9 +1,16 @@
 import { VerifyOTPComponentProps } from './types';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Text, View, Keyboard, KeyboardAvoidingView, Platform, DeviceEventEmitter } from 'react-native';
+import {
+  Text,
+  View,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  DeviceEventEmitter,
+} from 'react-native';
 import useMergeStyles from './styles';
 import {
-  ADBButton,
+  ASButton,
   OTPField,
   TriangelDangerIcon,
   ThemeContext,
@@ -56,8 +63,8 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
   }, [attemptCount]);
 
   useEffect(() => {
-    if(errorVerifySignIn) {
-      if(errorVerifySignIn.message === 'Network Error') {
+    if (errorVerifySignIn) {
+      if (errorVerifySignIn.message === 'Network Error') {
         DeviceEventEmitter.emit('network_error');
       }
     }
@@ -93,7 +100,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
 
   const getErrorMessage = () => {
     const errorCode = errorVerifySignIn?.response?.status;
-    if(errorCode) {
+    if (errorCode) {
       switch (errorCode.toString()) {
         case ResponseStatus.BAD_REQUEST:
         case ResponseStatus.UNAUTHORIZED:
@@ -132,7 +139,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
             ref={otpRef}
             cellCount={6}
             disabled={isVerifyLogin}
-            isError={!!(errorVerifySignIn?.response?.status)}
+            isError={!!errorVerifySignIn?.response?.status}
             isUnMasked={true}
             onChanged={setValue}
             style={{

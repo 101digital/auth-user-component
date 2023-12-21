@@ -15,17 +15,18 @@ import { Formik } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
 import {
-  ADBAlertModal,
-  ADBButton,
-  ADBInputField,
+  ASAlertModal,
+  ASButton,
+  ASInputField,
   EyesClosedIcon,
   EyesIcon,
   ThemeContext,
   defaultColors,
+  useThemeColors,
 } from 'react-native-theme-component';
 import { OTP_REQUIRED, PASSWORD_LOCKED_OUT, SINGLE_FACTOR_COMPLETED } from '../../utils/index';
 import { RegistrationContext } from 'react-native-register-component';
-import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { InputTypeEnum } from 'react-native-theme-component/src/input-field';
 
 export class SignInData {
   constructor(readonly username: string, readonly password: string) {}
@@ -43,15 +44,16 @@ export interface ILogin {
   isSkipOTPMode?: boolean;
 }
 
-const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
+const ASLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { onLoginSuccess, onLoginFailed, onForgotPassword, onLoginRestrict, isSkipOTPMode } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { adbLoginSingleFactor, adbLogin, errorSignIn, clearErrorSignIn } = useContext(AuthContext);
+  const { asLoginSingleFactor, asLogin, errorSignIn, clearErrorSignIn } = useContext(AuthContext);
   const { verifyExistedUserByEmail } = useContext(RegistrationContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
-  
+  const themeColors = useThemeColors();
+
   useEffect(() => {
     if (errorSignIn) {
       onLoginFailed(errorSignIn);
@@ -67,7 +69,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     const _password = password.trim();
     if (isSkipOTPMode) {
       try {
-        const response = await adbLoginSingleFactor(_username, _password, true);
+        const response = await asLoginSingleFactor(_username, _password, true);
         setIsLoading(false);
         if (response) {
           if (response.status && response.status === SINGLE_FACTOR_COMPLETED) {
@@ -87,7 +89,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
       responseVerified?.status === 'Active' ||
       responseVerified?.status === 'Verified'
     ) {
-      const response = await adbLogin(_username, _password);
+      const response = await asLogin(_username, _password);
       if (response) {
         if (response.status && response.status === OTP_REQUIRED) {
           onLoginSuccess();
@@ -101,7 +103,10 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
       }
     }
     setIsLoading(false);
-    onLoginRestrict(responseVerified?.status ?? (('existed' in responseVerified) ? (responseVerified.existed ? 'exist':'not_exist') : ''));
+    onLoginRestrict(
+      responseVerified?.status ??
+        ('existed' in responseVerified ? (responseVerified.existed ? 'exist' : 'not_exist') : '')
+    );
     return;
   };
 
@@ -116,7 +121,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
           <>
             <View style={styles.content}>
               <View>
-                <ADBInputField
+                <ASInputField
                   name="username"
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
@@ -130,7 +135,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                 />
               </View>
               <View style={styles.rowInput}>
-                <ADBInputField
+                <ASInputField
                   name="password"
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
@@ -143,7 +148,11 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   placeholderHint={i18n.t('login_component.enter_password') ?? 'Enter password'}
                   suffixIcon={
                     <TouchableOpacity onPress={onToggleVisiblePassword} style={styles.iconBtn}>
-                      {!isVisiblePassword ? <EyesClosedIcon /> : <EyesIcon />}
+                      {!isVisiblePassword ? (
+                        <EyesClosedIcon color={themeColors.primaryColor} />
+                      ) : (
+                        <EyesIcon color={themeColors.primaryColor} />
+                      )}
                     </TouchableOpacity>
                   }
                   testID="login-password-input"
@@ -155,13 +164,14 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   style={styles.flex}
                   testID="login-forgot-password-button"
                 >
-                  <Text style={styles.forgotPasswordTitle}>{i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'}</Text>
+                  <Text style={styles.forgotPasswordTitle}>
+                    {i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
-            <View
-            >
-              <ADBButton
+            <View>
+              <ASButton
                 isLoading={isLoading}
                 label={i18n.t('common.lbl_continue') ?? 'Continue'}
                 onPress={submitForm}
@@ -172,7 +182,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
           </>
         )}
       </Formik>
-      <ADBAlertModal
+      <ASAlertModal
         title={
           i18n.t('login_component.lbl_account_locked') ?? `Oops! Your account is temporarily locked`
         }
@@ -191,7 +201,7 @@ const ADBLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   );
 };
 
-export default ADBLoginComponent;
+export default ASLoginComponent;
 
 const styles = StyleSheet.create({
   container: {

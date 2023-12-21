@@ -6,16 +6,16 @@ import { AuthContext } from '../../auth-context';
 import { Formik, FormikProps, isObject } from 'formik';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { AlertCircleIcon } from '../../assets/icons';
-import { ADBButton, ADBInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
+import { ASButton, ASInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
 import { InputIdData, InputIdSchema } from './model';
-import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { InputTypeEnum } from 'react-native-theme-component/src/input-field';
 
 export interface IForgotPassword {
   onValidationSuccess: (flowId: string) => void;
   onErrorValidateID: (msg: string) => void;
 }
 
-const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPassword) => {
+const ASForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPassword) => {
   const { onValidationSuccess, onErrorValidateID } = props;
   const { i18n } = useContext(ThemeContext);
   const [errorModal, setErrorModal] = useState(false);
@@ -38,7 +38,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
     const _email = email.trim();
     const _nric = nric.trim();
     try {
-      if(_nric.match(/^[^0-9a-zA-Z]+$/)) {
+      if (_nric.match(/^[^0-9a-zA-Z]+$/)) {
         onShowInvalidIDNumber();
         return;
       }
@@ -48,7 +48,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
     }
 
     const response = await validateUserForgotPassword(_email, _nric);
-    if(response) {
+    if (response) {
       if (isObject(response) && response.resendCode) {
         onValidationSuccess(response.resendCode);
       } else {
@@ -72,8 +72,8 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
             <>
               <View style={styles.content}>
                 <View>
-                  <ADBInputField
-                    type='custom'
+                  <ASInputField
+                    type="custom"
                     inputType={InputTypeEnum.MATERIAL}
                     name="email"
                     returnKeyType="done"
@@ -83,36 +83,38 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
                     placeholderHint={i18n.t('login_component.example_email') ?? 'example@email.com'}
                     placeholderTextColor={defaultColors.black500}
                     placeHolderHintTextColor={defaultColors.gray400}
-                    testID='input-email'
+                    testID="input-email"
                     errors={errors}
                     touched={touched}
                   />
                 </View>
                 <View style={styles.rowInput}>
-                  <ADBInputField
-                    type='custom'
+                  <ASInputField
+                    type="custom"
                     inputType={InputTypeEnum.MATERIAL}
                     name={'nric'}
                     placeholder={i18n.t('id_number.login_id_placeholder') ?? 'ID number'}
                     maxLength={12}
                     returnKeyType="done"
                     keyboardType={'ascii-capable'}
-                    placeholderHint={i18n.t('id_number.enter_your_id_number') ?? 'Enter your ID number'}
+                    placeholderHint={
+                      i18n.t('id_number.enter_your_id_number') ?? 'Enter your ID number'
+                    }
                     placeholderTextColor={defaultColors.black500}
                     placeHolderHintTextColor={defaultColors.gray400}
-                    testID='input-id'
+                    testID="input-id"
                     errors={errors}
                     touched={touched}
                   />
                 </View>
               </View>
               <View>
-                <ADBButton
+                <ASButton
                   isLoading={isRecoveringUserPassword}
                   label={i18n.t('common.lbl_continue') ?? 'Continue'}
                   onPress={submitForm}
                   disabled={values.nric.length == 0 || values.email.length == 0}
-                  testId='continue-button'
+                  testId="continue-button"
                 />
               </View>
             </>
@@ -131,7 +133,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
             {i18n.t('login_component.please_try_again') ?? `Please try again.`}
           </Text>
           <View style={{ height: 32 }} />
-          <ADBButton
+          <ASButton
             label={i18n.t('common.lbl_done') ?? 'Done'}
             onPress={() => {
               setErrorModal(false);
@@ -143,7 +145,7 @@ const ADBForgotPasswordComponent: React.FC<IForgotPassword> = (props: IForgotPas
   );
 };
 
-export default ADBForgotPasswordComponent;
+export default ASForgotPasswordComponent;
 
 const styles = StyleSheet.create({
   container: {

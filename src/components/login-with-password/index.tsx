@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import {
-  ADBInputField,
+  ASInputField,
   ThemeContext,
-  ADBButton,
+  ASButton,
   EyesClosedIcon,
   EyesIcon,
   useThemeColors,
-  defaultColors
+  defaultColors,
 } from 'react-native-theme-component';
 import { Formik } from 'formik';
 import { colors, fonts } from '../../assets';
@@ -16,26 +16,26 @@ import authComponentStore from '../../services/local-store';
 import CookieManager from '@react-native-cookies/cookies';
 import { useIsFocused } from '@react-navigation/native';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
-import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { InputTypeEnum } from 'react-native-theme-component/src/input-field';
 import { hasNotch } from 'react-native-device-info';
 
-type ADBLoginWithPasswordProps = {
+type ASLoginWithPasswordProps = {
   onSuccessVerified: () => void;
   onFailedVerified: () => void;
   onInvalidPassword: () => void;
   onResetPassword: () => void;
   onShowLockDownModal: () => void;
 };
-const ADBLoginWithPasswordComponent = ({
+const ASLoginWithPasswordComponent = ({
   onSuccessVerified,
   onFailedVerified,
   onInvalidPassword,
   onResetPassword,
-  onShowLockDownModal
-}: ADBLoginWithPasswordProps) => {
+  onShowLockDownModal,
+}: ASLoginWithPasswordProps) => {
   const { i18n } = useContext(ThemeContext);
   const isFocused = useIsFocused();
-  const { adbLoginSingleFactor, errorSignIn, isSigning, setIsSignedIn } = useContext(AuthContext);
+  const { asLoginSingleFactor, errorSignIn, isSigning, setIsSignedIn } = useContext(AuthContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
   const themeColors = useThemeColors();
   const formikRef = useRef(null);
@@ -52,7 +52,7 @@ const ADBLoginWithPasswordComponent = ({
     const userName = await authComponentStore.getUserName();
     if (userName && password) {
       try {
-        const response = await adbLoginSingleFactor(userName, password);
+        const response = await asLoginSingleFactor(userName, password);
         if (response) {
           if (response?.error?.code === PASSWORD_LOCKED_OUT) {
             formikRef.current?.setFieldError(
@@ -97,7 +97,7 @@ const ADBLoginWithPasswordComponent = ({
           return (
             <>
               <View style={styles.content}>
-                <ADBInputField
+                <ASInputField
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   name={'password'}
@@ -126,18 +126,18 @@ const ADBLoginWithPasswordComponent = ({
                   testID="password-input"
                 />
                 <TouchableOpacity onPress={onResetPassword} testID="forgot-password-button">
-                  <Text style={styles.forgetPasswordLabel}>{`${i18n.t(
-                    'login_component.btn_forgot_password'
-                  ) ?? 'Forgot password'}`}</Text>
+                  <Text style={styles.forgetPasswordLabel}>{`${
+                    i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
+                  }`}</Text>
                 </TouchableOpacity>
               </View>
-              <ADBButton
+              <ASButton
                 isLoading={isSigning}
                 disabled={values?.password.length < 8}
                 label={'Continue'}
                 onPress={() => onSubmit(values?.password)}
                 testId="continue-button"
-                containerStyles={{marginBottom: hasNotch() ? 0 : 20}}
+                containerStyles={{ marginBottom: hasNotch() ? 0 : 20 }}
               />
             </>
           );
@@ -149,98 +149,98 @@ const ADBLoginWithPasswordComponent = ({
 
 const styles = StyleSheet.create({
   errorSection: {
-    marginTop: 8
+    marginTop: 8,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 22
+    paddingHorizontal: 22,
   },
   header: {
     paddingVertical: 10,
     paddingHorizontal: 5,
-    marginTop: 30
+    marginTop: 30,
   },
   validContainer: {
-    marginTop: 10
+    marginTop: 10,
   },
   validationLabel: {
-    marginLeft: 6
+    marginLeft: 6,
   },
   rowItemValid: {
     marginVertical: 5,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   iconBtn: {
-    marginRight: 10
+    marginRight: 10,
   },
   remainingLabel: {
-    textAlign: 'right'
+    textAlign: 'right',
   },
   verticalSpacing: {
-    height: 15
+    height: 15,
   },
   bottomSection: {
-    marginBottom: 15
+    marginBottom: 15,
   },
   flex: {
-    flex: 1
+    flex: 1,
   },
   rowSpaceBetween: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   content: {
-    flex: 1
+    flex: 1,
   },
   title: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.OutfitSemiBold
+    fontFamily: fonts.OutfitSemiBold,
   },
   subtitle: {
     color: colors.primaryBlack,
-    marginTop: 10
+    marginTop: 10,
   },
   subTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
     fontFamily: fonts.OutfitRegular,
-    marginTop: 14
+    marginTop: 14,
   },
   cameraDisableContainer: {
     width: '100%',
     alignItems: 'center',
     paddingVertical: 24,
-    paddingHorizontal: 24
+    paddingHorizontal: 24,
   },
   gap16: {
-    height: 16
+    height: 16,
   },
   gap40: {
-    height: 40
+    height: 40,
   },
   gap8: {
-    height: 8
+    height: 8,
   },
   modalsubTitle: {
     fontSize: 14,
     color: colors.primaryBlack,
     fontFamily: fonts.OutfitRegular,
-    marginTop: 8
+    marginTop: 8,
   },
   loginTitle: {
     fontSize: 24,
     color: colors.primaryBlack,
-    fontFamily: fonts.OutfitSemiBold
+    fontFamily: fonts.OutfitSemiBold,
   },
   forgetPasswordLabel: {
     fontSize: 12,
     color: colors.boldText,
     fontFamily: fonts.OutfitSemiBold,
-    marginTop: 8
-  }
+    marginTop: 8,
+  },
 });
 
-export default ADBLoginWithPasswordComponent;
+export default ASLoginWithPasswordComponent;

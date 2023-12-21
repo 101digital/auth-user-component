@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, NativeModules, Platform } from 'react-native';
 import {
-  ADBButton,
+  ASButton,
   ImageIcon,
   ThemeContext,
   PinNumberComponent,
+  DigiBankLogo,
 } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
@@ -15,9 +16,8 @@ import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { colors } from '../../assets';
 import { AuthServices } from 'react-native-auth-component';
-import { AeonIcon } from '@/assets/icons';
 
-type ADBLoginWithPINProps = {
+type ASLoginWithPINProps = {
   onFailedVerified: () => void;
   onSuccessVerified: () => void;
   onError: (err: Error) => void;
@@ -26,8 +26,9 @@ type ADBLoginWithPINProps = {
   onNetworkError: () => void;
 };
 
-const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
-  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal, onNetworkError } = prop;
+const ASLoginWithPINComponent = (prop: ASLoginWithPINProps) => {
+  const { onFailedVerified, onSuccessVerified, onError, onShowLockDownModal, onNetworkError } =
+    prop;
   const { saveResumeURL, setIsSignedIn } = useContext(AuthContext);
   const { i18n } = useContext(ThemeContext);
   const otpRef = useRef<OTPFieldRef>();
@@ -110,7 +111,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
           setIsSignedIn(false);
         } else if (authorizeResponse.error.code === 'NO_USABLE_DEVICES') {
           setIsSignedIn(false);
-        } 
+        }
       } else {
         setIsLoading(false);
         setBiometricAttempt(biometricAttempt + 1);
@@ -144,7 +145,7 @@ const ADBLoginWithPINComponent = (prop: ADBLoginWithPINProps) => {
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.imagePlaceHolderContainer}>
-            <AeonIcon />
+            <DigiBankLogo />
           </View>
           <Text style={styles.pinTitle}>
             {i18n.t('login_component.lbl_enter_pin') ?? `Enter your PIN`}
@@ -272,4 +273,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ADBLoginWithPINComponent;
+export default ASLoginWithPINComponent;

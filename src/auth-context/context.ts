@@ -4,7 +4,8 @@ import {
   CountryInformation,
   Recovery,
   VerificationMethod,
-  Devices
+  Devices,
+  UserPreferences,
 } from '../types';
 import authComponentStore from '../services/local-store';
 import React, { useCallback, useEffect } from 'react';
@@ -13,6 +14,8 @@ import { AuthServices } from '../services/auth-services';
 import _ from 'lodash';
 import { NativeModules, DeviceEventEmitter } from 'react-native';
 import { SINGLE_FACTOR_ACR_VALUE, SINGLE_FACTOR_SCOPE } from '../utils';
+// @ts-ignore
+import I18n from 'react-native-i18n';
 
 export interface AuthContextData {
   profile?: Profile;
@@ -46,7 +49,7 @@ export interface AuthContextData {
     newPassword: string,
     flowId: string
   ) => Promise<boolean>;
-  adbForgotPasswordVerifyOtp: (otp: string, flowId: string) => Promise<boolean>;
+  asForgotPasswordVerifyOtp: (otp: string, flowId: string) => Promise<boolean>;
   isChangingPassword: boolean;
   isChangePassword: boolean;
   errorChangePassword?: Error;
@@ -66,7 +69,11 @@ export interface AuthContextData {
   errorUserVerify?: Error;
   errorRequestResetPassword?: Error;
   clearUserVerificationData: () => void;
-  registerDevice: (token: string, platform: 'IOS' | 'Android', onNetworkError: any) => Promise<boolean>;
+  registerDevice: (
+    token: string,
+    platform: 'IOS' | 'Android',
+    onNetworkError: any
+  ) => Promise<boolean>;
   isDeviceRegistering: boolean;
   isDeviceRegistered: boolean;
   updateUserInfo: (
@@ -78,12 +85,12 @@ export interface AuthContextData {
     idIssuingCountry?: string,
     onError?: (err: Error) => void
   ) => Promise<boolean>;
-  adbLogin: (username: string, password: string) => Promise<boolean>;
+  asLogin: (username: string, password: string) => Promise<boolean>;
   isVerifyLogin: boolean;
   errorVerifySignIn?: Error;
-  adbLoginVerifyOtp: (otp: string) => Promise<boolean>;
-  adbResendOTP: () => void;
-  adbLoginSingleFactor: (
+  asLoginVerifyOtp: (otp: string) => Promise<boolean>;
+  asResendOTP: () => void;
+  asLoginSingleFactor: (
     username: string,
     password: string,
     isSkipLogged?: boolean
@@ -94,9 +101,9 @@ export interface AuthContextData {
   isValidatedSubsequenceLogin: boolean;
   setIsValidatedSubsequenceLogin: (isValidated: boolean) => void;
   verifyPassword: (password: string) => Promise<boolean>;
-  adbGetAccessToken: (username: string, password: string) => Promise<void>;
+  asGetAccessToken: (username: string, password: string) => Promise<void>;
   pairingDevice: (onNetworkError?: any) => Promise<void>;
-  adbAuthorizePushOnly: () => Promise<boolean>;
+  asAuthorizePushOnly: () => Promise<boolean>;
   obtainNewAccessToken: () => Promise<boolean>;
   saveResumeURL: (url: string) => void;
   reSelectDevice: () => Promise<boolean | undefined>;
@@ -119,6 +126,9 @@ export interface AuthContextData {
   getNotifications: (pageNumber: number) => void;
   updateReadNotifications: (notificationId: string) => void;
   notificationData: any;
+  getEnterpriseData: (groupCode: string) => Promise<any>;
+  updateUserLocale: (userId: string, locale: string) => Promise<boolean>;
+  userPreferences?: UserPreferences;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -135,7 +145,7 @@ export const authDefaultValue: AuthContextData = {
   changeUserPassword: async () => false,
   validateUserForgotPassword: async () => false,
   changeUserPasswordUsingRecoveryCode: async () => false,
-  adbForgotPasswordVerifyOtp: async () => false,
+  asForgotPasswordVerifyOtp: async () => false,
   requestResetUserPassword: async () => false,
   isChangingPassword: false,
   isChangePassword: false,
@@ -159,19 +169,19 @@ export const authDefaultValue: AuthContextData = {
   isDeviceRegistering: false,
   isDeviceRegistered: false,
   updateUserInfo: async () => false,
-  adbLogin: async () => false,
+  asLogin: async () => false,
   isVerifyLogin: false,
-  adbLoginVerifyOtp: async () => false,
-  adbResendOTP: () => false,
-  adbLoginSingleFactor: async () => undefined,
+  asLoginVerifyOtp: async () => false,
+  asResendOTP: () => false,
+  asLoginSingleFactor: async () => undefined,
   isManualLogin: false,
   setIsManualLogin: () => undefined,
   isValidatedSubsequenceLogin: false,
   setIsValidatedSubsequenceLogin: () => undefined,
   verifyPassword: async () => false,
-  adbGetAccessToken: async () => undefined,
+  asGetAccessToken: async () => undefined,
   pairingDevice: async (onNetworkError?: any) => undefined,
-  adbAuthorizePushOnly: async () => false,
+  asAuthorizePushOnly: async () => false,
   obtainNewAccessToken: async () => false,
   saveResumeURL: () => false,
   getListDevices: async () => undefined,
@@ -189,7 +199,9 @@ export const authDefaultValue: AuthContextData = {
   badgeNumber: 0,
   getNotifications: async () => false,
   updateReadNotifications: async () => false,
-  notificationData: false
+  getEnterpriseData: async () => undefined,
+  notificationData: false,
+  updateUserLocale: async () => false,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -240,12 +252,27 @@ export const useAuthContextValue = (): AuthContextData => {
   const [_isReselectingDevice, setIsReselectingDevice] = useState<boolean>(false);
   const [_badgeNumber, setbadgeNumber] = useState<number>(0);
   const [_notificationData, setNotificationData] = useState<any>(null);
+  const [_isUpdatedLanguageCode, setIsUpdatedLanguageCode] = useState<boolean>(false);
+  const [_userPreferences, setUserPreferences] = useState<UserPreferences>();
 
   const { PingOnesdkModule } = NativeModules;
 
   useEffect(() => {
     checkIsLogged();
   }, []);
+
+  const fetchUserPreference = async (userId: string) => {
+    const userPreferences = await AuthServices.instance().getUserPreferences(userId);
+    if (userPreferences) {
+      setUserPreferences(userPreferences.data);
+    }
+  };
+
+  useEffect(() => {
+    if (_profile?.userId && !_userPreferences) {
+      fetchUserPreference(_profile.userId);
+    }
+  }, [_profile]);
 
   const clearErrorVerifySignIn = () => {
     setErrorVerifySignIn(undefined);
@@ -298,10 +325,10 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const adbLogin = useCallback(async (username: string, password: string) => {
+  const asLogin = useCallback(async (username: string, password: string) => {
     try {
       setIsSigning(true);
-      const data = await AuthServices.instance().adbLogin(username, password);
+      const data = await AuthServices.instance().asLogin(username, password);
       if (data && data.id) {
         setFlowId(data.id);
         if (data._embedded.devices?.length > 0) {
@@ -329,12 +356,12 @@ export const useAuthContextValue = (): AuthContextData => {
     return false;
   }, []);
 
-  const adbLoginVerifyOtp = useCallback(
+  const asLoginVerifyOtp = useCallback(
     async (otp: string) => {
       try {
         setIsVerifyLogin(true);
         if (_flowId && _flowId.length > 0) {
-          const loginData = await AuthServices.instance().adbVerifyLogin(otp, _flowId);
+          const loginData = await AuthServices.instance().asVerifyLogin(otp, _flowId);
           if (!loginData.resumeUrl) {
             return false;
           }
@@ -342,8 +369,13 @@ export const useAuthContextValue = (): AuthContextData => {
           AuthServices.instance().setSessionId(afterValidateData.session.id);
           await AuthServices.instance().obtainToken(afterValidateData.authorizeResponse.code);
           const { data } = await AuthServices.instance().fetchProfile();
-          setProfile({ ...data });
-          setIsVerifyLogin(false);
+          if (data.userId) {
+            setProfile({ ...data });
+            if (!_isUpdatedLanguageCode) {
+              await AuthServices.instance().updateUserLocale(data.userId, I18n.currentLocale());
+              setIsUpdatedLanguageCode(true);
+            }
+          }
           return true;
         }
       } catch (error) {
@@ -355,31 +387,30 @@ export const useAuthContextValue = (): AuthContextData => {
     [_flowId]
   );
 
-  const adbGetAccessToken = useCallback(async (username: string, password: string) => {
+  const asGetAccessToken = useCallback(async (username: string, password: string) => {
     try {
-      const resLogin = await AuthServices.instance().adbLogin(
+      const resLogin = await AuthServices.instance().asLogin(
         username,
         password,
-        SINGLE_FACTOR_SCOPE,
+        true,
         SINGLE_FACTOR_ACR_VALUE
       );
       const resAfterValidate = await AuthServices.instance().resumeUrl(resLogin.resumeUrl);
       AuthServices.instance().setSessionId(resAfterValidate.session.id);
       await AuthServices.instance().obtainTokenSingleFactor(
-        resAfterValidate.authorizeResponse.code,
-        SINGLE_FACTOR_SCOPE
+        resAfterValidate.authorizeResponse.code
       );
     } catch (error) {}
   }, []);
 
-  const adbLoginSingleFactor = useCallback(
+  const asLoginSingleFactor = useCallback(
     async (username: string, password: string, isSkipLogged?: boolean) => {
       try {
         setIsSigning(true);
-        const resLogin = await AuthServices.instance().adbLogin(
+        const resLogin = await AuthServices.instance().asLogin(
           username,
           password,
-          SINGLE_FACTOR_SCOPE,
+          true,
           SINGLE_FACTOR_ACR_VALUE
         );
         if (resLogin.error) {
@@ -394,12 +425,18 @@ export const useAuthContextValue = (): AuthContextData => {
           await authComponentStore.storeIsUserLogged(true);
           await authComponentStore.storeUserName(username);
           setPassword(undefined);
-          setProfile({ ...data });
           if (!isSkipLogged) {
             setIsSignedIn(true);
           }
 
           setIsManualLogin(true);
+          if (data.userId) {
+            setProfile({ ...data });
+            if (!_isUpdatedLanguageCode) {
+              AuthServices.instance().updateUserLocale(data.userId, I18n.currentLocale());
+              setIsUpdatedLanguageCode(true);
+            }
+          }
           return resLogin;
         }
       } catch (error) {
@@ -416,10 +453,10 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       setIsSigning(true);
       if (_username) {
-        const resLogin = await AuthServices.instance().adbLogin(
+        const resLogin = await AuthServices.instance().asLogin(
           _username,
           password,
-          SINGLE_FACTOR_SCOPE,
+          true,
           SINGLE_FACTOR_ACR_VALUE
         );
         if (resLogin.resumeUrl) {
@@ -435,15 +472,11 @@ export const useAuthContextValue = (): AuthContextData => {
     return false;
   }, []);
 
-  const adbResendOTP = useCallback(async () => {
+  const asResendOTP = useCallback(async () => {
     try {
       setIsSigning(true);
       if (_username && _username.length > 0 && _password && _password.length > 0) {
-        const data = await AuthServices.instance().adbLogin(
-          _username,
-          _password,
-          SINGLE_FACTOR_ACR_VALUE
-        );
+        const data = await AuthServices.instance().asLogin(_username, _password, true);
         if (data && data.id) {
           setFlowId(data.id);
         }
@@ -538,7 +571,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsRecoveringUserPassword(false);
       return response;
     } catch (error) {
-      if(error?.message === 'Network Error') {
+      if (error?.message === 'Network Error') {
         DeviceEventEmitter.emit('network_error');
       }
       setIsRecoveringUserPassword(false);
@@ -573,7 +606,7 @@ export const useAuthContextValue = (): AuthContextData => {
         return response;
       } catch (error) {
         setIsRecoveringUserPassword(false);
-        if(error?.message === 'Network Error') {
+        if (error?.message === 'Network Error') {
           DeviceEventEmitter.emit('network_error');
         }
         return error?.response?.data;
@@ -582,11 +615,11 @@ export const useAuthContextValue = (): AuthContextData => {
     []
   );
 
-  const adbForgotPasswordVerifyOtp = useCallback(async (otp: string, flowId: string) => {
+  const asForgotPasswordVerifyOtp = useCallback(async (otp: string, flowId: string) => {
     try {
       setIsVerifyLogin(true);
       if (flowId && flowId.length > 0) {
-        const loginData = await AuthServices.instance().adbVerifyLogin(otp, flowId);
+        const loginData = await AuthServices.instance().asVerifyLogin(otp, flowId);
         setIsVerifyLogin(false);
         if (loginData.status === 'COMPLETED') {
           return true;
@@ -619,7 +652,7 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   }, [_userMobileNumber]);
 
-  const saveUserNewPassword = useCallback(newPassword => {
+  const saveUserNewPassword = useCallback((newPassword) => {
     setUserNewPassword(newPassword);
   }, []);
 
@@ -636,7 +669,7 @@ export const useAuthContextValue = (): AuthContextData => {
           if (result && result.resendCode) {
             setRecovery({
               ...recovery,
-              recoveryCode: result.resendCode
+              recoveryCode: result.resendCode,
             });
           }
         }
@@ -693,10 +726,10 @@ export const useAuthContextValue = (): AuthContextData => {
           return true;
         }
       } catch (error) {
-        if(error.message === 'Network Error') {
+        if (error.message === 'Network Error') {
           DeviceEventEmitter.emit('network_error');
         }
-        if(onNetworkError) {
+        if (onNetworkError) {
           onNetworkError();
         }
         setIsDeviceRegistering(false);
@@ -734,7 +767,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setIsUpdatingProfile(false);
         return true;
       } catch (error) {
-        if(error?.message === 'Network Error') {
+        if (error?.message === 'Network Error') {
           DeviceEventEmitter.emit('network_error');
         }
         onError && onError(error as Error);
@@ -750,7 +783,9 @@ export const useAuthContextValue = (): AuthContextData => {
     try {
       const code = AuthServices.instance().getPairingCode();
       if (!code) {
-        const { pairingCode } = await AuthServices.instance().getLoginhintTokenAndPairingCode(onNetworkError);
+        const { pairingCode } = await AuthServices.instance().getLoginhintTokenAndPairingCode(
+          onNetworkError
+        );
         PingOnesdkModule.pairDevice(pairingCode);
       } else {
         PingOnesdkModule.pairDevice(code);
@@ -758,7 +793,7 @@ export const useAuthContextValue = (): AuthContextData => {
     } catch (error) {}
   }, []);
 
-  const adbAuthorizePushOnly = useCallback(async () => {
+  const asAuthorizePushOnly = useCallback(async () => {
     try {
       const response = await AuthServices.instance().authorizePushOnly();
       if (response && response.selectedDevice?.id && response.authSession && response.resumeUrl) {
@@ -866,13 +901,32 @@ export const useAuthContextValue = (): AuthContextData => {
     const response = await AuthServices.instance().updateReadNotification(notificationId);
     if (response) {
       let cloneData = [...(_notificationData?.data ? _notificationData?.data : [])];
-      const itemIndex = cloneData.findIndex(item => item.id === notificationId);
+      const itemIndex = cloneData.findIndex((item) => item.id === notificationId);
       cloneData[itemIndex].isView = true;
       let newUpdatedData = Object.assign({}, _notificationData);
       newUpdatedData.data = [...cloneData];
       setNotificationData(newUpdatedData);
     }
   };
+
+  const getEnterpriseData = useCallback((groupCode: string) => {
+    try {
+      return AuthServices.instance().getED(groupCode);
+    } catch (error) {
+      return Promise.reject(error);
+    } finally {
+    }
+  }, []);
+
+  const updateUserLocale = useCallback((userId: string, code: string) => {
+    try {
+      setIsUpdatedLanguageCode(true);
+      return AuthServices.instance().updateUserLocale(userId, code);
+    } catch (error) {
+      return Promise.reject(error);
+    } finally {
+    }
+  }, []);
 
   return useMemo(
     () => ({
@@ -889,7 +943,7 @@ export const useAuthContextValue = (): AuthContextData => {
       changeUserPassword,
       validateUserForgotPassword,
       changeUserPasswordUsingRecoveryCode,
-      adbForgotPasswordVerifyOtp,
+      asForgotPasswordVerifyOtp,
       profilePicture: _profilePicture,
       errorSignIn: _errorSignIn,
       errorUpdateProfile: _errorUpdateProfile,
@@ -919,21 +973,21 @@ export const useAuthContextValue = (): AuthContextData => {
       isDeviceRegistering: _isDeviceRegistered,
       isDeviceRegistered: _isDeviceRegistered,
       updateUserInfo,
-      adbLogin,
-      adbLoginVerifyOtp,
+      asLogin,
+      asLoginVerifyOtp,
       isVerifyLogin: _isVerifyLogin,
       errorVerifySignIn: _errorVerifySignIn,
-      adbResendOTP,
-      adbLoginSingleFactor,
+      asResendOTP,
+      asLoginSingleFactor,
       flowId: _flowId,
       isManualLogin: _isManualLogin,
       setIsManualLogin,
       isValidatedSubsequenceLogin: _isValidatedSubsequenceLogin,
       setIsValidatedSubsequenceLogin,
       verifyPassword,
-      adbGetAccessToken,
+      asGetAccessToken,
       pairingDevice,
-      adbAuthorizePushOnly,
+      asAuthorizePushOnly,
       obtainNewAccessToken,
       saveResumeURL,
       errorRebindedDevice: _errorRebindedDevice,
@@ -952,7 +1006,10 @@ export const useAuthContextValue = (): AuthContextData => {
       badgeNumber: _badgeNumber,
       getNotifications,
       updateReadNotifications,
-      notificationData: _notificationData
+      notificationData: _notificationData,
+      getEnterpriseData,
+      updateUserLocale,
+      userPreferences: _userPreferences,
     }),
     [
       _profile,
@@ -992,7 +1049,8 @@ export const useAuthContextValue = (): AuthContextData => {
       selectedDeviceId,
       _isReselectingDevice,
       _badgeNumber,
-      _notificationData
+      _notificationData,
+      _userPreferences,
     ]
   );
 };

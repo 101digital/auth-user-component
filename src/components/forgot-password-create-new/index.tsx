@@ -3,16 +3,16 @@ import { StyleSheet, Text, View } from 'react-native';
 import { fonts } from '../../assets/fonts';
 import { Formik } from 'formik';
 import {
-  ADBInputField,
+  ASInputField,
   ThemeContext,
   AlertCircleIcon,
   CheckIcon,
   CrossIcon,
-  ADBButton,
+  ASButton,
   NonCheckIcon,
   defaultColors,
 } from 'react-native-theme-component';
-import { ADBChangePasswordData, ADBChangePasswordSchema } from './modal';
+import { ASChangePasswordData, ASChangePasswordSchema } from './modal';
 import { PasswordMask } from './password-mask';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { colors } from '../../assets';
@@ -21,15 +21,15 @@ import {
   DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY,
   OTP_REQUIRED,
 } from '../../utils';
-import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { InputTypeEnum } from 'react-native-theme-component/src/input-field';
 
-export interface IADBForgotPasswordCreateNewComponent {
+export interface IASForgotPasswordCreateNewComponent {
   forgotPasswordObj: object;
   onPressContinue: (newPassword: string) => void;
   onPasswordSameHistory: () => void;
   onError: () => void;
 }
-const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewComponent) => {
+const ASForgotPasswordCreateNewComponent = (prop: IASForgotPasswordCreateNewComponent) => {
   const { i18n } = useContext(ThemeContext);
   const [showNewPass, setShowNewPass] = useState(true);
   const [showConfirmPass, setShowConfirmPass] = useState(true);
@@ -105,7 +105,6 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
       }
       onError();
     }
-    
   };
 
   return (
@@ -113,7 +112,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
       <Formik
         innerRef={formikRef}
         enableReinitialize={true}
-        initialValues={ADBChangePasswordData.empty()}
+        initialValues={ASChangePasswordData.empty()}
         validateOnMount={true}
         onSubmit={(values) => {}}
       >
@@ -128,7 +127,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
           return (
             <>
               <View style={[styles.container]}>
-                <ADBInputField
+                <ASInputField
                   name={'createNew'}
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
@@ -138,9 +137,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   }}
                   placeholderTextColor={defaultColors.black500}
                   placeHolderHintTextColor={defaultColors.gray400}
-                  placeholder={
-                    i18n.t('password.createPassword') ?? 'Create password'
-                  }
+                  placeholder={i18n.t('password.createPassword') ?? 'Create password'}
                   placeholderHint={i18n.t('password.password_hint') ?? 'Enter password'}
                   secureTextEntry={showNewPass}
                   autoCapitalize="none"
@@ -165,7 +162,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   touched={touched}
                 />
                 <View style={styles.height16} />
-                <ADBInputField
+                <ASInputField
                   type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   isFocusError={dirty && isDisabledSubmit}
@@ -178,9 +175,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   onBlur={() => {
                     setFieldTouched('confirmNew');
                   }}
-                  placeholder={
-                    i18n.t('password.confirmPassword') ?? 'Confirm password'
-                  }
+                  placeholder={i18n.t('password.confirmPassword') ?? 'Confirm password'}
                   secureTextEntry={showConfirmPass}
                   autoCapitalize="none"
                   suffixIcon={
@@ -206,11 +201,17 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                 <View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} color={colors.lightSubtitle} />
+                      </View>
                     ) : checkSpecialCharacter(values.createNew) ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} />
+                      </View>
                     ) : (
-                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
+                      <View style={styles.crossIconStyle}>
+                        <NonCheckIcon size={16} />
+                      </View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -220,11 +221,17 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   </View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} color={colors.lightSubtitle} />
+                      </View>
                     ) : checkAtLeast1upperandLower(values.createNew) ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} />
+                      </View>
                     ) : (
-                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
+                      <View style={styles.crossIconStyle}>
+                        <NonCheckIcon size={16} />
+                      </View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -234,11 +241,17 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   </View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} color={colors.lightSubtitle} />
+                      </View>
                     ) : checkAtLeast1digit(values.createNew) ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} />
+                      </View>
                     ) : (
-                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
+                      <View style={styles.crossIconStyle}>
+                        <NonCheckIcon size={16} />
+                      </View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -247,11 +260,17 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   </View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} color={colors.lightSubtitle} />
+                      </View>
                     ) : checkIs8Character(values.createNew) ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} />
+                      </View>
                     ) : (
-                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
+                      <View style={styles.crossIconStyle}>
+                        <NonCheckIcon size={16} />
+                      </View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -261,13 +280,19 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
                   </View>
                   <View style={styles.row}>
                     {!dirty ? (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} color={colors.lightSubtitle} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} color={colors.lightSubtitle} />
+                      </View>
                     ) : values.confirmNew !== values.createNew ||
                       values.confirmNew.trim() === '' ||
                       values.createNew.trim() === '' ? (
-                      <View style={styles.crossIconStyle}><NonCheckIcon size={16} /></View>
+                      <View style={styles.crossIconStyle}>
+                        <NonCheckIcon size={16} />
+                      </View>
                     ) : (
-                      <View style={styles.checkIconStyle}><CheckIcon size={16} /></View>
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} />
+                      </View>
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
@@ -278,7 +303,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
               </View>
 
               <View style={[styles.bottomSection]}>
-                <ADBButton
+                <ASButton
                   label={i18n.t('change_password.btn_continue') ?? 'Continue'}
                   isLoading={loading}
                   disabled={isDisabledSubmit}
@@ -293,7 +318,7 @@ const ADBForgotPasswordCreateNewComponent = (prop: IADBForgotPasswordCreateNewCo
   );
 };
 
-export default ADBForgotPasswordCreateNewComponent;
+export default ASForgotPasswordCreateNewComponent;
 
 const styles = StyleSheet.create({
   container: {
@@ -366,9 +391,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   checkIconStyle: {
-    paddingTop:3,
+    paddingTop: 3,
   },
   crossIconStyle: {
-    paddingTop:2,
+    paddingTop: 2,
   },
 });

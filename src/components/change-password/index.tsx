@@ -3,21 +3,21 @@ import { StyleSheet, Text, View } from 'react-native';
 import { fonts } from '../../assets/fonts';
 import { Formik } from 'formik';
 import {
-  ADBInputField,
+  ASInputField,
   ThemeContext,
   AlertCircleIcon,
   CheckIcon,
   CrossIcon,
-  ADBButton,
+  ASButton,
   NonCheckIcon,
   NonCheckCrossIcon,
   SuccessBigIcon,
   AlertCircleBigIcon,
   NonCheckRightIcon,
-  ADBAlertModal,
+  ASAlertModal,
   defaultColors,
 } from 'react-native-theme-component';
-import { ADBChangePasswordData, ADBChangePasswordSchema } from './modal';
+import { ASChangePasswordData, ASChangePasswordSchema } from './modal';
 import { PasswordMask } from './password-mask';
 import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { SuccessIcon } from 'react-native-theme-component/src/assets/success.icon';
@@ -27,12 +27,12 @@ import {
   DEFAULT_ERROR_MESSAGE_INVALID_PROVIDED_PASSWORD,
   DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY,
 } from '../../utils';
-import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { InputTypeEnum } from 'react-native-theme-component/src/input-field';
 
-export interface IADBChangePasswordComponent {
+export interface IASChangePasswordComponent {
   onPressContinue: () => void;
 }
-const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
+const ASChangePasswordComponent = (prop: IASChangePasswordComponent) => {
   const { i18n } = useContext(ThemeContext);
   const [showOldPass, setShowOldPass] = useState(true);
   const [showNewPass, setShowNewPass] = useState(true);
@@ -50,7 +50,7 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
     i18n.t('change_password.lbl_sorry_there_was_problem') ?? 'Sorry, there was a problem'
   );
   const [loading, setLoading] = useState(false);
-  
+
   const checkIs8Character = (text: string) => {
     return /^.{8,}$/.test(text.trim());
   };
@@ -102,8 +102,10 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
           DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY
         )
       ) {
-        setErrorTitle(i18n.t('change_password.lbl_create_new_which_not_used') ??
-        'Create a new password that you have never used')
+        setErrorTitle(
+          i18n.t('change_password.lbl_create_new_which_not_used') ??
+            'Create a new password that you have never used'
+        );
         setErrorModal(true);
         setLoading(false);
       } else if (`${resp[0].message}`.includes(DEFAULT_ERROR_MESSAGE_INVALID_PROVIDED_PASSWORD)) {
@@ -111,8 +113,10 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
         setLoading(false);
       } else {
         setErrorModal(true);
-        setErrorTitle(i18n.t('change_password.lbl_create_new_which_not_used') ??
-        'Create a new password that you have never used')
+        setErrorTitle(
+          i18n.t('change_password.lbl_create_new_which_not_used') ??
+            'Create a new password that you have never used'
+        );
         setLoading(false);
       }
     });
@@ -122,8 +126,8 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
       <Formik
         innerRef={formikRef}
         enableReinitialize={true}
-        initialValues={ADBChangePasswordData.empty()}
-        validationSchema={ADBChangePasswordSchema(i18n)}
+        initialValues={ASChangePasswordData.empty()}
+        validationSchema={ASChangePasswordSchema(i18n)}
         onSubmit={(values) => {}}
       >
         {({ setFieldTouched, errors, values, touched }) => {
@@ -134,11 +138,13 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   {i18n.t('change_password.lbl_current_password') ?? 'Current password'}
                 </Text>
                 <View style={styles.height16} />
-                <ADBInputField
-                  type='custom'
+                <ASInputField
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   name={'oldPassword'}
-                  onFocus = {() => {setCheck(false)}}
+                  onFocus={() => {
+                    setCheck(false);
+                  }}
                   onBlur={() => {
                     setFieldTouched('oldPassword');
                   }}
@@ -157,25 +163,31 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   touched={touched}
                   placeholderTextColor={defaultColors.black500}
                   placeHolderHintTextColor={defaultColors.gray400}
-                  placeholderHint={i18n.t('change_password.plh_current_password') ?? 'Enter password'}
+                  placeholderHint={
+                    i18n.t('change_password.plh_current_password') ?? 'Enter password'
+                  }
                 />
                 <View style={styles.height32} />
                 <Text style={styles.subTitle16}>
                   {i18n.t('change_password.lbl_new_password') ?? 'New Password'}
                 </Text>
                 <View style={styles.height16} />
-                <ADBInputField
-                  type='custom'
+                <ASInputField
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   name={'createNew'}
-                  onFocus = {() => {setCheck(true)}}
+                  onFocus={() => {
+                    setCheck(true);
+                  }}
                   onBlur={() => {
                     setFieldTouched('createNew');
                   }}
                   placeholder={
                     i18n.t('change_password.lbl_title_create_new_password') ?? 'Create new password'
                   }
-                  placeholderHint={i18n.t('change_password.plh_new_password') ?? 'Enter new password'}
+                  placeholderHint={
+                    i18n.t('change_password.plh_new_password') ?? 'Enter new password'
+                  }
                   secureTextEntry={showNewPass}
                   autoCapitalize="none"
                   suffixIcon={
@@ -192,18 +204,22 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   touched={touched}
                 />
                 <View style={styles.height16} />
-                <ADBInputField
-                  type='custom'
+                <ASInputField
+                  type="custom"
                   inputType={InputTypeEnum.MATERIAL}
                   name={'confirmNew'}
-                  onFocus={() => {setCheck(true)}}
+                  onFocus={() => {
+                    setCheck(true);
+                  }}
                   onBlur={() => {
                     setFieldTouched('confirmNew');
                   }}
                   placeholder={
                     i18n.t('change_password.lbl_title_confirm_password') ?? 'Confirm new password'
                   }
-                  placeholderHint={i18n.t('change_password.plh_confirm_password') ?? 'Re-enter new password'}
+                  placeholderHint={
+                    i18n.t('change_password.plh_confirm_password') ?? 'Re-enter new password'
+                  }
                   secureTextEntry={showConfirmPass}
                   autoCapitalize="none"
                   suffixIcon={
@@ -221,8 +237,13 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                 />
                 <View>
                   <View style={styles.row}>
-                    {checkSpecialCharacter(values.createNew) ?  
-                      <CheckIcon size={18} /> : check ? <NonCheckCrossIcon size={18} /> : <NonCheckRightIcon size={18} color={colors.lightSubtitle} />}
+                    {checkSpecialCharacter(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : check ? (
+                      <NonCheckCrossIcon size={18} />
+                    ) : (
+                      <NonCheckRightIcon size={18} color={colors.lightSubtitle} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_special_char') ??
@@ -230,8 +251,13 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                     </Text>
                   </View>
                   <View style={styles.row}>
-                    {checkAtLeast1upperandLower(values.createNew) ?  
-                      <CheckIcon size={18} /> : check ? <NonCheckCrossIcon size={18} /> : <NonCheckRightIcon size={18} color={colors.lightSubtitle} />}
+                    {checkAtLeast1upperandLower(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : check ? (
+                      <NonCheckCrossIcon size={18} />
+                    ) : (
+                      <NonCheckRightIcon size={18} color={colors.lightSubtitle} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_lower_uper') ??
@@ -239,16 +265,26 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                     </Text>
                   </View>
                   <View style={styles.row}>
-                    {checkAtLeast1digit(values.createNew) ?  
-                      <CheckIcon size={18} /> : check ? <NonCheckCrossIcon size={18} /> : <NonCheckRightIcon size={18} color={colors.lightSubtitle} />}
+                    {checkAtLeast1digit(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : check ? (
+                      <NonCheckCrossIcon size={18} />
+                    ) : (
+                      <NonCheckRightIcon size={18} color={colors.lightSubtitle} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_at_least_one_number') ?? 'At least one number.'}
                     </Text>
                   </View>
                   <View style={styles.row}>
-                    {checkIs8Character(values.createNew) ?  
-                      <CheckIcon size={18} /> : check ? <NonCheckCrossIcon size={18} /> : <NonCheckRightIcon size={18} color={colors.lightSubtitle} />}
+                    {checkIs8Character(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : check ? (
+                      <NonCheckCrossIcon size={18} />
+                    ) : (
+                      <NonCheckRightIcon size={18} color={colors.lightSubtitle} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
                       {i18n.t('change_password.lbl_be_at_least_8_char') ??
@@ -258,18 +294,26 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
                   <View style={styles.row}>
                     {values.confirmNew !== values.createNew ||
                     values.confirmNew.trim() === '' ||
-                    values.createNew.trim() === '' 
-                    ? (check ? <NonCheckCrossIcon size={18} /> : <NonCheckRightIcon size={18} color={colors.lightSubtitle} />) : <CheckIcon size={18} /> }
+                    values.createNew.trim() === '' ? (
+                      check ? (
+                        <NonCheckCrossIcon size={18} />
+                      ) : (
+                        <NonCheckRightIcon size={18} color={colors.lightSubtitle} />
+                      )
+                    ) : (
+                      <CheckIcon size={18} />
+                    )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
-                      {i18n.t('change_password.lbl_both_password_match') ?? 'Both password matches.'}
+                      {i18n.t('change_password.lbl_both_password_match') ??
+                        'Both password matches.'}
                     </Text>
                   </View>
                 </View>
               </View>
 
               <View style={[styles.bottomSection]}>
-                <ADBButton
+                <ASButton
                   label={i18n.t('change_password.btn_continue') ?? 'Continue'}
                   isLoading={loading}
                   disabled={
@@ -287,54 +331,54 @@ const ADBChangePasswordComponent = (prop: IADBChangePasswordComponent) => {
           );
         }}
       </Formik>
-      
-      <ADBAlertModal 
-          title={errorTitle}
-          message= {i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
-          btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
-          type={'bottom'}
-          isVisible={errorModal}
-          icon={<AlertCircleBigIcon width={178} height={165} />}
-          onConfirmBtnPress={() => setErrorModal(false)}
+
+      <ASAlertModal
+        title={errorTitle}
+        message={i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
+        btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
+        type={'bottom'}
+        isVisible={errorModal}
+        icon={<AlertCircleBigIcon width={178} height={165} />}
+        onConfirmBtnPress={() => setErrorModal(false)}
       />
 
-      <ADBAlertModal 
-          title={i18n.t('change_password.lbl_password_updated') ?? 'Password has been updated!'}
-          btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
-          type={'bottom'}
-          isVisible={successModal}
-          icon={<SuccessBigIcon width={178} height={165} />}
-          onConfirmBtnPress={() => {
-            setSuccessModal(false), onPressContinue();
-          }}
+      <ASAlertModal
+        title={i18n.t('change_password.lbl_password_updated') ?? 'Password has been updated!'}
+        btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
+        type={'bottom'}
+        isVisible={successModal}
+        icon={<SuccessBigIcon width={178} height={165} />}
+        onConfirmBtnPress={() => {
+          setSuccessModal(false), onPressContinue();
+        }}
       />
 
-      <ADBAlertModal 
-          title={i18n.t('change_password.lbl_invalid_credentials') ?? 'Invalid credentials'}
-          message={i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
-          type={'bottom'}
-          btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
-          isVisible={invalidCredModal}
-          icon={<AlertCircleBigIcon width={178} height={165} />}
-          onConfirmBtnPress={() => setInvalidCredModal(false)}
+      <ASAlertModal
+        title={i18n.t('change_password.lbl_invalid_credentials') ?? 'Invalid credentials'}
+        message={i18n.t('change_password.lbl_please_try_again') ?? 'Please try again.'}
+        type={'bottom'}
+        btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
+        isVisible={invalidCredModal}
+        icon={<AlertCircleBigIcon width={178} height={165} />}
+        onConfirmBtnPress={() => setInvalidCredModal(false)}
       />
     </>
   );
 };
 
-export default ADBChangePasswordComponent;
+export default ASChangePasswordComponent;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24
+    paddingHorizontal: 24,
   },
   title: {
     color: colors.black100,
     fontSize: 24,
     lineHeight: 32,
     fontFamily: fonts.OutfitSemiBold,
-    fontWeight:'600'
+    fontWeight: '600',
   },
   subTitle: {
     color: colors.textColor,
@@ -348,7 +392,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.OutfitRegular,
     lineHeight: 16,
-    fontWeight: '400'
+    fontWeight: '400',
   },
   subTitle16: {
     color: colors.black100,

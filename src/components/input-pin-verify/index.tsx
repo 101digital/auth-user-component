@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
-import { ADBButton, NumberPadComponent, OTPField } from 'react-native-theme-component';
+import { ASButton, NumberPadComponent, OTPField } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
 
-type ADBInputPINVerifyProps = {
+type ASInputPINVerifyProps = {
   onContinue: () => void;
   onFailed: () => void;
 };
 
-const ADBInputPINVerifyComponent = (props: ADBInputPINVerifyProps) => {
+const ASInputPINVerifyComponent = (props: ASInputPINVerifyProps) => {
   const { onContinue, onFailed } = props;
   const otpRef = useRef<OTPFieldRef>();
   const [value, setValue] = useState<string>('');
@@ -112,4 +112,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ADBInputPINVerifyComponent;
+export default ASInputPINVerifyComponent;

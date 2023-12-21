@@ -2,7 +2,7 @@ import qs from 'qs';
 import authComponentStore from './local-store';
 import axios from 'axios';
 import { AuthApiClient } from '../api-client/auth-api-client';
-import { AuthComponentConfig, PKCE, Profile } from '../types';
+import { AuthComponentConfig, PKCE, Profile, UserPreferences } from '../types';
 import { authorize } from 'react-native-app-auth';
 import { PASSPORT } from '../types';
 import pkceChallenge from 'react-native-pkce-challenge';
@@ -139,21 +139,24 @@ export class AuthServices {
     return response.data.access_token;
   };
 
-  public adbLogin = async (
+  public asLogin = async (
     username: string,
     password: string,
-    scope?: string,
+    isSingleFactor?: boolean,
     acr_values = 'Multi_Factor'
   ) => {
-    const { clientId, responseType, responseMode } = this._configs || {};
+    const { clientId, responseType, responseMode, authScopeSingleFactor, authScopeMultiFactor } =
+      this._configs || {};
     const { codeChallenge } = this.refreshPKCEChallenge();
+    console.log('authScopeMultiFactor', authScopeMultiFactor);
+    console.log('authScopeSingleFactor', authScopeSingleFactor);
     const responseAuth = await AuthApiClient.instance()
       .getAuthApiClient()
       .get('as/authorize', {
         params: {
           response_type: responseType,
           client_id: clientId,
-          scope: scope ? scope : 'openid profilep',
+          scope: isSingleFactor ? authScopeSingleFactor : authScopeMultiFactor,
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
           response_mode: responseMode,
@@ -181,7 +184,7 @@ export class AuthServices {
     }
   };
 
-  public adbVerifyLogin = async (otp: string, flowId: string) => {
+  public asVerifyLogin = async (otp: string, flowId: string) => {
     const response = await AuthApiClient.instance()
       .getAuthApiClient()
       .post(
@@ -209,7 +212,7 @@ export class AuthServices {
     const body = qs.stringify({
       grant_type: authGrantType,
       code: authorizeCode,
-      scope: 'openid  profilep',
+      scope: 'openid profilep',
       code_verifier: codeVerifier,
       client_id: clientId,
     });
@@ -225,7 +228,7 @@ export class AuthServices {
   public getLoginhintTokenAndPairingCode = async (onNetworkError: any) => {
     const { identityPingUrl, accessToken, sessionId } = this._configs || {};
     const responseTokenHint = await axios
-      .get(`${identityPingUrl}/users/loginhint`, {
+      .get(`${identityPingUrl}/users/-/login-hints`, {
         headers: {
           Authorization: `${accessToken}`,
           'x-session-id': sessionId,
@@ -250,13 +253,13 @@ export class AuthServices {
     };
   };
 
-  public obtainTokenSingleFactor = async (authorizeCode: string, scope?: string) => {
-    const { clientId, authBaseUrl, authGrantType } = this._configs || {};
+  public obtainTokenSingleFactor = async (authorizeCode: string) => {
+    const { clientId, authBaseUrl, authGrantType, authScopeSingleFactor } = this._configs || {};
     const { codeVerifier } = this._pkce;
     const body = qs.stringify({
       grant_type: authGrantType,
       code: authorizeCode,
-      scope: scope ?? 'openid  profilep',
+      scope: authScopeSingleFactor,
       code_verifier: codeVerifier,
       client_id: clientId,
     });
@@ -372,7 +375,7 @@ export class AuthServices {
       confirmNewPassword,
     };
 
-    const response = await axios.put(`${identityPingUrl}/users/passwords`, body, {
+    const response = await axios.put(`${identityPingUrl}/users/-/passwords`, body, {
       headers: {
         Authorization: `${accessToken}`,
       },
@@ -535,7 +538,7 @@ export class AuthServices {
     let badgeNumber: number = 0;
     try {
       const response = await axios.get(
-        `${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM&platform=${
+        `${notificationBaseUrl}/notifications?entityId=101D&appId=SYSTEM&platform=${
           Platform.OS === 'android' ? 'Android' : 'IOS'
         }`,
         {
@@ -558,7 +561,7 @@ export class AuthServices {
     const { notificationBaseUrl, accessToken } = this._configs!;
     try {
       const response = await axios.get(
-        `${notificationBaseUrl}/notifications?entityId=ADB&appId=SYSTEM&pageSize=${pageSize}&pageNumber=${pageNumber}&platform=${
+        `${notificationBaseUrl}/notifications?entityId=101D&appId=SYSTEM&pageSize=${pageSize}&pageNumber=${pageNumber}&platform=${
           Platform.OS === 'android' ? 'Android' : 'IOS'
         }`,
         {
@@ -579,7 +582,7 @@ export class AuthServices {
   updateReadNotification = async (notificationId: string) => {
     const { notificationBaseUrl, accessToken } = this._configs!;
     try {
-      const response = await axios.post(
+      const response = await axios.patch(
         `${notificationBaseUrl}/notifications/${notificationId}/status`,
         { status: 'READ' },
         {
@@ -605,7 +608,15 @@ export class AuthServices {
   ) => {
     const { membershipBaseUrl, accessToken } = this._configs!;
     let body = {};
-
+    console.log(
+      'service -> updateUserInfo',
+      userId,
+      fullName,
+      nickname,
+      id,
+      idType,
+      idIssuingCountry
+    );
     const updateInfoPayload = {
       fullName: fullName,
       nickName: nickname,
@@ -649,7 +660,7 @@ export class AuthServices {
           params: {
             response_type: responseType,
             client_id: clientIdInit ? clientIdInit : clientId,
-            scope: scope ? scope : 'openid profilep',
+            scope: scope ? scope : 'openid profilepsf',
             code_challenge: codeChallenge,
             code_challenge_method: 'S256',
             response_mode: responseMode,
@@ -671,7 +682,7 @@ export class AuthServices {
 
   public getListDevices = async () => {
     const { accessToken } = this._configs || {};
-    const response = await axios.get(`${this._configs?.identityPingUrl}/users/devices`, {
+    const response = await axios.get(`${this._configs?.identityPingUrl}/users/-/devices`, {
       headers: {
         Authorization: `${accessToken}`,
       },
@@ -682,7 +693,7 @@ export class AuthServices {
   public deleteDevice = async (deviceId: string) => {
     const { accessToken } = this._configs || {};
     const response = await axios.delete(
-      `${this._configs?.identityPingUrl}/users/devices/${deviceId}`,
+      `${this._configs?.identityPingUrl}/users/-/devices/${deviceId}`,
       {
         headers: {
           Authorization: `${accessToken}`,
@@ -707,5 +718,114 @@ export class AuthServices {
       return true;
     } catch (err) {}
     return false;
+  };
+
+  public getED = async (groupCodes: string) => {
+    const { enterpriseDataServicesBaseUrl, accessToken } = this._configs || {};
+    console.log('enterpriseDataServicesBaseUrl', enterpriseDataServicesBaseUrl);
+    if (enterpriseDataServicesBaseUrl) {
+      const response = await axios.get(
+        `${this._configs?.enterpriseDataServicesBaseUrl}/data-groups?detailLevel=FULL&dataGroupCodes=${groupCodes}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data;
+    } else {
+      throw new Error('Scheduled Payment Client is not registered');
+    }
+  };
+
+  public getEnterpriseData = async (keys: string[], locale: string) => {
+    const { enterpriseDataServicesBaseUrl, accessToken } = this._configs || {};
+    const listEDKeys = keys.map((k) => k.replace('EntData_', '')).join(',');
+    const response = await axios.get(`${enterpriseDataServicesBaseUrl}/data-groups`, {
+      params: {
+        detailLevel: 'FULL',
+        dataGroupCodes: listEDKeys,
+        language: locale,
+        pageSize: keys.length,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data;
+  };
+
+  public updateUserLocale = async (userId: string, code: string) => {
+    const { accessToken } = this._configs || {};
+    if (this._configs?.membershipBaseUrl) {
+      const response = await axios.patch(
+        `${this._configs?.membershipBaseUrl}/users/${userId}/preference`,
+        {
+          languageCode: code,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data;
+    } else {
+      throw new Error('Membership Client is not registered');
+    }
+  };
+
+  public getUserPreferences = async (userId: string): Promise<{ data: UserPreferences }> => {
+    const { membershipBaseUrl, accessToken, defaultCurrecyCode } = this._configs || {};
+    console.log('getUserPreferences -> userId', userId, membershipBaseUrl);
+    if (membershipBaseUrl) {
+      const response = await axios.get(
+        `${this._configs?.membershipBaseUrl}/users/${userId}/preference`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log('response.data.currencyCode', response.data);
+
+      if (!response.data.data.currencyCode || response.data.data.currencyCode?.length === 0) {
+        return {
+          data: {
+            ...response.data,
+            currencyCode: defaultCurrecyCode,
+          },
+        };
+      } else {
+        return response.data;
+      }
+    } else {
+      throw new Error('Membership Client is not registered');
+    }
+  };
+  public getCurrencyFormat = async (userId: string): Promise<string> => {
+    const { membershipBaseUrl, accessToken, defaultCurrecyCode } = this._configs || {};
+    if (membershipBaseUrl) {
+      const response = await axios.get(
+        `${this._configs?.membershipBaseUrl}/users/${userId}/preference`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      let currencyCode = response.data.currencyCode;
+      if (!currencyCode || currencyCode?.length === 0) {
+        currencyCode = defaultCurrecyCode;
+      }
+
+      return currencyCode;
+    } else {
+      throw new Error('Membership Client is not registered');
+    }
   };
 }

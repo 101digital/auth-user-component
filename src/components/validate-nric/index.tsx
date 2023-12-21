@@ -1,18 +1,18 @@
 import { InputIdData, InputIdSchema } from './model';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Keyboard, Platform } from 'react-native';
-import { ADBButton, ADBInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
+import { ASButton, ASInputField, ThemeContext, defaultColors } from 'react-native-theme-component';
 import { Formik, FormikProps } from 'formik';
 import { AuthContext } from '../../auth-context';
-import { InputTypeEnum } from 'react-native-theme-component/src/adb-input-field';
+import { InputTypeEnum } from 'react-native-theme-component/src/input-field';
 
-type ADBInputIdProps = {
+type ASInputIdProps = {
   onVerifyNRICSuccess: () => void;
   onError: () => void;
   isLoading: boolean;
 };
 
-const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
+const ASValidateUserNRICComponent = (prop: ASInputIdProps) => {
   const { i18n } = useContext(ThemeContext);
   const { profile } = useContext(AuthContext);
   const formikRef = useRef<FormikProps<InputIdData>>(null);
@@ -24,6 +24,8 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
   };
 
   const validateIdNumber = async (id: string) => {
+    // onVerifyNRICSuccess();
+    // return;
     Keyboard.dismiss();
     try {
       if (id.match(/^[^0-9a-zA-Z]+$/)) {
@@ -58,7 +60,7 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
           return (
             <>
               <View style={styles.content}>
-                <ADBInputField
+                <ASInputField
                   type={'custom'}
                   inputType={InputTypeEnum.MATERIAL}
                   name={'userId'}
@@ -75,13 +77,13 @@ const ADBValidateUserNRICComponent = (prop: ADBInputIdProps) => {
                 />
               </View>
               <View style={styles.bottomSection}>
-              <ADBButton
-                label={i18n.t('common.lbl_continue')}
-                onPress={submitForm}
-                isLoading={isLoading}
-                disabled={values.userId.length === 0}
-                testId="validate-id-continue-button"
-              />
+                <ASButton
+                  label={i18n.t('common.lbl_continue')}
+                  onPress={submitForm}
+                  isLoading={isLoading}
+                  disabled={values.userId.length === 0}
+                  testId="validate-id-continue-button"
+                />
               </View>
             </>
           );
@@ -119,4 +121,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ADBValidateUserNRICComponent;
+export default ASValidateUserNRICComponent;
