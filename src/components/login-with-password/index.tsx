@@ -102,8 +102,8 @@ const ASLoginWithPasswordComponent = ({
                   inputType={InputTypeEnum.MATERIAL}
                   name={'password'}
                   secureTextEntry={!isVisiblePassword}
-                  placeholder={'Password'}
-                  placeholderHint={i18n.t('login_component.enter_password') ?? 'Enter password'}
+                  placeholder={i18n.t('login_component.enter_current_password')}
+                  placeholderHint={i18n.t('login_component.enter_current_password') ?? 'Enter password'}
                   placeholderTextColor={defaultColors.black500}
                   placeHolderHintTextColor={defaultColors.gray400}
                   onChange={() => setShowIncorrectPassword(false)}
@@ -125,11 +125,11 @@ const ASLoginWithPasswordComponent = ({
                   }
                   testID="password-input"
                 />
-                <TouchableOpacity onPress={onResetPassword} testID="forgot-password-button">
+                {/* <TouchableOpacity onPress={onResetPassword} testID="forgot-password-button">
                   <Text style={styles.forgetPasswordLabel}>{`${
                     i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'
                   }`}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               <ASButton
                 isLoading={isSigning}

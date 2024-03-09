@@ -5,7 +5,6 @@ import {
   ImageIcon,
   ThemeContext,
   PinNumberComponent,
-  DigiBankLogo,
 } from 'react-native-theme-component';
 import { OTPFieldRef } from 'react-native-theme-component/src/otp-field';
 import authComponentStore from '../../services/local-store';
@@ -16,6 +15,7 @@ import { AlertCircleIcon } from '../../assets/icons';
 import { PASSWORD_LOCKED_OUT } from '../../utils/index';
 import { colors } from '../../assets';
 import { AuthServices } from 'react-native-auth-component';
+import { DigibankLogo } from '@/assets/icons';
 
 type ASLoginWithPINProps = {
   onFailedVerified: () => void;
@@ -145,7 +145,7 @@ const ASLoginWithPINComponent = (prop: ASLoginWithPINProps) => {
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.imagePlaceHolderContainer}>
-            <DigiBankLogo />
+            <DigibankLogo width={215} height={32} />
           </View>
           <Text style={styles.pinTitle}>
             {i18n.t('login_component.lbl_enter_pin') ?? `Enter your PIN`}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     marginTop: 35,
-    marginBottom: 32,
+    marginBottom: 40,
   },
   bottomSpacing: {
     height: Platform.OS === 'ios' ? 10 : 20,
@@ -240,9 +240,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   pinTitle: {
-    color: colors.lightSubtitle,
+    color: '#231F20',
     fontFamily: fonts.OutfitRegular,
-    fontSize: 12,
+    fontSize: 14,
+    width: '100%',
+    paddingHorizontal: 5
   },
   cameraDisableContainer: {
     width: '100%',

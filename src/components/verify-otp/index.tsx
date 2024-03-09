@@ -38,7 +38,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
     clearError,
   } = props || {};
   const { errorVerifySignIn, isVerifyLogin } = useContext(AuthContext);
-  const { i18n } = useContext(ThemeContext);
+  const { i18n, colors } = useContext(ThemeContext);
   const [value, setValue] = useState<string>('');
   const [isValid, setIsValid] = useState<boolean>(false);
   const [attemptCount, setAttemptCount] = useState<number>(0);
@@ -72,6 +72,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
 
   const onValidateOTP = async () => {
     clearError && clearError();
+    console.log('alo coco')
     const isSuccess = await verifyOTP(value);
     if (isSuccess) {
       otpRef.current?.clearInput();
@@ -149,7 +150,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
           {errorVerifySignIn && errorVerifySignIn?.response?.status && (
             <View style={styles.errorWrapper}>
               <View style={styles.rowCenter}>
-                <AlertCircleIcon size={16} />
+                <AlertCircleIcon size={16} color={colors.errorColor}/>
                 <Text style={styles.errorText} testID="verify-otp-error-message">
                   {getErrorMessage()}
                 </Text>
@@ -177,6 +178,7 @@ const VerifyOTPComponent = ({ props, style }: VerifyOTPComponentProps) => {
       <NumberPadComponent
         testID={'verify-otp-number-pad'}
         onPress={(e: string | number) => {
+          console.log('s', e)
           switch (e) {
             case 'r':
               const newStr = value.substring(0, value.length - 1);

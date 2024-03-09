@@ -78,8 +78,7 @@ export interface AuthContextData {
   isDeviceRegistered: boolean;
   updateUserInfo: (
     userId: string,
-    fullName: string,
-    nickName: string,
+    userAdditionalInfo: any,
     id: string,
     idType?: string,
     idIssuingCountry?: string,
@@ -129,6 +128,15 @@ export interface AuthContextData {
   getEnterpriseData: (groupCode: string) => Promise<any>;
   updateUserLocale: (userId: string, locale: string) => Promise<boolean>;
   userPreferences?: UserPreferences;
+  setIsUpdatingProfile: (isUpdating: boolean) => void;
+  getFramlODDApplicationStatus: (userId: string, excludeStatuses: string) => Promise<any>;
+  updateODDReviewCycle: (applicationId: string, data: any) => Promise<any>;
+  checkFramlODDMandatory: (
+    userId: string,
+    excludeStatuses: string,
+    lastLoginAt: string,
+    checkDays: number
+  ) => Promise<any>;
 }
 
 export const authDefaultValue: AuthContextData = {
@@ -202,6 +210,10 @@ export const authDefaultValue: AuthContextData = {
   getEnterpriseData: async () => undefined,
   notificationData: false,
   updateUserLocale: async () => false,
+  setIsUpdatingProfile: async () => false,
+  updateODDReviewCycle: async () => undefined,
+  getFramlODDApplicationStatus: async () => undefined,
+  checkFramlODDMandatory: async () => undefined,
 };
 
 export const AuthContext = React.createContext<AuthContextData>(authDefaultValue);
@@ -522,6 +534,60 @@ export const useAuthContextValue = (): AuthContextData => {
     return false;
   }, []);
 
+  const updateODDReviewCycle = useCallback(async (applicationId: string, data: any) => {
+    try {
+      setIsUpdatingProfile(true);
+      const response = await AuthServices.instance().updateODDReviewApplication(
+        applicationId,
+        data
+      );
+      if (response) {
+        return true;
+      }
+    } catch (error) {
+      return false;
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  }, []);
+
+  const getFramlODDApplicationStatus = useCallback(
+    async (userId: string, excludeStatuses: string): Promise<Record<string, any> | undefined> => {
+      try {
+        setIsUpdatingProfile(true);
+        const response = await AuthServices.instance().getODDApplicationList(
+          userId,
+          excludeStatuses
+        );
+        /**
+         * Find application with these condition:
+         * 1. application.productDetails.productId === 'FramlODD'
+         * 2. application.status === 'Review'
+         * 3. application.applicationStatuses with condition:
+         * 3.1. status.statusName === 'EDD'
+         * 3.2. status.statusValue === 'Pending Submission'
+         */
+        const application = response.data.find((application: any) => {
+          if (application.status === 'Review') {
+            const withStatisfyStatus = application.applicationStatuses.find((status: any) => {
+              return status.statusName === 'EDD' && status.statusValue === 'Pending Submission';
+            });
+            return withStatisfyStatus ? true : false;
+          }
+          return false;
+        });
+        if (application) {
+          return application;
+        }
+      } catch (e) {
+        throw new Error(e);
+      } finally {
+        setIsUpdatingProfile(false);
+      }
+    },
+    []
+  );
+
   const fetchProfile = useCallback(async (onSuccess?: (data: Profile) => void) => {
     try {
       setIsUpdatingProfile(true);
@@ -620,6 +686,7 @@ export const useAuthContextValue = (): AuthContextData => {
       setIsVerifyLogin(true);
       if (flowId && flowId.length > 0) {
         const loginData = await AuthServices.instance().asVerifyLogin(otp, flowId);
+
         setIsVerifyLogin(false);
         if (loginData.status === 'COMPLETED') {
           return true;
@@ -744,8 +811,7 @@ export const useAuthContextValue = (): AuthContextData => {
   const updateUserInfo = useCallback(
     async (
       userId: string,
-      fullName: string,
-      nickName: string,
+      userAdditionalInfo: any,
       id: string,
       idType?: string,
       idIssuingCountry?: string,
@@ -755,8 +821,7 @@ export const useAuthContextValue = (): AuthContextData => {
         setIsUpdatingProfile(true);
         const response = await AuthServices.instance().updateUserInfo(
           userId,
-          fullName,
-          nickName,
+          userAdditionalInfo,
           id,
           idType,
           idIssuingCountry
@@ -928,6 +993,57 @@ export const useAuthContextValue = (): AuthContextData => {
     }
   }, []);
 
+
+  const checkFramlODDMandatory = useCallback(
+    async (
+      userId: string,
+      excludeStatuses: string,
+      lastLoginAt: string,
+      checkDays: number
+    ): Promise<Record<string, any> | undefined> => {
+      try {
+        setIsUpdatingProfile(true);
+        const response = await AuthServices.instance().getODDApplicationList(
+          userId,
+          excludeStatuses
+        );
+        const application = response.data.find((application: any) => {
+          if (application.status === 'Review') {
+            const withStatisfyStatus = application.applicationStatuses.find((status: any) => {
+              return status.statusName === 'EDD' && status.statusValue === 'Pending Submission';
+            });
+            return withStatisfyStatus ? true : false;
+          }
+          return false;
+        });
+        if (application) {
+          const lastLoginDate = moment(lastLoginAt)?.format('YYYY-MM-DD');
+          const applicateSubmittedDate = moment(application?.submittedAt)?.format('YYYY-MM-DD');
+          const checkDateDiff = moment(lastLoginDate).diff(moment(applicateSubmittedDate), 'days');
+          const dateDiffToPositive = Math.abs(checkDateDiff);
+
+          if (dateDiffToPositive >= checkDays) {
+            const oddType = application.customFields.find(
+              (item: { customKey: string; customValue: string }) => item.customKey === 'ODDType'
+            );
+            const mandatoryStatus: IOddMandatoryStatus = {
+              isOdd: true,
+              oddType: oddType?.customValue,
+            };
+            return mandatoryStatus;
+          } else {
+            const mandatoryStatus: IOddMandatoryStatus = { isOdd: false, oddType: undefined };
+            return mandatoryStatus;
+          }
+        }
+      } catch (e) {
+      } finally {
+        setIsUpdatingProfile(false);
+      }
+    },
+    []
+  );
+
   return useMemo(
     () => ({
       reSelectDevice,
@@ -1010,6 +1126,10 @@ export const useAuthContextValue = (): AuthContextData => {
       getEnterpriseData,
       updateUserLocale,
       userPreferences: _userPreferences,
+      setIsUpdatingProfile,
+      checkFramlODDMandatory,
+      updateODDReviewCycle,
+      getFramlODDApplicationStatus
     }),
     [
       _profile,

@@ -76,8 +76,8 @@ const useMergeStyles = (
       flexDirection: 'row',
       justifyContent: 'center',
       flex: 1,
-      alignItems: 'flex-end',
-      marginBottom: 32
+      alignItems: 'flex-start',
+      marginTop: 24,
     },
     notReceivedCodeLabel: {
       fontFamily: fonts.OutfitSemiBold,

@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { fonts } from '../../assets/fonts';
 import { Formik } from 'formik';
 import {
@@ -23,6 +23,7 @@ import BottomSheetModal from 'react-native-theme-component/src/bottom-sheet';
 import { SuccessIcon } from 'react-native-theme-component/src/assets/success.icon';
 import { colors } from '../../assets';
 import { AuthContext } from '../../auth-context/context';
+import { SuccessTransactionIcon } from '@/assets/icons'
 import {
   DEFAULT_ERROR_MESSAGE_INVALID_PROVIDED_PASSWORD,
   DEFAULT_ERROR_MESSAGE_NEW_PASSWORD_DID_NOT_SATISFY_PASSWORD_POLICY,
@@ -59,8 +60,12 @@ const ASChangePasswordComponent = (prop: IASChangePasswordComponent) => {
     return /(?=.*\d)/.test(text.trim());
   };
 
-  const checkAtLeast1upperandLower = (text: string) => {
-    return /(?=.*[A-Z])(?=.*[a-z])/.test(text.trim());
+  const checkAtLeast1Lower = (text: string) => {
+    return /(?=.*[a-z])/.test(text.trim());
+  };
+
+  const checkAtLeast1Upper = (text: string) => {
+    return /(?=.*[A-Z])/.test(text.trim());
   };
 
   const checkSpecialCharacter = (text: string) => {
@@ -70,7 +75,8 @@ const ASChangePasswordComponent = (prop: IASChangePasswordComponent) => {
   const validationCheck = (val: string) => {
     if (
       checkIs8Character(val) &&
-      checkAtLeast1upperandLower(val) &&
+      checkAtLeast1Lower(val) &&
+      checkAtLeast1Upper(val) &&
       checkAtLeast1digit(val) &&
       checkSpecialCharacter(val)
     ) {
@@ -134,6 +140,7 @@ const ASChangePasswordComponent = (prop: IASChangePasswordComponent) => {
           return (
             <>
               <View style={[styles.container]}>
+                <ScrollView>
                 <Text style={styles.subTitle16}>
                   {i18n.t('change_password.lbl_current_password') ?? 'Current password'}
                 </Text>
@@ -251,7 +258,7 @@ const ASChangePasswordComponent = (prop: IASChangePasswordComponent) => {
                     </Text>
                   </View>
                   <View style={styles.row}>
-                    {checkAtLeast1upperandLower(values.createNew) ? (
+                    {checkAtLeast1Lower(values.createNew) ? (
                       <CheckIcon size={18} />
                     ) : check ? (
                       <NonCheckCrossIcon size={18} />
@@ -260,7 +267,21 @@ const ASChangePasswordComponent = (prop: IASChangePasswordComponent) => {
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
-                      {i18n.t('change_password.lbl_at_least_one_lower_uper') ??
+                      {i18n.t('change_password.lbl_at_least_one_lower') ??
+                        'At least one uppercase and lowercase letter.'}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    {checkAtLeast1Upper(values.createNew) ? (
+                      <CheckIcon size={18} />
+                    ) : check ? (
+                      <NonCheckCrossIcon size={18} />
+                    ) : (
+                      <NonCheckRightIcon size={18} color={colors.lightSubtitle} />
+                    )}
+                    <View style={styles.width} />
+                    <Text style={styles.subTitle12}>
+                      {i18n.t('change_password.lbl_at_least_one_uper') ??
                         'At least one uppercase and lowercase letter.'}
                     </Text>
                   </View>
@@ -310,7 +331,8 @@ const ASChangePasswordComponent = (prop: IASChangePasswordComponent) => {
                     </Text>
                   </View>
                 </View>
-              </View>
+                </ScrollView>
+              </View> 
 
               <View style={[styles.bottomSection]}>
                 <ASButton
@@ -347,7 +369,7 @@ const ASChangePasswordComponent = (prop: IASChangePasswordComponent) => {
         btnLabel={i18n.t('common.lbl_done') ?? 'Done'}
         type={'bottom'}
         isVisible={successModal}
-        icon={<SuccessBigIcon width={178} height={165} />}
+        icon={<SuccessTransactionIcon size={120} />}
         onConfirmBtnPress={() => {
           setSuccessModal(false), onPressContinue();
         }}
@@ -406,7 +428,8 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     marginHorizontal: 24,
-    marginTop: 102,
+    marginTop: 50,
+    marginBottom: Platform.OS === 'android' ? 20 : 5
   },
   header: {
     flexDirection: 'row',
@@ -422,7 +445,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 7,
   },
   width: {
     width: 11.5,

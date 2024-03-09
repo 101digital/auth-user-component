@@ -40,6 +40,6 @@ export class AuthComponent {
   }
 
   public removeSessionListener(listener: (...args: any[]) => any) {
-    DeviceEventEmitter.removeListener('authcomponent.session.expired', listener);
+    DeviceEventEmitter.removeAllListeners();
   }
 }

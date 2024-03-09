@@ -11,6 +11,16 @@ export interface Address {
   accountEmploymentId?: string;
 }
 
+export interface TaxDetail {
+  id?: string | null;
+  haveTaxNumberHandy?: boolean;
+  taxNumber?: string;
+  taxCountry?: string;
+  taxCountryCode?: string;
+  reason?: string;
+  reasonDetails?: string;
+}
+
 export interface ContactDetails {
   id: string;
   accountEmploymentId?: string;
@@ -149,6 +159,7 @@ export type AuthComponentConfig = {
   notificationEntityId?: string;
   enterpriseDataServicesBaseUrl?: string;
   ott?: string;
+  accountOriginationBaseUrl?: string;
   defaultCurrecyCode?: string;
 };
 
@@ -208,6 +219,17 @@ export enum AccountStatus {
   Prospect = 'Prospect',
 }
 
+export interface IOddMandatoryStatus {
+  isOdd: boolean;
+  oddType: string | undefined;
+}
+
+export enum OddTypes {
+  REVIEW_CYCLE = 'ReviewCycle',
+  INCREMENTAL_HIGH_RISK = 'IncrementalHighRisk',
+}
+
 export const ONE_TIME_TOKEN_KEY = 'original-token';
 export const IAM_ID_TOKEN_KEY = 'iam-id-token';
 export const CONTEXT_DATA_VALUES_KEY = 'step-up-token';
+export const EXCLUDE_STATUSES_FRAML_ODD = 'Completed,Rejected,Cancelled,Expired,Withdrawn';

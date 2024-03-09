@@ -51,8 +51,12 @@ const ASForgotPasswordCreateNewComponent = (prop: IASForgotPasswordCreateNewComp
     return /(?=.*\d)/.test(text.trim());
   };
 
-  const checkAtLeast1upperandLower = (text: string) => {
-    return /(?=.*[A-Z])(?=.*[a-z])/.test(text.trim());
+  const checkAtLeast1UppercaseCharacter = (text: string) => {
+    return /(?=.*[A-Z])/.test(text.trim());
+  };
+
+  const checkAtLeast1LowercaseCharacter = (text: string) => {
+    return /(?=.*[a-z])/.test(text.trim());
   };
 
   const checkSpecialCharacter = (text: string) => {
@@ -62,7 +66,8 @@ const ASForgotPasswordCreateNewComponent = (prop: IASForgotPasswordCreateNewComp
   const validationCheck = (val: string) => {
     if (
       checkIs8Character(val) &&
-      checkAtLeast1upperandLower(val) &&
+      checkAtLeast1LowercaseCharacter(val) &&
+      checkAtLeast1UppercaseCharacter(val) &&
       checkAtLeast1digit(val) &&
       checkSpecialCharacter(val)
     ) {
@@ -224,7 +229,7 @@ const ASForgotPasswordCreateNewComponent = (prop: IASForgotPasswordCreateNewComp
                       <View style={styles.checkIconStyle}>
                         <CheckIcon size={16} color={colors.lightSubtitle} />
                       </View>
-                    ) : checkAtLeast1upperandLower(values.createNew) ? (
+                    ) : checkAtLeast1LowercaseCharacter(values.createNew) ? (
                       <View style={styles.checkIconStyle}>
                         <CheckIcon size={16} />
                       </View>
@@ -235,7 +240,27 @@ const ASForgotPasswordCreateNewComponent = (prop: IASForgotPasswordCreateNewComp
                     )}
                     <View style={styles.width} />
                     <Text style={styles.subTitle12}>
-                      {i18n.t('change_password.lbl_at_least_one_lower_uper') ??
+                      {i18n.t('change_password.lbl_at_least_one_lower') ??
+                        'At least one uppercase and lowercase letter'}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    {!dirty ? (
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} color={colors.lightSubtitle} />
+                      </View>
+                    ) : checkAtLeast1UppercaseCharacter(values.createNew) ? (
+                      <View style={styles.checkIconStyle}>
+                        <CheckIcon size={16} />
+                      </View>
+                    ) : (
+                      <View style={styles.crossIconStyle}>
+                        <NonCheckIcon size={16} />
+                      </View>
+                    )}
+                    <View style={styles.width} />
+                    <Text style={styles.subTitle12}>
+                      {i18n.t('change_password.lbl_at_least_one_uper') ??
                         'At least one uppercase and lowercase letter'}
                     </Text>
                   </View>

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -53,6 +53,7 @@ const ASLoginComponent: React.FC<ILogin> = (props: ILogin) => {
   const { verifyExistedUserByEmail } = useContext(RegistrationContext);
   const [isVisiblePassword, setIsVisiblePassword] = React.useState(false);
   const themeColors = useThemeColors();
+  const formRef = useRef();
 
   useEffect(() => {
     if (errorSignIn) {
@@ -73,6 +74,9 @@ const ASLoginComponent: React.FC<ILogin> = (props: ILogin) => {
         setIsLoading(false);
         if (response) {
           if (response.status && response.status === SINGLE_FACTOR_COMPLETED) {
+            if(formRef?.current) {
+              formRef.current.resetForm();
+            }
             onLoginSuccess();
           } else if (response.error?.code === PASSWORD_LOCKED_OUT) {
             setErrorModal(true);
@@ -114,9 +118,10 @@ const ASLoginComponent: React.FC<ILogin> = (props: ILogin) => {
     setIsVisiblePassword(!isVisiblePassword);
   };
 
+
   return (
     <View style={styles.container}>
-      <Formik initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
+      <Formik innerRef={formRef} initialValues={SignInData.empty()} onSubmit={handleOnSignIn}>
         {({ submitForm, values }) => (
           <>
             <View style={styles.content}>
@@ -165,7 +170,7 @@ const ASLoginComponent: React.FC<ILogin> = (props: ILogin) => {
                   testID="login-forgot-password-button"
                 >
                   <Text style={styles.forgotPasswordTitle}>
-                    {i18n.t('login_component.btn_forgot_password') ?? 'Forgot password'}
+                    {i18n.t('login_component.trouble_shoot') ?? 'Forgot password'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -173,7 +178,7 @@ const ASLoginComponent: React.FC<ILogin> = (props: ILogin) => {
             <View>
               <ASButton
                 isLoading={isLoading}
-                label={i18n.t('common.lbl_continue') ?? 'Continue'}
+                label={i18n.t('common.lbl_login') ?? 'Continue'}
                 onPress={submitForm}
                 disabled={values.password.length < 8 || values.username.length === 0}
                 testId="login-continue-button"
@@ -216,7 +221,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
     paddingHorizontal: 5,
   },
   input: {
@@ -241,8 +246,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
   },
   forgotPasswordTitle: {
-    fontSize: 12,
-    fontFamily: fonts.OutfitSemiBold,
+    fontSize: 14  ,
+    fontFamily: fonts.OutfitMedium,
+    fontWeight: "500",
+    lineHeight: 16,
+    textDecorationLine: 'underline'
   },
   helpTitle: {
     fontSize: 14,

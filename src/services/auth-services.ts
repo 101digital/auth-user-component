@@ -198,6 +198,21 @@ export class AuthServices {
           },
         }
       );
+    return { ...response.data, ...{ cookie: response.headers['set-cookie'][0] } };
+  };
+
+
+  changeUserPasswordForgot = async (flowId: string, email: string) => {
+    const body = {
+      username: email,
+    };
+    const response = await AuthApiClient.instance()
+      .getAuthApiClient()
+      .post(`flows/${flowId}`, body, {
+        headers: {
+          'Content-Type': 'application/vnd.pingidentity.password.forgot+json',
+        },
+      });
     return response.data;
   };
 
@@ -462,6 +477,33 @@ export class AuthServices {
     return response.data;
   };
 
+  public getODDApplicationList = async (userId: string, excludeStatus: string) => {
+    const { accountOriginationBaseUrl, accessToken } = this._configs!;
+    const response = await axios.get(
+      `${accountOriginationBaseUrl}/applications?pageSize=10&pageNumber=1&userId=${userId}&excludeStatuses=${excludeStatus}productId=FramlODD`,
+      {
+        headers: {
+          Authorization: `${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  };
+
+  updateODDReviewApplication = async (applicationId: string, data: any) => {
+    const { accountOriginationBaseUrl, accessToken } = this._configs!;
+    const response = await axios.patch(
+      `${accountOriginationBaseUrl}/applications/${applicationId}/statuses/EDD`,
+      data,
+      {
+        headers: {
+          Authorization: `${accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  };
+
   changeUserPasswordUsingRecoveryCode = async (
     recoveryCode: string,
     newPassword: string,
@@ -600,47 +642,31 @@ export class AuthServices {
 
   updateUserInfo = async (
     userId: string,
-    fullName: string,
-    nickname: string,
+    userAdditionalInfo: any,
     id: string,
     idType?: string,
     idIssuingCountry?: string
   ) => {
     const { membershipBaseUrl, accessToken } = this._configs!;
     let body = {};
-    console.log(
-      'service -> updateUserInfo',
-      userId,
-      fullName,
-      nickname,
-      id,
-      idType,
-      idIssuingCountry
-    );
     const updateInfoPayload = {
-      fullName: fullName,
-      nickName: nickname,
-      firstName: fullName.length > 100 ? fullName.slice(0, 99) : fullName,
-      lastName: fullName.length > 100 ? fullName.slice(0, 99) : fullName,
+      ...userAdditionalInfo,
+      firstName: userAdditionalInfo.fullName ? (userAdditionalInfo.fullName.length > 100 ? 
+        userAdditionalInfo.fullName.slice(0, 99) : 
+        userAdditionalInfo.fullName) : 'Noraini',
+      lastName: userAdditionalInfo.fullName ? (
+        userAdditionalInfo.fullName.length > 100 ? userAdditionalInfo.fullName.slice(0, 99) : userAdditionalInfo.fullName) 
+        : 'Binti Hassan',
     };
 
-    if (idType === PASSPORT) {
-      body = {
-        ...updateInfoPayload,
-        kycDetails: {
-          altIdNumber: id,
-          idType,
-          idIssuingCountry,
-        },
-      };
-    } else {
-      body = {
-        ...updateInfoPayload,
-        kycDetails: {
-          altIdNumber: id,
-        },
-      };
-    }
+    body = {
+      ...updateInfoPayload,
+      kycDetails: {
+        altIdNumber: id,
+        idType,
+        idIssuingCountry,
+      },
+    };
 
     const response = await axios.patch(`${membershipBaseUrl}/users/${userId}`, body, {
       headers: {
@@ -791,12 +817,16 @@ export class AuthServices {
         }
       );
 
-      console.log('response.data.currencyCode', response.data);
-
-      if (!response.data.data.currencyCode || response.data.data.currencyCode?.length === 0) {
+      if (!response.data.data) {
         return {
           data: {
-            ...response.data,
+            currencyCode: defaultCurrecyCode || "SGD",
+          },
+        };
+      } else if(!response.data.data.currencyCode || response.data.data.currencyCode?.length === 0) {
+        return {
+          data: {
+            ...response.data.data,
             currencyCode: defaultCurrecyCode,
           },
         };
